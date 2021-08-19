@@ -18682,6 +18682,16 @@ exports.data = {
             "grenade":{
                "jump":true
             }
+            },
+            {
+	        "name": "Short",
+	        "description": "Concer",
+	        "weapon": "weapon_hegrenade",
+	        "position": [-752.03125,-48.44181442260742,-161.5494384765625],
+	        "viewangles": [-20.786418914794922,142.87997436523438],
+	        "grenade": {
+		    "run": 2,
+	        }
          },
          {
             "name":[
@@ -23232,10 +23242,11 @@ exports.data = {
             ],
             "grenade":{
                "strength":0,
-               "run":22,
+               "run":27,
                "jump":true
             }
          },
+
          {
             "name":[
                "Tunnel",
@@ -23278,28 +23289,29 @@ exports.data = {
                "jump":true
             }
          },
-         {
-            "name":[
-               "Connector",
-               "Ticket Box"
-            ],
-            "weapon":"weapon_molotov",
-            "position":[
-               -696.25299072266,
-               -797.53302001953,
-               -263.96875
-            ],
-            "viewangles":[
-               0.063013792037964,
-               -92.795745849609
-            ],
-            "grenade":{
-               "run":29,
-               "recovery_yaw":-147,
-               "run_yaw":3,
-               "jump":true
-            }
-         },
+{
+	"name": "Ticket Box",
+	"description": "UnSafe",
+	"weapon": "weapon_molotov",
+	"position": [-658.880615234375,-787.4596557617188,-263.96875],
+	"viewangles": [-0.36799412965774536,-95.3957290649414],
+	"grenade": {
+		"run": 28,
+		"run_yaw": 3,
+		"recovery_yaw": -147,
+		"jump": true,
+	},
+},
+{
+	"name": "T Under Stairs",
+	"weapon": "weapon_molotov",
+	"position": [-522.1116943359375,-1465.2679443359375,-56.48345947265625],
+	"viewangles": [12.17201042175293,-65.6407241821289],
+	"grenade": {
+		"run": 5,
+	},
+},
+
          {
             "name":[
                "Palace Alley",
@@ -24475,7 +24487,7 @@ exports.data = {
                -167.96875
             ],
             "viewangles":[
-               3.1724038124084,
+               2.7724038124084,
                -88.746192932129
             ],
             "grenade":{
@@ -25275,7 +25287,7 @@ exports.data = {
             ],
             "grenade":{
                "run":18,
-               "delay":10,
+               "delay":9,
                "recovery_yaw":0,
                "jump":true
             }
@@ -25316,12 +25328,12 @@ exports.data = {
                -143.96875
             ],
             "viewangles":[
-               -7.2195935249329,
+               -6.9195935249329,
                -26.664148330688
             ],
             "grenade":{
                "run":25,
-               "delay":10,
+               "delay":9,
                "recovery_yaw":0,
                "jump":true
             }
@@ -25363,7 +25375,7 @@ exports.data = {
                -95.604301452637
             ],
             "grenade":{
-               "run":9,
+               "run":10,
                "delay":10,
                "recovery_yaw":0,
                "jump":true
@@ -26342,7 +26354,7 @@ exports.data = {
                -167.96875
             ],
             "viewangles":[
-               14.907538414001,
+               16.907538414001,
                -30.281921386719
             ],
             "grenade":{
@@ -26664,7 +26676,7 @@ exports.data = {
                -271.84219360352
             ],
             "viewangles":[
-               5.8279705047607,
+               4.8279705047607,
                124.69020843506
             ],
             "grenade":{
@@ -27178,26 +27190,6 @@ exports.data = {
             ],
             "grenade":{
                "run":11,
-               "jump":true
-            }
-         },
-         {
-            "name":[
-               "Unnamed",
-               "Stairs [20HP]"
-            ],
-            "weapon":"weapon_hegrenade",
-            "position":[
-               -195.03245544434,
-               -387.69235229492,
-               -167.828125
-            ],
-            "viewangles":[
-               2.5949611663818,
-               -32.345096588135
-            ],
-            "grenade":{
-               "run":19,
                "jump":true
             }
          },
