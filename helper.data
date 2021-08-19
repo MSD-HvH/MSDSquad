@@ -25650,7 +25650,7 @@ exports.data = {
          },
          {
             "name":[
-               "Unnamed",
+               "CT Stairs",
                "T Roof"
             ],
             "weapon":"weapon_hegrenade",
@@ -25660,11 +25660,11 @@ exports.data = {
                -39.96875
             ],
             "viewangles":[
-               -0.26935377717018,
+               -1.26935377717018,
                0.77622509002686
             ],
             "grenade":{
-               "run":12,
+               "run":14,
                "recovery_jump":true,
                "delay":11,
                "jump":true
@@ -26236,29 +26236,6 @@ exports.data = {
                "run":16,
                "run_yaw":90,
                "recovery_yaw":-90,
-               "jump":true
-            }
-         },
-         {
-            "name":[
-               "Tetris",
-               "Tetris"
-            ],
-            "weapon":"weapon_molotov",
-            "position":[
-               -538.29663085938,
-               -1466.1298828125,
-               -55.858974456787
-            ],
-            "viewangles":[
-               33.833099365234,
-               16.123876571655
-            ],
-            "grenade":{
-               "run":16,
-               "recovery_jump":true,
-               "recovery_yaw":-90,
-               "run_yaw":180,
                "jump":true
             }
          },
@@ -27655,8 +27632,8 @@ exports.data = {
                -39.96875
             ],
             "viewangles":[
-               0.61215204000473,
-               99.679962158203
+               -0.91215204000473,
+               100.679962158203
             ],
             "grenade":{
                "fov":5.12,
