@@ -18694,6 +18694,27 @@ exports.data = {
 	        }
          },
          {
+	"name": "Palace Enter",
+	"description": "Jump",
+	"weapon": "weapon_molotov",
+	"position": [-709.957763671875,-1286.763671875,-167.96875],
+	"viewangles": [1.2305010557174683,-52.26139450073242],
+	"grenade": {
+		"run": 16,
+		"jump": true,
+	},
+},
+{
+	"name": "Under Palace",
+	"weapon": "weapon_molotov",
+	"position": [-709.9581298828125,-1281.28466796875,-167.96875],
+	"viewangles": [-13.39,-55.74],
+	"grenade": {
+		"run": 7,
+		"recovery_yaw": 147,
+	},
+},
+         {
             "name":[
                "T Roof",
                "Middle of Boxes in A"
@@ -22883,6 +22904,16 @@ exports.data = {
             ]
          },
          {
+	"name": "Jungle Enter",
+	"weapon": "weapon_molotov",
+	"position": [-140.7424774169922,-2222.342041015625,-167.96875],
+	"viewangles": [-18.197031021118164,136.8964080810547],
+	"grenade": {
+		"run": 4,
+	},
+},
+
+         {
             "name":[
                "here",
                "Ramp Roof [1]"
@@ -23610,23 +23641,6 @@ exports.data = {
          },
          {
             "name":[
-               "Shop",
-               "Plant R wall"
-            ],
-            "description":"50HP",
-            "weapon":"weapon_hegrenade",
-            "position":[
-               -2061.5009765625,
-               -611.95275878906,
-               -167.96875
-            ],
-            "viewangles":[
-               3.3253712654114,
-               71.161743164063
-            ]
-         },
-         {
-            "name":[
                "Door",
                "Plant"
             ],
@@ -23644,6 +23658,15 @@ exports.data = {
                "run":11
             }
          },
+         {
+	"name": "Waiting",
+	"weapon": "weapon_hegrenade",
+	"position": [-2363.132568359375,-361.599853515625,-167.96875],
+	"viewangles": [-3.944632434844971,57.3568000793457],
+	"grenade": {
+		"run": 4,
+	},
+},
          {
             "name":[
                "Door",
@@ -25354,7 +25377,7 @@ exports.data = {
                -66.300231933594
             ],
             "grenade":{
-               "delay":17,
+               "delay":16,
                "recovery_yaw":0,
                "jump":true
             }
@@ -25500,7 +25523,7 @@ exports.data = {
                -171.57809448242
             ],
             "viewangles":[
-               -0.923832654953,
+               -2.323832654953,
                -75.215805053711
             ],
             "grenade":{
@@ -25510,6 +25533,17 @@ exports.data = {
                "jump":true
             }
          },
+         {
+	"name": "Stairs",
+	"weapon": "weapon_molotov",
+	"position": [119.38591766357422,-892.5599975585938,-39.96875],
+	"viewangles": [8.21701431274414,-158.0408172607422],
+	"grenade": {
+		"run": 15,
+		"jump": true,
+	},
+},
+
          {
             "name":[
                "window",
@@ -25807,13 +25841,23 @@ exports.data = {
                0.14600802958012
             ],
             "grenade":{
-               "run":27,
+               "run":28,
                "recovery_jump":true,
                "delay":32,
                "recovery_yaw":90,
                "jump":true
             }
          },
+         {
+	"name": "Balcony",
+	"weapon": "weapon_molotov",
+	"position": [138.40447998046875,-1591.0423583984375,-172.0667724609375],
+	"viewangles": [0.5161982178688049,-125.50568389892578],
+	"grenade": {
+		"run": 10,
+	},
+},
+
          {
             "name":[
                "Unnamed",
@@ -25831,7 +25875,7 @@ exports.data = {
             ],
             "grenade":{
                "recovery_jump":true,
-               "delay":20,
+               "delay":17,
                "jump":true
             }
          },
@@ -26208,28 +26252,6 @@ exports.data = {
          },
          {
             "name":[
-               "Ramp",
-               "Ramp"
-            ],
-            "description":"UNSAFE",
-            "weapon":"weapon_hegrenade",
-            "position":[
-               619.60595703125,
-               -1507.6899414063,
-               -263.96875
-            ],
-            "viewangles":[
-               20.775632858276,
-               176.28202819824
-            ],
-            "grenade":{
-               "run":9,
-               "run_yaw":90,
-               "jump":true
-            }
-         },
-         {
-            "name":[
                "tiao tai",
                "Stairs"
             ],
@@ -26248,28 +26270,6 @@ exports.data = {
                "run":16,
                "run_yaw":90,
                "recovery_yaw":-90,
-               "jump":true
-            }
-         },
-         {
-            "name":[
-               "Ramp",
-               "Ramp "
-            ],
-            "description":"UNSAFE",
-            "weapon":"weapon_molotov",
-            "position":[
-               619.53094482422,
-               -1507.6953125,
-               -263.96875
-            ],
-            "viewangles":[
-               20.608472824097,
-               174.98374938965
-            ],
-            "grenade":{
-               "run":9,
-               "run_yaw":90,
                "jump":true
             }
          },
@@ -26296,6 +26296,16 @@ exports.data = {
                "jump":true
             }
          },
+{
+	"name": "Waiting",
+	"weapon": "weapon_hegrenade",
+	"position": [616.390380859375,-1353.45263671875,-260.54583740234375],
+	"viewangles": [-16.8084537982940674,33.08810043334961],
+	"grenade": {
+		"jump": true,
+		"delay": 21,
+	},
+},
          {
             "name":[
                "tiao tai",
@@ -26364,6 +26374,16 @@ exports.data = {
             }
          },
          {
+	"name": "T Spawn [FD]",
+	"weapon": "weapon_molotov",
+	"position": [1004.0781860351563,-1253.96875,-108.96875],
+	"viewangles": [-16.114953994750977,75.5298843383789],
+	"grenade": {
+		"run": 3,
+	},
+},
+
+         {
             "name":[
                "gou men",
                "Connector"
@@ -26376,7 +26396,7 @@ exports.data = {
                -167.96875
             ],
             "viewangles":[
-               14.907538414001,
+               16.907538414001,
                -30.281921386719
             ],
             "grenade":{
@@ -26742,7 +26762,7 @@ exports.data = {
                -172.95622253418
             ],
             "viewangles":[
-               1.8038228750229,
+               -1.0038228750229,
                114.80462646484
             ],
             "grenade":{
@@ -27041,7 +27061,7 @@ exports.data = {
                -72.175369262695
             ],
             "viewangles":[
-               -8.8999767303467,
+               -8.5999767303467,
                -56.993118286133
             ],
             "grenade":{
@@ -27322,7 +27342,7 @@ exports.data = {
                117.15937805176
             ],
             "grenade":{
-               "run":8,
+               "run":9,
                "run_yaw":29,
                "jump":true
             }
@@ -27343,7 +27363,7 @@ exports.data = {
                117.49459075928
             ],
             "grenade":{
-               "run":8,
+               "run":9,
                "run_yaw":29,
                "jump":true
             }
@@ -27763,11 +27783,22 @@ exports.data = {
             ],
             "grenade":{
                "strength":0.5,
-               "run":2,
+               "run":5,
                "recovery_yaw":90,
                "jump":true
             }
          },
+         {
+	"name": "Waiting Ramp",
+	"weapon": "weapon_molotov",
+	"position": [1003.96875,-1219.776611328125,-108.96875],
+	"viewangles": [6.137602806091309,-166.54627990722656],
+	"grenade": {
+		"run": 16,
+		"jump": true,
+	},
+},
+
          {
             "name":[
                "Unnamed",
