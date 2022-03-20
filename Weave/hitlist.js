@@ -1,4 +1,4 @@
-var players = [];
+var players = []; //Made by Mased
 var screen = render.get_screen_size();
 
 ui.add_slider("Position x", "x", 10, screen[0])
