@@ -1,9 +1,5 @@
-var DEG2RAD = function(x){
-    return x * 3.1415926535 / 180
-}
-var RAD2DEG = function(x){
-    return x * 180 / 3.1415926535
-}
+var DEG2RAD = function(x){ return x * 3.1415926535 / 180 }
+var RAD2DEG = function(x){ return x * 180 / 3.1415926535 }
 
 function HSVtoRGB(h,s,v){
     var r, g, b, i, f, p, q, t;
@@ -31,6 +27,9 @@ function HSVtoRGB(h,s,v){
     ]
 }
 
+convars.set_int("crosshair", 0);
+
+var screen_size = render.get_screen_size()
 var rainbow = 0.00
 var rotationdegree = 0.000
 
@@ -61,10 +60,10 @@ var draw_svaston = function (x, y, size){
     rotationdegree = rotationdegree + vars.get_uint("js.crosshair_speed")
 }
 
-var screen_size = render.get_screen_size()
 function clantag(){ //? Clantag??
     draw_svaston(screen_size[0] / 2, screen_size[1] / 2, screen_size[1] / 2)
 }
 register_callback("render", clantag);
-
-convars.set_int("crosshair", 0);
+register_callback('unload', function(){
+    convars.set_int("crosshair", 1)
+})
