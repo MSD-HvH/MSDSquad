@@ -2,7 +2,6 @@ var anim = 0
 //Made by Mased
 register_callback("render", function() { 
     var a = ui.get_menu_alpha()
-    //cheat.log(ui.get_menu_alpha())
 
     if (a > 0) {
         var lerp = function(a, b, percentage) { return a + (b - a) * percentage }
