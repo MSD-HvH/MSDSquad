@@ -24,12 +24,12 @@ register_callback("render", function() {
         if(vars.is_bind_active(binds[i][0])) { activeBinds.push(binds[i][1]); }
     }
 
+    render.line([x, y - 1], [x + width * anim, y - 1], [170, 100, 255, 255 * anim], 2)
+    render.filled_rect([x, y], [width * anim, 15], [15, 15, 15, 255 * anim], 3)
+
+    render.text([x + 5, y], [255, 255, 255, 255 * anim], 9, 1, "keybinds")
+    
     for(var i = 0; i < activeBinds.length; i++) {
-        render.line([x, y - 1], [x + width * anim, y - 1], [170, 100, 255, 255 * anim], 2)
-        render.filled_rect([x, y], [width * anim, 15], [15, 15, 15, 255 * anim], 3)
-
-        render.text([x + 5, y], [255, 255, 255, 255 * anim], 9, 1, "keybinds")
-
         render.text([x + 5, y + 17 + (12 * i) * anim], [255, 255, 255, 255 * anim], 1, 1, activeBinds[i])
         render.text([x + width - 50, y + 17 + (12 * i) * anim], [255, 255, 255, 255 * anim], 1, 1, "[ toggled ] " )
     }
