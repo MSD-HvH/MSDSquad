@@ -20,7 +20,11 @@ function get_player() {
     }
 
     for(i in hitboxes) {
-        if(hitgroup == i) { hitgroup = hitboxes[i] }
+        if(hitgroup == i) { 
+             hitgroup = hitboxes[i] 
+        } else {
+             hitgroup = "generic"
+        }
     }
 
     function dmg_check(){
