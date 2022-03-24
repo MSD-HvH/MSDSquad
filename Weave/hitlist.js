@@ -30,7 +30,7 @@ function get_player() {
     if (attacker == entity.get_local_player() && userid != entity.get_local_player()) {
         players.push([
         userid_info.name, 
-        hitgroup.toString(), 
+        hitgroup, 
         dmg_check()])
     }
 
