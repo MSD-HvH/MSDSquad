@@ -1,4 +1,4 @@
-var players = []; //Made by Mased
+var players = []; //Made by mased
 var screen = render.get_screen_size();
 
 ui.add_slider("Position x", "x", 10, screen[0])
@@ -7,49 +7,34 @@ ui.add_slider("Position y", "y", 10, screen[1])
 function get_player() {
     var userid = entity.get_player_for_user_id(current_event.get_int("userid"))
     var attacker = entity.get_player_for_user_id(current_event.get_int("attacker"))
-
-    var userid_info = entity.get_player_info(userid);
-
+    var userid_info = entity.get_player_info(userid); 
     var hitgroup = current_event.get_int("hitgroup");
+    var hitboxes = {
+        1: "head",
+        2: "chest",
+        3: "stomach",
+        4: "left arm",
+        5: "right arm",
+        6: "right leg",
+        7: "left leg"
+    }
 
-    switch (hitgroup){
-    case 1:
-        hitgroup = "head";
-        break;
-    case 2:
-        hitgroup = "chest";
-        break;
-    case 3:
-        hitgroup = "stomach";
-        break;
-    case 4:
-        hitgroup = "left arm";
-        break;
-    case 5:
-        hitgroup = "right arm";
-        break;
-    case 6:
-        hitgroup = "right leg";
-        break;
-    case 7:
-        hitgroup = "left leg";
-        break;
-    default:
-        hitgroup = "generic";
+    for(i in hitboxes) {
+        if(hitgroup == i) { hitgroup = hitboxes[i] }
     }
 
     function dmg_check(){
-        if(current_event.get_int("dmg_health") >= 100){ return "fatal" } else { return current_event.get_int("dmg_health")}
+        if(current_event.get_int("dmg_health") >= 100) { return "fatal" } else { return current_event.get_int("dmg_health")}
     }
 
     if (attacker == entity.get_local_player() && userid != entity.get_local_player()) {
         players.push([
         userid_info.name, 
-        hitgroup, 
+        hitgroup.toString(), 
         dmg_check()])
     }
 
-    if(players.length >= 7) { players.length = 0 }
+    if(players.length > 7) { players.length = 0 }
 }
 
 function hitlogList() {
