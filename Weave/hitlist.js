@@ -10,6 +10,7 @@ function get_player() {
     var userid_info = entity.get_player_info(userid); 
     var hitgroup = current_event.get_int("hitgroup");
     var hitboxes = {
+        0: "generic",
         1: "head",
         2: "chest",
         3: "stomach",
@@ -21,10 +22,8 @@ function get_player() {
 
     for(i in hitboxes) {
         if(hitgroup == i) { 
-             hitgroup = hitboxes[i] 
-        } else {
-             hitgroup = "generic"
-        }
+            hitgroup = hitboxes[i] 
+        } 
     }
 
     function dmg_check(){
