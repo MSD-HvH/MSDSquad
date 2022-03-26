@@ -46,14 +46,11 @@ const hs_killsays = [
     "БЛЯ НИЩ ХУЯК ХУЯК И ТЕБЯ НЕТ КАК МОЖНО ТАКИМ БЫТЬ?????? ОБЬЯСНИСЬ БЛЯТЬ"
 ];
 
-function trashtalk() {
+register_callback("player_death", function () {
     if(vars.get_bool("js.trashtalk")){
-        var attacker = current_event.get_int("attacker");
-        var enemy = current_event.get_int("userid");
-        var enemy_index = entity.get_player_for_user_id(enemy);
+        var userid = entity.get_player_for_user_id(current_event.get_int("userid"))
+        var attacker = entity.get_player_for_user_id(current_event.get_int("attacker"))
         var enemies = entity.get_enemies();
-
-        var enemy_name = entity.get_player_info(enemy_index).name;
 
         if (attacker == entity.get_local_player() && userid != entity.get_local_player()) {
             for(i in enemies){
@@ -62,11 +59,8 @@ function trashtalk() {
                 } else {
                     killsay = normal_killsays[math.random_int(0, normal_killsays.length)]
                 }
-                cheat.execute_command("say " + enemy_name + ", " + killsay)
+                cheat.execute_command("say " + killsay)
             }
         }
     }
-
-}
-
-register_callback("player_death", trashtalk);
+})
