@@ -13,3 +13,7 @@ register_callback("createmove", function() {
         convars.set_int("cl_csm_rot_override", 0);
     }
 })
+
+register_callback("unload", function() {
+    convars.set_int("cl_csm_rot_override", 0);
+})
