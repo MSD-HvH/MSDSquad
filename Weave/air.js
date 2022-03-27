@@ -1,12 +1,8 @@
-function yes() {
-    if(!(user_cmd.get_buttons() & (1 << 1))){
-        cheat.log("On ground")
+register_callback("render", function() {
+    var flags = entity.get_flags(entity.get_local_player())
+    if(!(flags & (1 << 0))){
+        cheat.log("in air")
     } else {
-        cheat.log("In air")
-    }   
-
-    // (1 << 1) in air
-    // (1 << 2) in ctrl
-}
-
-register_callback('render', yes)
+        cheat.log("On ground")
+    }
+})
