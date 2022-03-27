@@ -1,11 +1,9 @@
-var playerFlags = entity.get_flags(entity.get_local_player());
-
 function yes() {
-    if(playerFlags & (1 << 0)){
-        vars.set_int("ragebot.weapons[2].hitchance", 70)
+    if(!(user_cmd.get_buttons() & (1 << 1))){
+        cheat.log("On ground")
     } else {
-        vars.set_int("ragebot.weapons[2].hitchance", 40)
+        cheat.log("In air")
     }   
 }
 
-register_callback('createmove', yes)
+register_callback('render', yes)
