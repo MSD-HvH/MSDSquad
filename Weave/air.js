@@ -4,6 +4,9 @@ function yes() {
     } else {
         cheat.log("In air")
     }   
+
+    // (1 << 1) in air
+    // (1 << 2) in ctrl
 }
 
 register_callback('render', yes)
