@@ -4,8 +4,13 @@ ui.add_slider("Clantag", "clantag", 1, 3)
 var lastTime = 0;
 var clantags = {
     1: [
-        " ", "N ", "N3 ", "Ne ", "Ne\\ ", "Ne\\/ ", "Nev ", "Nev3 ", "Neve ", "Neve| ", "Neve|2 ", "Never| ", "Never|_ ", "Neverl ", "Neverl0 ", "Neverlo ", "Neverlo5 ", "Neverlos ", "Neverlos3 ", "Neverlose ", "Neverlose. ", "Neverlose.< ", "Neverlose.c< ", "Neverlose.cc ",
-        "Neverlose.cc ", "Neverlose.c< ", "Neverlose.< ", "Neverlose. ", "Neverlose ", "Neverlos3 ", "Neverlos ", "Neverlo_ ", "Neverlo5 ", "Neverlo ", "Neverl_ ", "Never|0 ", "Never| ", "Neve|2 ", "Neve| ", "Neve ", "Nev3 ", "Nev ", "Ne\\/ ", "Ne\\ ", "Ne ", "N3 ", "N ", " ",
+        " ", "N ", "N3 ", "Ne ", "Ne\\ ", "Ne\\/ ", "Nev ", "Nev3 ", "Neve ", "Neve| ", 
+        "Neve|2 ", "Never| ", "Never|_ ", "Neverl ", "Neverl0 ", "Neverlo ", "Neverlo5 ", 
+        "Neverlos ", "Neverlos3 ", "Neverlose ", "Neverlose. ", "Neverlose.< ", "Neverlose.c< ", 
+        "Neverlose.cc ", "Neverlose.cc ", "Neverlose.c< ", "Neverlose.< ", "Neverlose. ", 
+        "Neverlose ", "Neverlos3 ", "Neverlos ", "Neverlo_ ", "Neverlo5 ", "Neverlo ", "Neverl_ ", 
+        "Never|0 ", "Never| ", "Neve|2 ", "Neve| ", "Neve ", "Nev3 ", "Nev ", "Ne\\/ ", "Ne\\ ", 
+        "Ne ", "N3 ", "N ", " ",
     ],
 
     2: [
