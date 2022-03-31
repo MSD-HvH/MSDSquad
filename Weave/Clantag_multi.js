@@ -1,5 +1,5 @@
 ui.add_slider("Speed", "speed", 1, 10)
-ui.add_slider("Clantag", "clantag", 1, 3)
+ui.add_slider("Clantag", "clantag", 1, 4)
 
 var lastTime = 0;
 var clantags = {
