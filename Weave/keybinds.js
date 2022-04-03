@@ -28,8 +28,8 @@ register_callback("render", function() {
     }
 
     for(var i = 0; i < activeBinds.length; i++) {
-        render.text([x + 5, y + 17 + (12 * i)], [255, 255, 255, 255 * (anim / 255)], 1, 1, activeBinds[i])
-        render.text([x + width - 50, y + 17 + (12 * i)], [255, 255, 255, 255 * (anim / 255)], 1, 1, "[ toggled ]" )
+        render.text([x + 5, y + 17 * (anim / 255) + (12 * i)], [255, 255, 255, 255 * (anim / 255)], 1, 1, activeBinds[i])
+        render.text([x + width - 50, y + 17 * (anim / 255) + (12 * i)], [255, 255, 255, 255 * (anim / 255)], 1, 1, "[ toggled ]" )
     }
 
     anim = lerp(anim, (activeBinds.length != 0 || ui.get_menu_alpha()) ? 255 : 0, 0.03)
