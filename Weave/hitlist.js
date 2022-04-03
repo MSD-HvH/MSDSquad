@@ -1,4 +1,6 @@
-var players = []; //Made by mased
+var players = [];
+var anim = 0;
+lerp = function(start, end, time, do_extraanim) { if(!do_extraanim && Math.floor(start) == end) return end; time = global_vars.frametime() * (time * 175); if(time < 0) time = 0.01; else if(time > 1) time = 1; return (end - start) * time + start }
 var screen = render.get_screen_size();
 
 ui.add_slider("Position x", "x", 10, screen[0])
@@ -21,9 +23,7 @@ function get_player() {
     }
 
     for(i in hitboxes) {
-        if(hitgroup == i) { 
-            hitgroup = hitboxes[i] 
-        } 
+        if(hitgroup == i) { hitgroup = hitboxes[i] }
     }
 
     function dmg_check(){
@@ -45,24 +45,27 @@ function hitlogList() {
     var hitlogPos = [vars.get_uint("js.x"), vars.get_uint("js.y")]
     var hitlogSize = [270, 14]
 
-    render.line([hitlogPos[0], hitlogPos[1] - 1], [hitlogPos[0] + hitlogSize[0], hitlogPos[1] - 1], [182, 79, 255, 255], 1.5)
-    render.filled_rect(hitlogPos, hitlogSize, [40, 40, 40, 200], 1)
+    render.line([hitlogPos[0], hitlogPos[1] - 1], [hitlogPos[0] + hitlogSize[0], hitlogPos[1] - 1], [182, 79, 255, 255 * (anim / 255)], 1.5)
+    render.filled_rect(hitlogPos, hitlogSize, [40, 40, 40, 200 * (anim / 200)], 1)
     
-    render.text([hitlogPos[0] + 8, hitlogPos[1] + 6], [255, 255, 255, 255], 5, 2, text[0])
-    render.text([hitlogPos[0] + 40, hitlogPos[1] + 6], [255, 255, 255, 255], 5, 2, text[1])
-    render.text([hitlogPos[0] + 123, hitlogPos[1] + 6], [255, 255, 255, 255], 5, 2, text[2])
-    render.text([hitlogPos[0] + 245, hitlogPos[1] + 6], [255, 255, 255, 255], 5, 2, text[3])
+    render.text([hitlogPos[0] + 8, hitlogPos[1] + 6], [255, 255, 255, 255 * (anim / 255)], 5, 2, text[0])
+    render.text([hitlogPos[0] + 40, hitlogPos[1] + 6], [255, 255, 255, 255 * (anim / 255)], 5, 2, text[1])
+    render.text([hitlogPos[0] + 123, hitlogPos[1] + 6], [255, 255, 255, 255 * (anim / 255)], 5, 2, text[2])
+    render.text([hitlogPos[0] + 245, hitlogPos[1] + 6], [255, 255, 255, 255 * (anim / 255)], 5, 2, text[3])
 
     for(var i in players){
-        render.line([hitlogPos[0] + 2, hitlogPos[1] + 25 + (12 * i)], [hitlogPos[0] + 2, hitlogPos[1] + 16 + (12 * i)], [84, 220, 120, 255], 1.5)
-        render.text([hitlogPos[0] + 8, hitlogPos[1] + 20 + (12 * i)], [255, 255, 255, 255], 5, 2, (i + "         " + players[i][0]))
-        render.text([hitlogPos[0] + 123, hitlogPos[1] + 20 + (12 * i)], [255, 255, 255, 255], 5, 2, (players[i][1]))
-        render.text([hitlogPos[0] + 245, hitlogPos[1] + 20 + (12 * i)], [255, 255, 255, 255], 5, 2, (players[i][2].toString()))
+        render.line([hitlogPos[0] + 2, hitlogPos[1] + 25 * (anim / 255) + (12 * i)], [hitlogPos[0] + 2, hitlogPos[1] + 16 + (12 * i)], [84, 220, 120, 255 * (anim / 255)], 1.5)
+        render.text([hitlogPos[0] + 8, hitlogPos[1] + 20 * (anim / 255) + (12 * i)], [255, 255, 255, 255 * (anim / 255)], 5, 2, (i + "         " + players[i][0]))
+        render.text([hitlogPos[0] + 123, hitlogPos[1] + 20 * (anim / 255) + (12 * i)], [255, 255, 255, 255 * (anim / 255)], 5, 2, (players[i][1]))
+        render.text([hitlogPos[0] + 245, hitlogPos[1] + 20 * (anim / 255) + (12 * i)], [255, 255, 255, 255 * (anim / 255)], 5, 2, (players[i][2].toString()))
     }
+
+    anim = lerp(anim, (players.length != 0 || ui.get_menu_alpha()) ? 255 : 0, 0.03)
+
 }
 
 register_callback("player_hurt", get_player)
 register_callback("render", hitlogList)
-register_callback('round_end', function(){
+register_callback('round_end', function() {
     players.length = 0
 })
