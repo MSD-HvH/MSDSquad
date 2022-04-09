@@ -1,5 +1,7 @@
 # MSDSquad
 
+[![Preview](https://i.imgur.com/vT0UVeY.jpeg "Preview")](https://github.com/MasedMSD/MSDSquad "Preview")
+
 Сделано было для Self-using
 
 api всех здесь находящися читов: 
