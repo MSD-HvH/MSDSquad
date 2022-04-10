@@ -1,12 +1,12 @@
 var anim = 0;
 var x = 0;
 var y = 0;
-var today = new Date();
-var hours = today.getHours() <= 9 ? "0" + today.getHours() + ":" : today.getHours();
-var minutes = today.getMinutes() <= 9 ? "0" + today.getMinutes() : today.getMinutes();
 var lerp = function(a, b, percentage) { return a + (b - a) * percentage; }
 
 register_callback("render", function() { 
+    var today = new Date();
+    var hours = today.getHours() <= 9 ? "0" + today.getHours() + ":" : today.getHours();
+    var minutes = today.getMinutes() <= 9 ? "0" + today.getMinutes() : today.getMinutes();
     var a = ui.get_menu_alpha() //Made by Mased
     var pos = ui.get_menu_position()
     var size = ui.get_menu_size()
