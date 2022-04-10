@@ -10,8 +10,8 @@ register_callback("render", function() {
     var pos = ui.get_menu_position()
     var size = ui.get_menu_size()
 
-    x = lerp(x, pos[0] + 100, global_vars.frametime() * 4); 
-    y = lerp(y, pos[1] + 150, global_vars.frametime() * 4)
+    x = lerp(x, pos[0] + 100, global_vars.frametime() * 6); 
+    y = lerp(y, pos[1] + 150, global_vars.frametime() * 6)
 
     if (a > 0) {
         render.filled_rect([x - 80, y - 220], [size[0], 40], [16,16,16, 255 * a], 4)
