@@ -1,7 +1,6 @@
-var anim = 0;
+var lerp = function(a, b, percentage) { return a + (b - a) * percentage; }
 var x = 0;
 var y = 0;
-var lerp = function(a, b, percentage) { return a + (b - a) * percentage; }
 
 register_callback("render", function() { 
     var today = new Date();
@@ -11,7 +10,6 @@ register_callback("render", function() {
     var pos = ui.get_menu_position()
     var size = ui.get_menu_size()
 
-    anim = lerp(anim, ui.get_menu_alpha() ? 255 : 0, 0.5)
     x = lerp(x, pos[0] + 100, global_vars.frametime() * 3); 
     y = lerp(y, pos[1] + 150, global_vars.frametime() * 3)
 
