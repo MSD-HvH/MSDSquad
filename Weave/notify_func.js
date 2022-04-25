@@ -6,7 +6,7 @@ var anim = 0
 
 function notify_func(x, y, w, h, color1, color2, rounding, timeout, moving, title, description){
     var lerp = function(a, b, percentage) { return a + (b - a) * percentage }
-    anim = lerp(anim, moving, 2 * global_vars.frametime()) //thanks @Magma
+    anim = lerp(anim, moving, 2 * global_vars.frametime())
     notify.push([x, y], [w, h], color1, color2, rounding, title, description)
 
     if(lasttime + timeout < global_vars.realtime()){
