@@ -3,7 +3,7 @@ ui.add_slider("Position X", "x", 5, screen[0])
 ui.add_slider("Position Y", "y", 5, screen[1])
 
 const in_bounds = function(vec, x, y, x2, y2) {
-    return (vec[0] > x) && (vec[1] > y) && (vec[0] < x2) && (vec[1] < x2)
+    return (vec[0] > x) && (vec[1] > y) && (vec[0] < x2) && (vec[1] < y2)
 }
 
 register_callback("render", function() {
