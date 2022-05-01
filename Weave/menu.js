@@ -183,7 +183,6 @@ ui.add_slider("Position X", "pos_x", 5, screen[0])
 ui.add_slider("Position Y", "pos_y", 5, screen[1])
 
 function menu() {
-    cheat.log(enabled["slider"].current.toString())
     var x = vars.get_uint("js.pos_x");
     var y = vars.get_uint("js.pos_y");
     var pos = ui.get_cursor_position();
