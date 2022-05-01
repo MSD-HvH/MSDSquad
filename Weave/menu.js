@@ -10,7 +10,7 @@ var enabled = {
     "RectColor2": { color: [255, 255, 255, 255], cached: [0, 0, 0, 255], anim: 0, enabled: false },
     "RectColor3": { color: [255, 255, 255, 255], cached: [0, 0, 0, 255], anim: 0, enabled: false },
     "rect3": { state: false, anim: 0 },
-    "slider": { current: 1, anim: 0 }
+    "slider": { current: 40, anim: 0 }
 }
 var cache = [0, 0]
 var size = [480, 360];
@@ -159,21 +159,22 @@ function AddColorPicker(pos, x, y, name, varname) {
     }
 }
 
-function AddSlider(pos, x, y, name, varname, min, max) { 
+function AddSlider(pos, x, y, name, varname, min, max) {
     var alpha = ui.get_menu_alpha()
+    var numb = 200
     if(alpha < 0.9) return
 
     enabled[varname].anim = Render.Lerp(enabled[varname].anim, 3, 8 * global_vars.frametime())
 
     render.filled_rect([x, y], [140, 10], [30, 30, 30, 255], 3)
-    render.filled_circle([(x + enabled[varname].current / max * 140) / (3 / enabled[varname].anim), y + 5], 8, [255, 255, 255, 155], 10)
+    render.filled_circle([(x + (enabled[varname].current - min) / (max - min) * 140), y + 5], 8, [255, 255, 255, 155], 10)
     render.text([x, y - 10], [255, 255, 255, 255], 5, 2, name)
-    render.text([x + 130, y - 10], [255, 255, 255, 255], 7, 2, enabled[varname].current.toString())
+    render.text([x + 130, y - 10], [255, 255, 255, 255], 7, 2, (enabled[varname].current).toString()) 
 
-    if (Render.CursorBox(pos, x, y - 5, x + 141, y + 10) && ui.is_mouse_down()){
+    if (Render.CursorBox(pos, x - 1, y - 4, x + 140.5, y + 10) && ui.is_mouse_down()){
         var cursor = pos
-        var slider_x = Math.floor((max * ((cursor[0] - x) / 140)))
-        current_slider = slider_x
+        var slider_x = Math.floor((max - min) * ((cursor[0] - x + 140 / ((max - min) / min)) / 140)); 
+        current_slider = slider_x 
         enabled[varname].current = current_slider
     }
 }
@@ -182,6 +183,7 @@ ui.add_slider("Position X", "pos_x", 5, screen[0])
 ui.add_slider("Position Y", "pos_y", 5, screen[1])
 
 function menu() {
+    cheat.log(enabled["slider"].current.toString())
     var x = vars.get_uint("js.pos_x");
     var y = vars.get_uint("js.pos_y");
     var pos = ui.get_cursor_position();
@@ -195,7 +197,7 @@ function menu() {
     AddCheckbox(pos, x + 10, y + 105, "Render Rect", "rect")
     AddCheckbox(pos, x + 80, y + 65, "Render Rect2", "rect2")
     AddCheckbox(pos, x + 80, y + 105, "Render Rect3 + slider", "rect3")
-    AddSlider(pos, x + 10, y + 230, "Slider", "slider", 0, 255)
+    AddSlider(pos, x + 10, y + 230, "Slider", "slider", 30, 300)
     AddColorPicker(pos, x + 80, y + 145, "Color3", "RectColor3")
     AddColorPicker(pos, x + 10, y + 185, "Color2", "RectColor2")
     AddColorPicker(pos, x + 10, y + 145, "Color", "RectColor")
