@@ -35,6 +35,9 @@ function Drag(pos, x, y, x2, y2, item) {
 }
 
 function AddCheckbox(pos, x, y, name, varname) {
+    var alpha = ui.get_menu_alpha()
+    if(alpha < 0.9) return
+
     if(ui.is_mouse_down()) {
         if(Render.CursorBox(pos, x, y, x + 20, y + 20)) {
             enabled[varname].state = true
@@ -53,8 +56,10 @@ function AddCheckbox(pos, x, y, name, varname) {
 }
 
 function AddColorPicker(pos, x, y, name, varname) {
-    render.text([x, y - 10], [255, 255, 255, 255], 5, 2, name)
+    var alpha = ui.get_menu_alpha()
+    if(alpha < 0.9) return
     render.filled_rect([x, y], [20, 20], enabled[varname].color, 3)
+    render.text([x, y - 10], [255, 255, 255, 255 * alpha], 5, 2, name)
     enabled[varname].anim = Render.Lerp(enabled[varname].anim, enabled[varname].enabled ? 3 : 0, 8 * global_vars.frametime())
     if(ui.is_mouse_down()) {
         if(Render.CursorBox(pos, x, y, x + 20, y + 20)) {
@@ -62,7 +67,7 @@ function AddColorPicker(pos, x, y, name, varname) {
         }
     }
     if(enabled[varname].enabled) {
-        render.filled_rect([x + 40, y], [150 / (3 / enabled[varname].anim), 180 / (3 / enabled[varname].anim)], [55, 55, 55, 255], 3)
+        render.filled_rect([x + 40, y], [150 / (3 / enabled[varname].anim), 180 / (3 / enabled[varname].anim)], [55, 55, 55, 255 * alpha], 3)
         render.filled_rect([x + 200, y], [20, 20], [78, 59, 255, 255 / (3 / enabled[varname].anim)], 3); y += 40
 
         var color = enabled[varname].cached
@@ -84,7 +89,6 @@ function AddColorPicker(pos, x, y, name, varname) {
             if (color[1] + color_x > 255) color_new[1] = 255
             if (color[0] + color_x > 255) color_new[0] = 255
             enabled[varname].color = color_new
-            cheat.log(enabled[varname].color.toString())
         }
 
         //Opacity
@@ -156,11 +160,15 @@ function AddColorPicker(pos, x, y, name, varname) {
 }
 
 function AddSlider(pos, x, y, name, varname, min, max) { 
+    var alpha = ui.get_menu_alpha()
+    if(alpha < 0.9) return
+
     enabled[varname].anim = Render.Lerp(enabled[varname].anim, 3, 8 * global_vars.frametime())
 
     render.filled_rect([x, y], [140, 10], [30, 30, 30, 255], 3)
     render.filled_circle([x + 8 + (1 * enabled[varname].current / 2) / (3 / enabled[varname].anim), y + 5], 8, [255, 255, 255, 155], 10)
     render.text([x, y - 10], [255, 255, 255, 255], 5, 2, name)
+    render.text([x + 130, y - 10], [255, 255, 255, 255], 7, 2, enabled[varname].current.toString())
 
     if (Render.CursorBox(pos, x, y - 5, x + 141, y + 10) && ui.is_mouse_down()){
         var cursor = pos
@@ -177,10 +185,11 @@ function menu() {
     var x = vars.get_uint("js.pos_x");
     var y = vars.get_uint("js.pos_y");
     var pos = ui.get_cursor_position();
+    var alpha = ui.get_menu_alpha()
 
-    render.filled_rect([x, y], size, [20, 20, 20, 255], 6)
-    render.line([x, y + 40], [x + size[0], y + 40], [23, 98, 219, 255], 2)
-    render.text([x + size[0] / 2, y + 20], [255, 255, 255, 255], 7, 4, "Mased")
+    render.filled_rect([x, y], size, [20, 20, 20, 255 * alpha], 6)
+    render.line([x, y + 40], [x + size[0], y + 40], [23, 98, 219, 255 * alpha], 2)
+    render.text([x + size[0] / 2, y + 20], [255, 255, 255, 255 * alpha], 7, 4, "Mased")
 
     AddCheckbox(pos, x + 10, y + 65, "Console.log", "log")
     AddCheckbox(pos, x + 10, y + 105, "Render Rect", "rect")
