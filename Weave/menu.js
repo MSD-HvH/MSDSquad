@@ -150,7 +150,7 @@ function AddColorPicker(pos, x, y, name, varname) {
     
         render.filled_rect([x + 50, y - 30], [60, 80], enabled[varname].color, 3)
         render.filled_rect([x + 120, y - 30], [60, 80], enabled[varname].cached, 3)
-		
+        
         if(ui.is_mouse_down()) {
             if(Render.CursorBox(pos, x + 200, y - 40, x + 220, y - 20)) {
                 enabled[varname].enabled = false
@@ -166,7 +166,7 @@ function AddSlider(pos, x, y, name, varname, min, max) {
     enabled[varname].anim = Render.Lerp(enabled[varname].anim, 3, 8 * global_vars.frametime())
 
     render.filled_rect([x, y], [140, 10], [30, 30, 30, 255], 3)
-    render.filled_circle([x + 8 + (1 * enabled[varname].current / 2) / (3 / enabled[varname].anim), y + 5], 8, [255, 255, 255, 155], 10)
+    render.filled_circle([(x + enabled[varname].current / max * 140) / (3 / enabled[varname].anim), y + 5], 8, [255, 255, 255, 155], 10)
     render.text([x, y - 10], [255, 255, 255, 255], 5, 2, name)
     render.text([x + 130, y - 10], [255, 255, 255, 255], 7, 2, enabled[varname].current.toString())
 
