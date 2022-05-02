@@ -10,7 +10,7 @@ var enabled = {
     "RectColor2": { color: [255, 255, 255, 255], cached: [0, 0, 0, 255], anim: 0, enabled: false },
     "RectColor3": { color: [255, 255, 255, 255], cached: [0, 0, 0, 255], anim: 0, enabled: false },
     "rect3": { state: false, anim: 0 },
-    "slider": { current: 40, anim: 0 }
+    "slider": { current: 30, anim: 0 }
 }
 var cache = [0, 0]
 var size = [480, 360];
@@ -97,7 +97,6 @@ function AddColorPicker(pos, x, y, name, varname) {
             var color_x = Math.floor(255 * (cursor[0] - x - 50) / 129)
             color_new_alpha = [color_non_cached[0], color_non_cached[1], color_non_cached[2], 255 - color_x]
             enabled[varname].cached = color_new_alpha
-            enabled[varname].color = color_new_alpha
         }
 
         render.filled_rect_gradient([x + 50, y + 106], [21.5, 20], [0, 0, 255, 255], [0, 255, 255, 255], [0, 255, 255, 255], [0, 0, 255, 255])
