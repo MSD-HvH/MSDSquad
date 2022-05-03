@@ -195,10 +195,12 @@ function AddCombobox(pos, x, y, name, varname, elements) {
     }
 
     enabled[varname].elements = elements
+    enabled[varname].anim = Render.Lerp(enabled[varname].anim, enabled[varname].enabled ? 255 : 0, 8 * global_vars.frametime())
 
-    render.filled_rect([x, y], [100, enabled[varname].height], [30, 30, 30, 255], 4)
+    render.filled_rect([x, y], [100, 20], [30, 30, 30, 255], 4)
+    render.filled_rect([x, y + 21], [100, (enabled[varname].height - 20) / (255 / enabled[varname].anim)], [30, 30, 30, 255 / (255 / enabled[varname].anim)], 4)
     render.rect([x, y], [100, 20], [55, 55, 55, 155], 3)
-    render.rect([x, y], [100, enabled[varname].height], [55, 55, 55, 155], 3)
+    render.rect([x, y + 21], [100, enabled[varname].height / (255 / enabled[varname].anim) - 20], [55, 55, 55, 155 / (255 / enabled[varname].anim)], 3)
     render.text([x, y - 10], [255, 255, 255, 255], 5, 2, name)
     render.text([x + 5, y + 9], [255, 255, 255, 255], 5, 2, elements[enabled[varname].current])
 
@@ -211,7 +213,7 @@ function AddCombobox(pos, x, y, name, varname, elements) {
                     enabled[varname].current = Number(i)
                 }
             }
-            render.text([x + 5, y + 30 + 20 * i], [255, 255, 255, 255], 5, 2, enabled[varname].elements[i])
+            render.text([x + 5, y + 30 + 20 * i], [255, 255, 255, 255 / (255 / enabled[varname].anim)], 5, 2, enabled[varname].elements[i])
         }
     }
 }
@@ -230,10 +232,10 @@ function menu() {
     render.text([x + size[0] / 2, y + 20], [255, 255, 255, 255 * alpha], 7, 4, "Mased")
 
     AddCheckbox(pos, x + 10, y + 65, "Console.log", "log")
-    AddCheckbox(pos, x + 10, y + 105, "Render Rect", "rect")
-    AddCheckbox(pos, x + 80, y + 65, "Render Rect2", "rect2")
-    AddCheckbox(pos, x + 80, y + 105, "Render Rect3 + slider", "rect3")
-    AddSlider(pos, x + 10, y + 230, "Slider", "slider", 30, screen[0])
+    AddCheckbox(pos, x + 10, y + 105, "Rect", "rect")
+    AddCheckbox(pos, x + 80, y + 65, "Rect2", "rect2")
+    AddCheckbox(pos, x + 80, y + 105, "Rect3 + slider", "rect3")
+    AddSlider(pos, x + 10, y + 230, "Slider for rect3", "slider", 30, screen[0])
     AddColorPicker(pos, x + 80, y + 145, "Color3", "RectColor3")
     AddColorPicker(pos, x + 10, y + 185, "Color2", "RectColor2")
     AddColorPicker(pos, x + 10, y + 145, "Color", "RectColor")
