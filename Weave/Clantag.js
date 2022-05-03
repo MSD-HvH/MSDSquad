@@ -11,9 +11,7 @@ register_callback("render", function() {
 
     if(time != lastTime) {
         for(i in text) {
-            if((time % text.length) == i) {
-                cheat.set_clantag(text[i])
-            }
+            if((time % text.length) == i) cheat.set_clantag(text[i])
         }
     }
 })
