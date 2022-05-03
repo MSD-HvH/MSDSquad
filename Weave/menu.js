@@ -10,7 +10,8 @@ var enabled = {
     "RectColor2": { color: [255, 255, 255, 255], cached: [0, 0, 0, 255], anim: 0, enabled: false },
     "RectColor3": { color: [255, 255, 255, 255], cached: [0, 0, 0, 255], anim: 0, enabled: false },
     "rect3": { state: false, anim: 0 },
-    "slider": { current: 30, anim: 0 }
+    "slider": { current: 30, anim: 0 },
+    "combobox": { current: 0, anim: 0, enabled: false, height: 20, elements: [] }
 }
 var cache = [0, 0]
 var size = [480, 360];
@@ -51,8 +52,9 @@ function AddCheckbox(pos, x, y, name, varname) {
     enabled[varname].anim = Render.Lerp(enabled[varname].anim, enabled[varname].state ? 3 : 0, 8 * global_vars.frametime())
 
     render.text([x, y - 10], [255, 255, 255, 255], 5, 2, name)
-    render.filled_rect([x, y], [40, 15], [30, 30, 30, 155], 3)
-    render.filled_circle([x + 8 + (8 * enabled[varname].anim), y + 7], 6, enabled[varname].state ? [77, 255, 79, 155] : [255, 255, 255, 155], 10)
+    render.filled_rect([x, y], [40, 15], [30, 30, 30, 155], 5)
+    render.rect([x, y], [40, 15], [55, 55, 55, 155], 5)
+    render.filled_circle([x + 8 + (8 * enabled[varname].anim), y + 7.5], 6, enabled[varname].state ? [77, 255, 79, 155] : [255, 255, 255, 155], 10)
 }
 
 function AddColorPicker(pos, x, y, name, varname) {
@@ -160,13 +162,11 @@ function AddColorPicker(pos, x, y, name, varname) {
 
 function AddSlider(pos, x, y, name, varname, min, max) {
     var alpha = ui.get_menu_alpha()
-    var numb = 200
     if(alpha < 0.9) return
 
-    enabled[varname].anim = Render.Lerp(enabled[varname].anim, 3, 8 * global_vars.frametime())
-
-    render.filled_rect([x, y], [140, 10], [30, 30, 30, 255], 3)
-    render.filled_circle([(x + (enabled[varname].current - min) / (max - min) * 140), y + 5], 8, [255, 255, 255, 155], 10)
+    render.filled_rect([x, y], [140, 10], [30, 30, 30, 255], 4)
+    render.rect([x, y], [140, 10], [55, 55, 55, 155], 3)
+    render.filled_circle([(x + (enabled[varname].current - min) / (max - min) * 140), y + 5], 8, [255, 255, 255, 155], 15)
     render.text([x, y - 10], [255, 255, 255, 255], 5, 2, name)
     render.text([x + 130, y - 10], [255, 255, 255, 255], 7, 2, (enabled[varname].current).toString()) 
 
@@ -175,6 +175,44 @@ function AddSlider(pos, x, y, name, varname, min, max) {
         var slider_x = Math.floor((max - min) * ((cursor[0] - x + 140 / ((max - min) / min)) / 140)); 
         current_slider = slider_x 
         enabled[varname].current = current_slider
+    }
+}
+
+function AddCombobox(pos, x, y, name, varname, elements) {
+    var alpha = ui.get_menu_alpha()
+    if(alpha < 0.9) return
+
+    if(ui.is_mouse_down()) {
+        if(Render.CursorBox(pos, x, y, x + 100, y + 20)) {
+            enabled[varname].enabled = true
+            enabled[varname].height = 20 + 20 * elements.length
+        }
+
+        if(Render.CursorBox(pos, x + 102, y, x + 135, y + 20)) {
+            enabled[varname].enabled = false
+            enabled[varname].height = 20
+        }
+    }
+
+    enabled[varname].elements = elements
+
+    render.filled_rect([x, y], [100, enabled[varname].height], [30, 30, 30, 255], 4)
+    render.rect([x, y], [100, 20], [55, 55, 55, 155], 3)
+    render.rect([x, y], [100, enabled[varname].height], [55, 55, 55, 155], 3)
+    render.text([x, y - 10], [255, 255, 255, 255], 5, 2, name)
+    render.text([x + 5, y + 9], [255, 255, 255, 255], 5, 2, elements[enabled[varname].current])
+
+    
+    if(enabled[varname].enabled) {
+        render.filled_rect([x, y + 20 + 20 * enabled[varname].current], [100, 20], [55, 55, 55, 55], 4)
+        for(i in enabled[varname].elements) {
+            if(ui.is_mouse_down()) {
+                if(Render.CursorBox(pos, x, y + 20 + 20 * i, x + 100, y + 40 + 20 * i)) {
+                    enabled[varname].current = Number(i)
+                }
+            }
+            render.text([x + 5, y + 30 + 20 * i], [255, 255, 255, 255], 5, 2, enabled[varname].elements[i])
+        }
     }
 }
 
@@ -195,10 +233,11 @@ function menu() {
     AddCheckbox(pos, x + 10, y + 105, "Render Rect", "rect")
     AddCheckbox(pos, x + 80, y + 65, "Render Rect2", "rect2")
     AddCheckbox(pos, x + 80, y + 105, "Render Rect3 + slider", "rect3")
-    AddSlider(pos, x + 10, y + 230, "Slider", "slider", 30, 300)
+    AddSlider(pos, x + 10, y + 230, "Slider", "slider", 30, screen[0])
     AddColorPicker(pos, x + 80, y + 145, "Color3", "RectColor3")
     AddColorPicker(pos, x + 10, y + 185, "Color2", "RectColor2")
     AddColorPicker(pos, x + 10, y + 145, "Color", "RectColor")
+    AddCombobox(pos, x + 300, y + 65, "Combobox", "combobox", ["None", "White", "Purple", "Orange", "Pink"])
 
     Drag(pos, x, y, x + size[0], y + 40, "js.pos")
 }
@@ -227,8 +266,29 @@ function to_rect3() {
     }
 }
 
+function to_combo() {
+    switch (enabled["combobox"].current) {
+        case 1:
+            render.filled_rect([300, 300], [100, 100], [255, 255, 255, 255], 3)
+        break;
+
+        case 2:
+            render.filled_rect([300, 300], [100, 100], [255, 92, 135, 255], 3)
+        break;
+    
+        case 3:
+            render.filled_rect([300, 300], [100, 100], [3, 119, 252, 255], 3)
+        break;
+
+        case 4:
+            render.filled_rect([300, 300], [100, 100], [252, 92, 255, 255], 3)
+        break;
+    }
+}
+
 register_callback("render", menu)
 register_callback("render", log)
 register_callback("render", to_rect)
 register_callback("render", to_rect2)
 register_callback("render", to_rect3)
+register_callback("render", to_combo)
