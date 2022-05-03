@@ -13,6 +13,7 @@ var enabled = {
     "slider": { current: 30, anim: 0 },
     "combobox": { current: 0, anim: 0, enabled: false, height: 20, elements: [] }
 }
+var cache2 = {}
 var cache = [0, 0]
 var size = [480, 360];
 var Render = {
@@ -63,11 +64,13 @@ function AddColorPicker(pos, x, y, name, varname) {
     render.filled_rect([x, y], [20, 20], enabled[varname].color, 3)
     render.text([x, y - 10], [255, 255, 255, 255 * alpha], 5, 2, name)
     enabled[varname].anim = Render.Lerp(enabled[varname].anim, enabled[varname].enabled ? 3 : 0, 8 * global_vars.frametime())
-    if(ui.is_mouse_down()) {
-        if(Render.CursorBox(pos, x, y, x + 20, y + 20)) {
-            enabled[varname].enabled = true
-        }
+    
+    if(Render.CursorBox(pos, x, y, x + 20, y + 20)) {
+        col = enabled[varname].color.toString()
+        if(ui.is_mouse_down()) enabled[varname].enabled = true
+        render.text([pos[0] + 25, pos[1] + 10], [255, 255, 255, 255], 12, 2, col)
     }
+
     if(enabled[varname].enabled) {
         render.filled_rect([x + 40, y], [150 / (3 / enabled[varname].anim), 180 / (3 / enabled[varname].anim)], [55, 55, 55, 255 * alpha], 3)
         render.filled_rect([x + 200, y], [20, 20], [78, 59, 255, 255 / (3 / enabled[varname].anim)], 3); y += 40
@@ -152,8 +155,9 @@ function AddColorPicker(pos, x, y, name, varname) {
         render.filled_rect([x + 50, y - 30], [60, 80], enabled[varname].color, 3)
         render.filled_rect([x + 120, y - 30], [60, 80], enabled[varname].cached, 3)
         
-        if(ui.is_mouse_down()) {
-            if(Render.CursorBox(pos, x + 200, y - 40, x + 220, y - 20)) {
+
+        if(Render.CursorBox(pos, x + 200, y - 40, x + 220, y - 20)) {
+            if(ui.is_mouse_down()) {
                 enabled[varname].enabled = false
             }
         }
@@ -166,11 +170,11 @@ function AddSlider(pos, x, y, name, varname, min, max) {
 
     render.filled_rect([x, y], [140, 10], [30, 30, 30, 255], 4)
     render.rect([x, y], [140, 10], [55, 55, 55, 155], 3)
-    render.filled_circle([(x + (enabled[varname].current - min) / (max - min) * 140), y + 5], 8, [255, 255, 255, 155], 15)
+    render.filled_circle([(x + (enabled[varname].current - min) / (max - min) * 140), y + 5], 6, [255, 255, 255, 155], 15)
     render.text([x, y - 10], [255, 255, 255, 255], 5, 2, name)
     render.text([x + 130, y - 10], [255, 255, 255, 255], 7, 2, (enabled[varname].current).toString()) 
 
-    if (Render.CursorBox(pos, x - 1, y - 4, x + 140.5, y + 10) && ui.is_mouse_down()){
+    if (Render.CursorBox(pos, x - 1, y - 2, x + 140.5, y + 10) && ui.is_mouse_down()){
         var cursor = pos
         var slider_x = Math.floor((max - min) * ((cursor[0] - x + 140 / ((max - min) / min)) / 140)); 
         current_slider = slider_x 
@@ -218,6 +222,63 @@ function AddCombobox(pos, x, y, name, varname, elements) {
     }
 }
 
+function Config(pos, x, y) {
+    render.filled_rect([x, y], [100, 20], [30, 30, 30, 255], 4)
+    render.rect([x, y], [100, 20], [55, 55, 55, 155], 3)
+    render.text([x + 5, y + 9], [255, 255, 255, 255], 5, 2, "Save config")
+
+    render.filled_rect([x, y + 30], [100, 20], [30, 30, 30, 255], 4)
+    render.rect([x, y + 30], [100, 20], [55, 55, 55, 155], 3)
+    render.text([x + 5, y + 39], [255, 255, 255, 255], 5, 2, "Load config")
+
+    if(ui.is_mouse_down()) {
+        if(Render.CursorBox(pos, x, y, x + 100, y + 20)) {
+            for(i in enabled) {
+                if(enabled[i].state == undefined) continue
+                cache2[i] = {
+                    state: Number(enabled[i].state)
+                }
+            }
+
+            for(i in enabled) {
+                if(enabled[i].current == undefined) continue
+                cache2[i] = {
+                    current: enabled[i].current
+                }
+            }
+        
+            for(i in enabled) {
+                if(enabled[i].color == undefined) continue
+                cache2[i] = {
+                    color: enabled[i].color
+                }
+            }
+
+            utils.to_clipboard(JSON.stringify(cache2))
+            cheat.log("Config successfully saved!")
+        }
+
+        if(Render.CursorBox(pos, x, y + 30, x + 100, y + 50)) {
+            var cache = JSON.parse(utils.from_clipboard())
+            for(i in cache) {
+                if(cache[i].current == undefined) continue
+                enabled[i].current = cache[i].current
+            }
+
+            for(i in cache) {
+                if(cache[i].color == undefined) continue
+                enabled[i].color = cache[i].color
+            }
+
+            for(i in cache) {
+                if(cache[i].state == undefined) continue
+                enabled[i].state = cache[i].state
+            }
+            cheat.log("Config successfully loaded!")
+        }
+    }
+}
+
 ui.add_slider("Position X", "pos_x", 5, screen[0])
 ui.add_slider("Position Y", "pos_y", 5, screen[1])
 
@@ -239,9 +300,10 @@ function menu() {
     AddColorPicker(pos, x + 80, y + 145, "Color3", "RectColor3")
     AddColorPicker(pos, x + 10, y + 185, "Color2", "RectColor2")
     AddColorPicker(pos, x + 10, y + 145, "Color", "RectColor")
-    AddCombobox(pos, x + 300, y + 65, "Combobox", "combobox", ["None", "White", "Purple", "Orange", "Pink"])
+    AddCombobox(pos, x + 160, y + 65, "Combobox", "combobox", ["None", "White", "Purple", "Orange", "Pink"])
 
     Drag(pos, x, y, x + size[0], y + 40, "js.pos")
+    Config(pos, x + 370, y + 300)
 }
 
 function log() {
