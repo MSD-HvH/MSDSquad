@@ -223,6 +223,9 @@ function AddCombobox(pos, x, y, name, varname, elements) {
 }
 
 function Config(pos, x, y) {
+    var alpha = ui.get_menu_alpha()
+    if(alpha < 0.9) return
+
     render.filled_rect([x, y], [100, 20], [30, 30, 30, 255], 4)
     render.rect([x, y], [100, 20], [55, 55, 55, 155], 3)
     render.text([x + 5, y + 9], [255, 255, 255, 255], 5, 2, "Save config")
