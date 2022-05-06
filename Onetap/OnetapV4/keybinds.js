@@ -24,12 +24,13 @@ var binds = [
 UI.AddSubTab(["Visuals", "SUBTAB_MGR"], "Keybinds")
 UI.AddSliderInt(["Visuals", "Keybinds", "Keybinds"], "Keybinds | Position X", 1, screen[0])
 UI.AddSliderInt(["Visuals", "Keybinds", "Keybinds"], "Keybinds | Position Y", 1, screen[0])
-UI.AddColorPicker(["Visuals", "Keybinds", "Keybinds"], "Keybinds | Color")
+UI.AddColorPicker(["Visuals", "Keybinds", "Keybinds"], "Keybinds | Color"); UI.SetColor(["Visuals", "Keybinds", "Keybinds", "Keybinds | Color"], [180, 180, 255, 255])
 
 for(var i in binds) {
     data[binds[i][1]] = {
         name: binds[i][1],
         path: binds[i][0],
+        state: "",
         anim: 0
     }
 }
@@ -44,14 +45,16 @@ function on_draw() {
     var y = UI.GetValue(["Visuals", "Keybinds", "Keybinds", "Keybinds | Position Y"])
     var Color = UI.GetColor(["Visuals", "Keybinds", "Keybinds", "Keybinds | Color"])
     var font = Render.GetFont("Verdanab.ttf", 9, true)
+    var size = [160, 17]
     var masterActive = new Array
 
-    Render.FilledRect(x, y + 2, 140, 17, [0, 0, 0, 200 * (anim / 255)])
-    Render.FilledRect(x, y, 140, 2, [Color[0], Color[1], Color[2], Color[3] * (anim / 255)])
+    Render.FilledRect(x, y + 2, size[0], size[1], [0, 0, 0, 200 * (anim / 255)])
+    Render.FilledRect(x, y, size[0], 2, [Color[0], Color[1], Color[2], Color[3] * (anim / 255)])
     Render_StringShadow(x + 5, y + 3, 0, "keybinds", [255, 255, 255, 255 * (anim / 255)], font)
 
     for(var i in data) {
         data[i].anim = Lerp(data[i].anim, (UI.GetValue(data[i].path) || UI.IsMenuOpen()) ? 255 : 0.00, 0.2)
+        data[i].state = UI.GetHotkeyState(data[i].path)
         if(UI.GetValue(data[i].path)) {
             masterActive.push(data[i])
         }
@@ -59,7 +62,7 @@ function on_draw() {
 
     for(i = 0; i < masterActive.length; i++) {
         Render_StringShadow(x + 5, y + 20 + (12 * i) * (masterActive[i].anim / 255), 0, masterActive[i].name, [255, 255, 255, 255 * (masterActive[i].anim / 255)], font)
-        //render.text([x + width - 50, y + 17 * (masterActive[i].anim / 255) + (13 * i)], [255, 255, 255, 255 * (masterActive[i].anim / 255)], 1, 1, "[ toggled ]" )
+        Render_StringShadow(x + size[0] - 45 - masterActive[i].state.length / 3, y + 20 + (12 * i) * (masterActive[i].anim / 255), 0, "[ " + masterActive[i].state.toLowerCase() + " ]", [255, 255, 255, 255 * (masterActive[i].anim / 255)], font)
     }
 
     anim = Lerp(anim, (masterActive.length != 0 || UI.IsMenuOpen()) ? 255 : 0.00, 0.2)
