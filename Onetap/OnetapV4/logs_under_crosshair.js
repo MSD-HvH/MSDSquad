@@ -37,7 +37,7 @@ function get_player() {
 
     if(attacker == local && victim !== local) {
         logs_time.push(Globals.Curtime())
-        logs.push("[onetap] hit " + name + "'s " + hitgroup + " for " + damage + " (" + health + " remaining)")
+        logs.push("[onetap] hit " + name + "'s " + hitgroup + " for " + damage + " (" + health + ")")
         logs_anim_move.push(0)
         logs_anim_alpha.push(0)
     }
@@ -69,8 +69,8 @@ function on_render() {
         logs_anim_move[i] = Lerp(logs_anim_alpha[i], (logs_time[0] + 3.45 > Globals.Curtime()) ? 255 : 125, 0.2)
         if(scoped) scopeCheck = Lerp(scopeCheck, IsScoped ? 255 : 0, 0.2)
 
-        Render.String(((screen[0] / 2 - 89) + 100 * (logs_anim_move[i] / 254)) + 140 * (scopeCheck / 255), offset + 1 + (14 * i), 1, logs[i], [0, 0, 0, 255 * (logs_anim_alpha[i] / 255)], font)
-        Render.String(((screen[0] / 2 - 90) + 100 * (logs_anim_move[i] / 254)) + 140 * (scopeCheck / 255), offset + (14 * i), 1, logs[i], [255, 255, 255, 255 * (logs_anim_alpha[i] / 255)], font)
+        Render.String(((screen[0] / 2 - 89) + 100 * (logs_anim_move[i] / 254)) + (Render.TextSize(logs[i], font)[0] / 2) * (scopeCheck / 255), offset + 1 + (14 * i), 1, logs[i], [0, 0, 0, 255 * (logs_anim_alpha[i] / 255)], font)
+        Render.String(((screen[0] / 2 - 90) + 100 * (logs_anim_move[i] / 254)) + (Render.TextSize(logs[i], font)[0] / 2) * (scopeCheck / 255), offset + (14 * i), 1, logs[i], [255, 255, 255, 255 * (logs_anim_alpha[i] / 255)], font)
     }
 }
 
