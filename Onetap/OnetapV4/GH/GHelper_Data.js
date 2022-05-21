@@ -604,10 +604,690 @@ var locations = {
             "run_speed": true
       }
     },
+    //Smokes de_mirage
+    { 
+      "name" : ["UNNAMED", "Window"], 
+      "weapon" : "weapon_smokegrenade", 
+      "position" : [1422.9718017578125, 34.83058166503906, -167.96875], 
+      "viewangles" : [-26.53143310546875, -164.5767059326172],
+      "grenade" : {
+            "run": 8,
+            "run_yaw": -61,
+            "jump": true
+      }
+    },
+    
+    { 
+      "name" : ["UNNAMED", "Window"], 
+      "weapon" : "weapon_smokegrenade", 
+      "position" : [1390.0032958984375, 70.999267578125, -123.27919006347656], 
+      "viewangles" : [-31.23390769958496, -163.64817810058594],
+      "grenade" : {
+            "run": 6,
+            "run_yaw": -70,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Short"], 
+      "weapon" : "weapon_smokegrenade", 
+      "position" : [631.680908203125, 588.3298950195313, -123.96875], 
+      "viewangles" : [-11.147496223449707, -140.53599548339844],
+      "grenade" : {
+            "run": 14,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Under Palace"], 
+      "weapon" : "weapon_smokegrenade", 
+      "position" : [445.4247741699219, 679.96875, -165.96875], 
+      "viewangles" : [-22.584455490112305, -103.49903869628906],
+      "grenade" : {
+            "run": 9,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Pit"], 
+      "weapon" : "weapon_smokegrenade", 
+      "position" : [445.4247741699219, 679.96875, -165.96875], 
+      "viewangles" : [-13.52779769897461, -103.67060852050781],
+      "grenade" : {
+            "run": 8,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Firebox"], 
+      "weapon" : "weapon_smokegrenade", 
+      "position" : [445.4247741699219, 679.96875, -165.96875], 
+      "viewangles" : [-16.254722595214844, -112.90387725830078],
+      "grenade" : {
+            "run": 16,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "City"], 
+      "weapon" : "weapon_smokegrenade", 
+      "position" : [445.4247741699219, 679.96875, -165.96875], 
+      "viewangles" : [-18.867233276367188, -112.78784942626953],
+      "grenade" : {
+            "run": 22,
+            "jump": true
+      }
+    },
   ],
 
   "de_dust2": [
 
+  ],
+
+  "de_overpass": [
+    //Molotovs de_overpass
+    { 
+      "name" : ["UNNAMED", "Box Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "position" : [-647.0838623046875, -1912.11669921875, 144.86997985839844], 
+      "viewangles" : [2.264207601547241, 108.99774169921875],
+      "grenade" : {
+            "run": 15,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Fakeduck Fence"], 
+      "weapon" : "weapon_molotov", 
+      "position" : [-647.0127563476563, -1912.7479248046875, 144.88169860839844], 
+      "viewangles" : [-1.3933236598968506, 97.61421966552734],
+      "grenade" : {
+            "run": 16,
+            "jump": true,
+            "delay": 5
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Barrels"], 
+      "weapon" : "weapon_molotov", 
+      "description": "Unsafe",
+      "position" : [-548.7201538085938, -1159.087646484375, 66.01858520507813], 
+      "viewangles" : [-25.660598754882813, 102.37722778320313],
+      "grenade" : {
+            "run": 6
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description": "Unsafe",
+      "position" : [-548.739990234375, -1159.027099609375, 65.99625396728516], 
+      "viewangles" : [-22.99006462097168, 116.60057830810547],
+      "grenade" : {
+            "run": 1
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Holder"], 
+      "weapon" : "weapon_molotov", 
+      "description": "Safe",
+      "position" : [-299.3851623535156, -711.0493774414063, 65.9183120727539], 
+      "viewangles" : [-18.635900497436523, 174.82550048828125]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-206.18199157714844, -931.8660278320313, 25.676406860351563], 
+      "viewangles" : [-2.4384026527404785, 156.90103149414063],
+      "grenade" : {
+            "run": 10,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Squeaky"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-271.4228210449219, -755.3858032226563, 54.48004150390625], 
+      "viewangles" : [0.5223837494850159, -167.0389404296875],
+      "grenade" : {
+            "run": 3,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Holder"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1085.261474609375, -988.3677978515625, 0.4683523178100586], 
+      "viewangles" : [-3.6576361656188965, 149.36898803710938],
+      "grenade" : {
+            "run": 9
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "UnSafe", 
+      "position" : [-1085.262939453125, -988.372314453125, 0.48078155517578125], 
+      "viewangles" : [-0.5226372480392456, 150.76748657226563],
+      "grenade" : {
+            "run": 27,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Water Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1273.9539794921875, -1049.7537841796875, 0.03125], 
+      "viewangles" : [-25.60265350341797, 90.10443878173828],
+      "grenade" : {
+            "run": 3,
+            "jump": true,
+            "delay": 19
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Sniper Nest"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1273.987548828125, -1049.6644287109375, 0.03125], 
+      "viewangles" : [-6.6175150871276855, 105.4359359741211],
+      "grenade" : {
+            "run": 12,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Barrels"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1273.9798583984375, -1049.8211669921875, 0.03125], 
+      "viewangles" : [-26.125164031982422, 78.8997802734375],
+      "grenade" : {
+            "run": 12,
+            "jump": true,
+            "delay": 19
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Fakeduck Box"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1273.989501953125, -1049.7271728515625, 0.03125], 
+      "viewangles" : [-31.29214859008789, 87.6084213256836],
+      "grenade" : {
+            "run": 1,
+            "jump": true,
+            "delay": 23
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Fakeduck Fence"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1274.0228271484375, -1049.876708984375, 0.03125], 
+      "viewangles" : [-35.00772476196289, 70.19166564941406],
+      "grenade" : {
+            "run": 1,
+            "jump": true,
+            "delay": 22
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Column"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1274.01318359375, -1049.826171875, 0.03125], 
+      "viewangles" : [-36.40106201171875, 79.94491577148438],
+      "grenade" : {
+            "run": 3,
+            "jump": true,
+            "delay": 24
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Water"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1273.9259033203125, -1049.7476806640625, 0.03125], 
+      "viewangles" : [-35.820281982421875, 90.62905883789063],
+      "grenade" : {
+            "run": 2,
+            "jump": true,
+            "delay": 24
+      }
+    },    
+
+    { 
+      "name" : ["UNNAMED", "Water Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1537.25, -1046.070556640625, 5.271217346191406], 
+      "viewangles" : [-27.692495346069336, 74.83799743652344],
+      "grenade" : {
+            "run": 9,
+            "jump": true,
+            "delay": 20
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Column"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1537.257080078125, -1046.0888671875, 5.266061305999756], 
+      "viewangles" : [-23.918926239013672, 67.11663818359375],
+      "grenade" : {
+            "run": 4,
+            "jump": true,
+            "delay": 17
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Barrels"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1537.2535400390625, -1046.1190185546875, 5.2578229904174805], 
+      "viewangles" : [-28.969743728637695, 67.1798095703125],
+      "grenade" : {
+            "run": 12
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Water"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1537.2322998046875, -1046.04443359375, 5.263885498046875], 
+      "viewangles" : [-23.570568084716797, 76.9332275390625]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Fakeduck Fence"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1537.2615966796875, -1046.1256103515625, 5.255932331085205], 
+      "viewangles" : [-24.035017013549805, 53.18844985961914]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Box Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1537.252685546875, -1046.0692138671875, 5.271366119384766], 
+      "viewangles" : [-22.757801055908203, 74.20458984375]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Water Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1090.4520263671875, -638.96875, 96.03125], 
+      "viewangles" : [-34.65922546386719, 98.64595794677734],
+      "grenade" : {
+            "jump": true,
+            "delay": 28
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Barrels"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1090.4249267578125, -638.96875, 96.03125], 
+      "viewangles" : [-13.817317008972168, 84.24821472167969],
+      "grenade" : {
+            "jump": true,
+            "delay": 20
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Column"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1090.36279296875, -638.96875, 96.03125], 
+      "viewangles" : [-45.74784851074219, 84.70758819580078],
+      "grenade" : {
+            "jump": true,
+            "delay": 33
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Box Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1090.364013671875, -638.96875, 96.03125], 
+      "viewangles" : [-55.674442291259766, 107.86701202392578],
+      "grenade" : {
+            "jump": true,
+            "delay": 36
+      }
+    }, 
+
+    { 
+      "name" : ["UNNAMED", "Sniper Nest"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1090.479248046875, -638.975341796875, 96.03125], 
+      "viewangles" : [0.11692099273204803, 117.73648834228516],
+      "grenade" : {
+            "run": 3,
+            "jump": true,
+            "delay": 3
+      }
+    },
+    
+    { 
+      "name" : ["UNNAMED", "Fakeduck Fence"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1142.1943359375, -524.7232666015625, 70.02857971191406], 
+      "viewangles" : [-15.906421661376953, -66.34550476074219],
+      "grenade" : {
+            "run": 3,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Box Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1142.1551513671875, -524.7265014648438, 70.04834747314453], 
+      "viewangles" : [-25.71783447265625, -97.5240249633789],
+      "grenade" : {
+            "run": 7,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Holder"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1133.6072998046875, -570.7386474609375, 76.74398040771484], 
+      "viewangles" : [9.87021541595459, -162.6748046875],
+      "grenade" : {
+            "run": 5
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Water Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1264.094970703125, -707.9183959960938, 12.42047119140625], 
+      "viewangles" : [-49.8109245300293, 88.94535064697266],
+      "grenade" : {
+            "run": 2,
+            "jump": true,
+            "delay": 27
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Column"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1264.07568359375, -707.8499145507813, 12.439590454101563], 
+      "viewangles" : [-49.05617141723633, 72.63436889648438],
+      "grenade" : {
+            "run": 1,
+            "jump": true,
+            "delay": 28
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Water Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-865.7411499023438, -574.05517578125, 96.03125], 
+      "viewangles" : [-11.08787727355957, 114.50473022460938]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Barrels"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-865.7141723632813, -574.0995483398438, 96.03125], 
+      "viewangles" : [-11.958685874938965, 88.03386688232422]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Column"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-865.68701171875, -574.1245727539063, 96.03125], 
+      "viewangles" : [-30.07193946838379, 103.24693298339844]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Sniper Nest"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-856.03125, -638.96875, 96.03125], 
+      "viewangles" : [-23.62778663635254, 126.8756103515625],
+      "grenade" : {
+            "run": 9
+      }
+    },
+ 
+    { 
+      "name" : ["UNNAMED", "Water"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-856.03125, -638.96875, 96.03125], 
+      "viewangles" : [-29.491378784179688, 118.22786712646484]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Box"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1286.924072265625, 352.9606628417969, 25.51274871826172], 
+      "viewangles" : [-19.795949935913086, -69.64043426513672],
+      "grenade" : {
+            "jump": true,
+            "delay": 18
+      }
+    },    
+
+    { 
+      "name" : ["UNNAMED", "Box"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-856.0847778320313, 206.6951141357422, 96.03125], 
+      "viewangles" : [-28.736507415771484, -85.08562469482422]
+    },
+    
+    { 
+      "name" : ["UNNAMED", "Water"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-536.22412109375, -159.93492126464844, 1.7647173404693604], 
+      "viewangles" : [-13.235669136047363, 164.20741271972656]
+    },
+    
+    { 
+      "name" : ["UNNAMED", "Water"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-823.8862915039063, 70.98707580566406, 96.03125], 
+      "viewangles" : [-11.203720092773438, 145.74563598632813],
+      "grenade" : {
+            "run": 10,
+            "run_yaw": -84
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Barrels"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1394.6473388671875, -761.2427368164063, 22.62905502319336], 
+      "viewangles" : [-28.85261344909668, 70.39208221435547],
+      "grenade" : {
+            "run": 2,
+            "jump": true,
+            "delay": 21
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Column"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1394.5467529296875, -760.970458984375, 22.582378387451172], 
+      "viewangles" : [-63.105445861816406, 64.76073455810547],
+      "grenade" : {
+            "run": 11,
+            "jump": true,
+            "delay": 32
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Cement Plant"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1922.4791259765625, 495.8153991699219, 256.03125], 
+      "viewangles" : [-0.40541309118270874, 6.129662990570068],
+      "grenade" : {
+            "run": 8
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Box Plant"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "UnSafe", 
+      "position" : [-1890.8753662109375, 527.7951049804688, 256.03125], 
+      "viewangles" : [1.8006912469863892, -51.57754135131836],
+      "grenade" : {
+            "run": 19,
+            "run_yaw": 73
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-3086.704833984375, 628.5213012695313, 478.7351989746094], 
+      "viewangles" : [-36.98041534423828, -36.70798110961914],
+      "grenade" : {
+            "jump": true,
+            "delay": 26
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Stone"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-3558.316650390625, -275.30108642578125, 519.81201171875], 
+      "viewangles" : [-14.222664833068848, -105.09739685058594]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Far Stone"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-3558.361328125, -275.2852478027344, 519.808349609375], 
+      "viewangles" : [-16.835180282592773, -85.12385559082031],
+      "grenade" : {
+            "run": 1
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Truck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-2310.863525390625, 42.55207824707031, 476.03125], 
+      "viewangles" : [-55.848594665527344, 68.03152465820313],
+      "grenade" : {
+            "run": 6,
+            "jump": true
+      }
+    },
+    
+    //HE Grenades de_overpass
+    { 
+      "name" : ["UNNAMED", "Barrels"], 
+      "weapon" : "weapon_hegrenade", 
+      "description" : " ", 
+      "position" : [-619.1361694335938, -1199.816162109375, 91.94304656982422], 
+      "viewangles" : [5.108814239501953, 97.84629821777344],
+      "grenade" : {
+            "run": 15,
+            "jump": true,
+            "delay": 2
+      }
+    },
+     
+    { 
+      "name" : ["UNNAMED", "Column"], 
+      "weapon" : "weapon_hegrenade", 
+      "description" : "Safe", 
+      "position" : [-1090.483154296875, -638.9684448242188, 96.03125], 
+      "viewangles" : [-41.33466339111328, 84.86791229248047],
+      "grenade" : {
+            "jump": true,
+            "delay": 32
+      }
+    },
+    
+    { 
+      "name" : ["UNNAMED", "Water Fakeduck"], 
+      "weapon" : "weapon_hegrenade", 
+      "description" : "Safe", 
+      "position" : [-1090.9986572265625, -638.96875, 96.03125], 
+      "viewangles" : [-37.967445373535156, 93.28780364990234],
+      "grenade" : {
+            "run": 1,
+            "jump": true,
+            "delay": 29
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Sniper Nest"], 
+      "weapon" : "weapon_hegrenade", 
+      "description" : "Safe", 
+      "position" : [-856.03125, -638.96875, 96.03125], 
+      "viewangles" : [-22.931095123291016, 126.61674499511719],
+      "grenade" : {
+            "run": 19
+      }
+    },    
   ]
 }
 
