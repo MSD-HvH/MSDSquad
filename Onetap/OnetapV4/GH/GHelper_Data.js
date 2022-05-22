@@ -1288,6 +1288,351 @@ var locations = {
             "run": 19
       }
     },    
+  ],
+
+  "de_vertigo": [
+    //Molotovs de_vertigo
+    { 
+      "name" : ["UNNAMED", "Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Unsafe", 
+      "position" : [-2562.464111328125, -1483.9696044921875, 11776.03125], 
+      "viewangles" : [-1.1611180305480957, 89.91893615722656],
+      "grenade" : {
+            "run": 24,
+            "jump": true,
+            "delay": 1
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Holder"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1979.54638671875, -658.9588623046875, 11776.03125], 
+      "viewangles" : [-18.170507431030273, 62.22956848144531]
+    },
+
+    { 
+      "name" : ["UNNAMED", "1 Way Molotov"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1394.03125, 673.03125, 11841.0224609375], 
+      "viewangles" : [-8.997700691223145, -117.33386993408203]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Wall Dormant"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Unsafe", 
+      "position" : [-1716.03125, -295.9971618652344, 11791.126953125], 
+      "viewangles" : [-17.18360710144043, 117.67491912841797]
+    },
+    
+    { 
+      "name" : ["UNNAMED", "Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1772.692138671875, -64.16427612304688, 11776.03125], 
+      "viewangles" : [-25.94999122619629, 64.7401123046875]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Ventbox"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1772.72509765625, -64.1919937133789, 11776.03125], 
+      "viewangles" : [-49.404483795166016, 94.64868927001953],
+      "grenade" : {
+            "jump": true,
+            "delay": 26
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Holder"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1891.27294921875, -10.013579368591309, 11776.03125], 
+      "viewangles" : [-19.854232788085938, 25.30188751220703]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Fakeduck Cement"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1772.6505126953125, -64.13316345214844, 11776.03125], 
+      "viewangles" : [-29.83979606628418, 52.764644622802734],
+      "grenade" : {
+            "strength": 0.5
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Holder"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1298.8631591796875, 252.70225524902344, 11776.03125], 
+      "viewangles" : [-10.565381050109863, 125.63188171386719],
+      "grenade" : {
+            "run": 3
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Ventbox"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1298.848388671875, 252.6496124267578, 11776.03125], 
+      "viewangles" : [-1.56834077835083, 120.35391235351563],
+      "grenade" : {
+            "run": 15,
+            "jump": true,
+            "delay": 4
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Doublebox"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Unsafe", 
+      "position" : [-860.9940185546875, 600.3875732421875, 11873.03125], 
+      "viewangles" : [-10.624990463256836, 176.84178161621094],
+      "grenade" : {
+            "run": 5
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Box Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Unsafe", 
+      "position" : [-860.970458984375, 600.415283203125, 11873.03125], 
+      "viewangles" : [-7.896385192871094, 166.39431762695313],
+      "grenade" : {
+            "run": 1,
+            "run_speed": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Ventbox"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-905.2131958007813, 697.3753051757813, 11776.03125], 
+      "viewangles" : [-30.828319549560547, -178.67999267578125],
+      "grenade" : {
+            "jump": true,
+            "delay": 26
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Ventbox"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1161.2989501953125, 855.2252197265625, 11776.03125], 
+      "viewangles" : [-27.22882652282715, 170.6378936767578]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Box Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1330.51904296875, 963.0767822265625, 11776.03125], 
+      "viewangles" : [-33.208553314208984, -177.808837890625],
+      "grenade" : {
+            "jump": true,
+            "delay": 30
+      }
+    },
+ 
+    { 
+      "name" : ["UNNAMED", "Doublebox"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1330.4974365234375, 963.0809936523438, 11776.03125], 
+      "viewangles" : [-42.787784576416016, -165.55418395996094],
+      "grenade" : {
+            "run": 6,
+            "jump": true,
+            "delay": 31
+      }
+    },
+ 
+    { 
+      "name" : ["UNNAMED", "Cement Column"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1330.5535888671875, 963.1007080078125, 11776.03125], 
+      "viewangles" : [-33.963348388671875, -163.22215270996094],
+      "grenade" : {
+            "run": 6,
+            "jump": true,
+            "delay": 27
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Cement Column"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1650.8370361328125, 821.8159790039063, 11776.03125], 
+      "viewangles" : [-38.723934173583984, -166.29161071777344],
+      "grenade" : {
+            "jump": true,
+            "delay": 28
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Holder Wall + Doublebox"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-1650.8729248046875, 821.8106689453125, 11776.03125], 
+      "viewangles" : [-49.928672790527344, -152.4745635986328],
+      "grenade" : {
+            "jump": true,
+            "delay": 34
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-2493.62939453125, 154.61306762695313, 11788.03125], 
+      "viewangles" : [-31.699161529541016, 19.210620880126953]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Doublebox"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-2142.786376953125, -65.88362884521484, 11568.4775390625], 
+      "viewangles" : [-38.72400665283203, 124.8138427734375],
+      "grenade" : {
+            "run": 10,
+            "run_speed": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Cement Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-2142.7431640625, -65.8727798461914, 11568.4755859375], 
+      "viewangles" : [-31.64124298095703, 125.74259185791016]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Box Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-2278.904296875, -200.00173950195313, 11631.4873046875], 
+      "viewangles" : [-25.661468505859375, 86.79241943359375]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Box Fakeduck"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-2202.03125, 405.3469543457031, 11744.03125], 
+      "viewangles" : [-4.064806938171387, 136.71768188476563],
+      "grenade" : {
+            "run": 1,
+            "run_speed": true,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Ventbox"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-2323.382080078125, 418.6659851074219, 11744.03125], 
+      "viewangles" : [-0.3492434620857239, 55.32625961303711],
+      "grenade" : {
+            "run": 1,
+            "run_speed": true,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Holder"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [-2420.52783203125, 411.12091064453125, 11744.03125], 
+      "viewangles" : [-24.035888671875, 2.4401328563690186]
+    },
+    //HE Grenades de_vertigo
+    { 
+      "name" : ["UNNAMED", "Fakeduck"], 
+      "weapon" : "weapon_hegrenade", 
+      "description" : "Safe", 
+      "position" : [-1772.6605224609375, -64.1707992553711, 11776.03125], 
+      "viewangles" : [-25.893657684326172, 64.7363052368164]
+    },    
+
+    { 
+      "name" : ["UNNAMED", "Holder"], 
+      "weapon" : "weapon_hegrenade", 
+      "description" : "Safe", 
+      "position" : [-1298.842041015625, 252.72547912597656, 11776.03125], 
+      "viewangles" : [-10.0444917678833, 125.87373352050781],
+      "grenade" : {
+            "run": 4
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Fakeduck Cement"], 
+      "weapon" : "weapon_hegrenade", 
+      "description" : "Safe", 
+      "position" : [-1772.6602783203125, -64.1118392944336, 11776.03125], 
+      "viewangles" : [-30.13170051574707, 52.842369079589844]
+    },
+
+    { 
+      "name" : ["UNNAMED", "Box Fakeduck"], 
+      "weapon" : "weapon_hegrenade", 
+      "description" : "Safe", 
+      "position" : [-1330.484130859375, 963.0850219726563, 11776.03125], 
+      "viewangles" : [-33.44084167480469, -177.7494354248047],
+      "grenade" : {
+            "run": 2,
+            "run_speed": true,
+            "jump": true,
+            "delay": 30
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Doublebox"], 
+      "weapon" : "weapon_hegrenade", 
+      "description" : "Safe", 
+      "position" : [-1565.256103515625, 821.5519409179688, 11785.03125], 
+      "viewangles" : [-30.943634033203125, -167.1067352294922],
+      "grenade" : {
+            "jump": true,
+            "delay": 29
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Cement Fakeduck"], 
+      "weapon" : "weapon_hegrenade", 
+      "description" : "Safe", 
+      "position" : [-1565.151611328125, 822.1446533203125, 11785.03125], 
+      "viewangles" : [-34.659156799316406, -155.84877014160156],
+      "grenade" : {
+            "run": 4,
+            "run_speed": true,
+            "jump": true,
+            "delay": 29
+      }
+    },
   ]
 }
 
