@@ -1,4 +1,4 @@
-var value = 0
+var value = 0//https://neverlose.cc/market/item?id=5MQFwU
 var pow = Math.pow
 var sin = Math.sin
 var cos = Math.cos
