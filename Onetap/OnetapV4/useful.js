@@ -90,6 +90,15 @@ exports.Arc = function(x, y, radius, start_angle, percent, thickness, color) {
     }
 }
 
+/**
+ * 
+ * @param {Number} x Position x
+ * @param {Number} y position y
+ * @param {Number=} centered Text should be centered
+ * @param {String} text Text to render
+ * @param {[red: Number, green: Number, blue: Number, alpha: Number]} color Text color
+ * @param {Render.GetFont} font https://docs.onecrack.shop/onecrack-api/render#getfont
+ */
 exports.StringShadow = function(x, y, centered, text, color, font) {
     Render.String(x - 1, y - 1, centered, text, [0, 0, 0, color[3]], font)
     Render.String(x + 1, y - 1, centered, text, [0, 0, 0, color[3]], font)
@@ -98,12 +107,42 @@ exports.StringShadow = function(x, y, centered, text, color, font) {
     Render.String(x, y, centered, text, color, font)
 }
 
+/**
+ * @param {Number} x Position x
+ * @param {Number} y Position y
+ * @param {Number=} centered Text should be centered
+ * @param {[text: String, color: Array(red: Number, green: Number, blue: Number, alpha: number)][]} text Array of arrays with text information
+ * @param {Render.GetFont} font https://docs.onecrack.shop/onecrack-api/render#getfont
+ * @param {Number} slice Line spacing
+ * @param {Boolean=} shadow Text should have shadow
+ * 
+ * @example
+ * ```
+    const useful = require("useful.js")
+    const text = [
+        ["Missed", [255, 255, 255, 255]],
+        ["Mased", [255, 46, 46, 255]],
+        ["in the", [255, 255, 255, 255]],
+        ["neck", [255, 46, 46, 255]],
+        ["due to", [255, 255, 255, 255]],
+        ["resolver", [255, 46, 46, 255]]
+    ]
+
+
+    function on_draw() {
+        const font = Render.GetFont("Verdana.ttf", 11, true);
+        useful.multi_colored_text(500, 100, 0, text, font, 5, true)
+    }
+
+    Cheat.RegisterCallback("Draw", "on_draw")
+ * ```
+ */
 exports.multi_colored_text = function(x, y, centered, text, font, slice, shadow) {
     text.forEach(function(string, i) {
         if(string[0].startsWith("\n")) y += Render.TextSize(string[0], font)[1] + slice
 
-        if(shadow) Render.String(x + 1, y + 1, centered, string[0], [0, 0, 0, string[1][3]], font)
-        Render.String(x, y, centered, string[0], string[1], font)
+        if(shadow) Render.String(x + 1, y + 1, centered || 0, string[0], [0, 0, 0, string[1][3]], font)
+        Render.String(x, y, centered || 0, string[0], string[1], font)
 
         x += Render.TextSize(string[0], font)[0] + slice
     })
