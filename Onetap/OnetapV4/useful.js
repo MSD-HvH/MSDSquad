@@ -98,6 +98,17 @@ exports.StringShadow = function(x, y, centered, text, color, font) {
     Render.String(x, y, centered, text, color, font)
 }
 
+exports.multi_colored_text = function(x, y, centered, text, font, slice, shadow) {
+    text.forEach(function(string, i) {
+        if(string[0].startsWith("\n")) y += Render.TextSize(string[0], font)[1] + slice
+
+        if(shadow) Render.String(x + 1, y + 1, centered, string[0], [0, 0, 0, string[1][3]], font)
+        Render.String(x, y, centered, string[0], string[1], font)
+
+        x += Render.TextSize(string[0], font)[0] + slice
+    })
+}
+
 exports.OutLineCorner = function(x, y, w, h, size1, size2, color) {
     Render.Line(x - 2, y - 2, x + w - 2, y - 2, color)
     Render.Line(x - 2, y - 2, x - 2, y + h - 2, color)
