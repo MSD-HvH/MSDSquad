@@ -1,3 +1,5 @@
+//https://yougame.biz/threads/239797/
+
 function CreateErrorHandler(fnCallback) {
     Duktape.errCreate = function(e) {
         if(!(e instanceof Error) || 'thrown' in e || !Object.isExtensible(e))
