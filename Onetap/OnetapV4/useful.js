@@ -52,8 +52,8 @@ exports.Cheat = {
      * ```
      */
     PrintColor: function(text, color, dev) {
-        if(text == undefined) return throw_error("cheat.PrintColor()", "To use this method, you must have the text to print");
-        if(!color || typeof color != "object" || color.length < 4 || color.length > 4) return throw_error("cheat.print_color()", "To use this method, your color must be an Array with 4 elements: Red, Green, Blue, Alpha");
+        if(text == undefined) return throw_error("Cheat.PrintColor()", "To use this method, you must have the text to print");
+        if(!color || typeof color != "object" || color.length < 4 || color.length > 4) return throw_error("Cheat.PrintColor()", "To use this method, your color must be an Array with 4 elements: Red, Green, Blue, Alpha");
 
         if(typeof text == "object") return Cheat.PrintColor(color, JSON.stringify(text, null, 2) + (dev ? ": " + typeof text + "\n" : "\n"));
 
@@ -78,7 +78,7 @@ exports.Cheat = {
      * ```
      */
     PrintChat: function(text, dev) {
-        if(text == undefined) return throw_error("cheat.PrintChat()", "To use this method, you must have the text to print");
+        if(text == undefined) return throw_error("Cheat.PrintChat()", "To use this method, you must have the text to print");
 
         if(typeof text == "object") return Cheat.PrintChat(JSON.stringify(text, null, 2) + (dev ? ": " + typeof text + "\n" : "\n"));
 
@@ -99,7 +99,7 @@ exports.Cheat = {
      * ```
      */
     ExecuteCmd: function(cmd) {
-        if(!cmd || typeof cmd != "string") return throw_error("cheat.ExecuteCmd", "To use this method, you must have the command");
+        if(!cmd || typeof cmd != "string") return throw_error("Cheat.ExecuteCmd", "To use this method, you must have the command");
 
         return Cheat.ExecuteCommand(cmd);
     }
