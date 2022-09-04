@@ -7,47 +7,6 @@ const throw_error = function(method, string) {
     return Cheat.PrintColor([255, 0, 0, 255], "\nuseful.js \n - " + method + ": " + string + "\n");
 }
 
-const Vec3D = function(xx, yy, zz) {
-    this.x = xx;
-    this.y = yy;
-    this.z = zz;
-    this.length2d = function() {
-        return Math.sqrt(this.x * this.x + this.y * this.y);
-    }
-    this.length = function() {
-        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-    }
-    this.normalize = function(){
-        var l = this.length();
-        if (l != 0.0) this /= l;
-		else this.x = this.y = this.z = 0.0;
-		return l;
-    }
-    this.distto = function(vec){
-        var delta = new Vec3D;
-
-        delta.x = this.x - vec.x;
-        delta.y = this.y - vec.y;
-        delta.z = this.z - vec.z;
-
-        return delta.length();
-    }
-    this.toArray = function(){
-        return [this.x, this.y, this.z];
-    }
-    this.clamp = function(){
-        if (this.x < -89.0) this.x = -89.0;
-		if (this.x > 89.0) this.x = 89.0;
-		while (this.y < -180.0) this.y += 360.0;
-		while (this.y > 180.0)
-        this.y -= 360.0;
-
-		this.z = 0.0;
-		return this;
-    }
-    return this;
-}
-
 const screen = Render.GetScreenSize();
 
 /** Библиотека основанная на Cheat @link https://docs.onecrack.shop/onecrack-api/cheat */
@@ -176,7 +135,46 @@ exports.Math = {
         return this;
     },
 
-    Vec3D: Vec3D,
+    Vec3D: function(xx, yy, zz) {
+        this.x = xx;
+        this.y = yy;
+        this.z = zz;
+        this.length2d = function() {
+            return Math.sqrt(this.x * this.x + this.y * this.y);
+        }
+        this.length = function() {
+            return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        }
+        this.normalize = function(){
+            var l = this.length();
+            if (l != 0.0) this /= l;
+            else this.x = this.y = this.z = 0.0;
+            return l;
+        }
+        this.distto = function(vec){
+            var delta = new this;
+    
+            delta.x = this.x - vec.x;
+            delta.y = this.y - vec.y;
+            delta.z = this.z - vec.z;
+    
+            return delta.length();
+        }
+        this.toArray = function(){
+            return [this.x, this.y, this.z];
+        }
+        this.clamp = function(){
+            if (this.x < -89.0) this.x = -89.0;
+            if (this.x > 89.0) this.x = 89.0;
+            while (this.y < -180.0) this.y += 360.0;
+            while (this.y > 180.0)
+            this.y -= 360.0;
+    
+            this.z = 0.0;
+            return this;
+        }
+        return this;
+    },
 
     VectorAngles: function(forward, angles) {
         if (forward.y == 0.0 && forward.x == 0.0) {
@@ -220,7 +218,7 @@ exports.Math = {
     },
 
     CrossProduct: function(a,b) {
-        return new Vec3D(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+        return new this.Vec3D(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
     },
 
     DotProduct: function(a, b) {
@@ -236,8 +234,8 @@ exports.Math = {
     },
 
     CalcAngle: function(vec1, vec2) {
-        var qAngles = new Vec3D;
-        var delta = new Vec3D((vec1.x - vec2.x), (vec1.y - vec2.y), (vec1.z - vec2.z));
+        var qAngles = new this.Vec3D;
+        var delta = new this.Vec3D((vec1.x - vec2.x), (vec1.y - vec2.y), (vec1.z - vec2.z));
         var hyp = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
         qAngles.x = (Math.atan(delta.z / hyp) * (180.0 / Math.PI));
         qAngles.y = (Math.atan(delta.y / delta.x) * (180.0 / Math.PI));
