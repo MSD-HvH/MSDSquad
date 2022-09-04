@@ -1,4 +1,4 @@
-/** @author Mased | @version 1.0.7 */
+/** @author Mased | @version 1.0.9 */
 
 /** @author dermagister | @link https://yougame.biz/magister | @link https://yougame.biz/threads/221305 */
 const throw_error = function(method, string) {
