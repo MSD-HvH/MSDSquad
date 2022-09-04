@@ -329,6 +329,16 @@ exports.Render = {
         }
     },
 
+    /**
+     * 
+     * @param {Number} x Позиция по горизонтали (x)
+     * @param {Number} y Позиция по вертикали (y)
+     * @param {Number} radius Радиус круга
+     * @param {Number} start_angle 
+     * @param {Number} percent 
+     * @param {Number} thickness 
+     * @param {[red: Number, green: Number, blue: Number, alpha: Number]} color Цвет круга
+     */
     Arc: function(x, y, radius, start_angle, percent, thickness, color) {
         var precision = (2 * Math.PI) / 30;
         var step = Math.PI / 180;
@@ -438,11 +448,57 @@ exports.Render = {
         Render.Rect(x - 5, y - 5, w + 11, h + 12, [56, 56, 56, 255]);
     },
 
-    // Я хз, оно баганутое
+    /**
+     * Чесно говоря я хз как оно работает. Вроде все правильно, а вроде когда видишь - пишет false
+     * @param {Vec3D} origin 
+     */
     IsOnScreen: function(origin) {
         const w2s = Render.WorldToScreen(origin);
         if(!w2s) return false;
         return screen[0] + 270 > w2s[0] && screen[1] + 500 > w2s[1];
+    },
+
+    LerpColor: function(value, min, max) {
+        var r = min[0] * (1-value) + max[0] * value
+        var g = min[1] * (1-value) + max[1] * value
+        var b = min[2] * (1-value) + max[2] * value
+        var a = min[3] * (1-value) + max[3] * value
+        return [r, g, b, a]
+    },
+
+    /**
+     * Функция для рендера 4-х стороннего градиента
+     * @param {Number} x Позиция по горизонтали (x)
+     * @param {Number} y Позиция по вертикали (y)
+     * @param {Number} w Размер в ширину (width)
+     * @param {Number} h Размер в высоту (height)
+     * @param {[red: Number, green: Number, blue: Number, alpha: Number]} top_left Градиент сверху слева
+     * @param {[red: Number, green: Number, blue: Number, alpha: Number]} top_right Градиент сверху справа
+     * @param {[red: Number, green: Number, blue: Number, alpha: Number]} bottom_left Градинет снизу слева
+     * @param {[red: Number, green: Number, blue: Number, alpha: Number]} bottom_right Градиент снизу справа
+     * 
+     * @example
+     * ```
+     * const other = require("./useful.js");
+     * 
+     * function on_draw() {
+     *     Render.Gradient(100, 100, 100, 100, [255, 255, 255, 255], [255, 0, 0, 255], [0, 255, 0, 255], [0, 0, 255, 255])
+     * }
+     * 
+     * Cheat.RegisterCallback("Draw", "on_draw")
+     * ```
+     */
+    Gradient: function(x, y, w, h, top_left, top_right, bottom_left, bottom_right) {
+        if (h < w) {
+            for (i = 0; i < h; i++) {
+                Render.GradientRect(x, y + i, w, 1, 1, this.LerpColor(i / h, top_left, bottom_left), this.LerpColor(i / h, top_right, bottom_right))
+            }
+        }
+        else {
+            for (i = 0; i < w; i++) {
+                Render.GradientRect(x + i, y, 1, h, 0, this.LerpColor(i / w, top_left, top_right), this.LerpColor(i / w, bottom_left , bottom_right))
+            }
+        }
     }
 }
 
