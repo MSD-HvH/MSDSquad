@@ -466,6 +466,7 @@ exports.Render = {
         return [r, g, b, a]
     },
 
+    /** @author v4wt345 | @link https://brokencore.club/members/62786 | @link https://brokencore.club/resources/4167 */
     /**
      * Функция для рендера 4-х стороннего градиента
      * @param {Number} x Позиция по горизонтали (x)
