@@ -151,15 +151,6 @@ exports.Math = {
             else this.x = this.y = this.z = 0.0;
             return l;
         }
-        this.distto = function(vec){
-            var delta = new this;
-    
-            delta.x = this.x - vec.x;
-            delta.y = this.y - vec.y;
-            delta.z = this.z - vec.z;
-    
-            return delta.length();
-        }
         this.toArray = function(){
             return [this.x, this.y, this.z];
         }
