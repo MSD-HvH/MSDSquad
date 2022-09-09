@@ -28,9 +28,6 @@ const IsAnimating = function(anim) {
  * 
  * ***************
  * TODO: 
- * - Slider
- * - Checkbox
- * - Button
  * - ColorPicker
  * - Dropdown
  */
