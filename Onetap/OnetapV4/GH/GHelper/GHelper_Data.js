@@ -853,6 +853,18 @@ var locations = {
             "run": 10
       }
     },
+
+    { 
+      "name" : ["UNNAMED", "Firebox"], 
+      "weapon" : "weapon_hegrenade", 
+      "position" : [-1574.904296875, -2195.47802734375, -254.1384735107422], 
+      "viewangles" : [-23.9512882232666, -8.725075721740723],
+      "grenade" : {
+            "run": 10,
+            "jump": true,
+            "delay": 18
+      }
+    },
     //#endregion
 
     //#region Smokes de_mirage
@@ -2185,6 +2197,100 @@ var locations = {
             "jump": true
       }
     },
+
+    { 
+      "name" : ["UNNAMED", "Plant"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Unsafe", 
+      "position" : [2002.75048828125, 480.2315368652344, 160.03125], 
+      "viewangles" : [-47.15034866333008, -131.25662231445313],
+      "duck" : "true"
+    },
+
+    { 
+      "name" : ["UNNAMED", "Holder"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [1074.8731689453125, 589.545654296875, 106.85545349121094], 
+      "viewangles" : [-45.394657135009766, -46.65107345581055],
+      "grenade" : {
+            "run": 4,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Holder Between"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [462.1744689941406, 1967.2637939453125, 128.51473999023438], 
+      "viewangles" : [-45.520042419433594, 90.0975341796875],
+      "grenade" : {
+            "jump": true,
+            "delay": 1
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Church Boxes"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [615.6585083007813, 1873.02734375, 168.03125], 
+      "viewangles" : [-12.5397367477417, 95.32516479492188],
+      "grenade" : {
+            "jump": true,
+            "delay": 11
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Holder Wall"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [527.6359252929688, 1976.8319091796875, 128.03125], 
+      "viewangles" : [-51.789913177490234, 63.48951721191406],
+      "grenade" : {
+            "jump": true,
+            "delay": 30
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Holder Wall [2]"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [1015.4540405273438, 2781.9658203125, 128.02386474609375], 
+      "viewangles" : [-39.93962860107422, -115.46382141113281],
+      "grenade" : {
+            "run": 1,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Holder near Stairs"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [184.7441864013672, 701.6737060546875, 80.03125], 
+      "viewangles" : [-61.75926971435547, 179.7202911376953],
+      "grenade" : {
+            "run": 14,
+            "jump": true
+      }
+    },
+
+    { 
+      "name" : ["UNNAMED", "Pit R8 Fakeduck [2]"], 
+      "weapon" : "weapon_molotov", 
+      "description" : "Safe", 
+      "position" : [2050.321044921875, 1225.97607421875, 174.03125], 
+      "viewangles" : [-2.2284810543060303, -71.23729705810547],
+      "grenade" : {
+            "run": 1,
+            "jump": true,
+            "delay": 7
+      }
+    },
     //#endregion
 
     //#region HE de_inferno
@@ -2201,6 +2307,11 @@ var locations = {
             "delay": 28
       }
     },
+    //#endregion
+
+    //#region Smokes de_inferno
+
+
     //#endregion
   ],
 
@@ -2398,8 +2509,6 @@ var locations = {
 
     //#endregion
   ]
-
-
 }
 
 exports.locations = locations;
