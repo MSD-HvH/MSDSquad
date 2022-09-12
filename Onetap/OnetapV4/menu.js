@@ -24,12 +24,76 @@ const IsAnimating = function(anim) {
  * https://brokencore.club/members/1529
  * https://yougame.biz/members/228508
  * 
- * Текущая версия меню: 2.0.1
+ * Текущая версия меню: 2.1.4
  * 
  * ***************
- * TODO: 
+ * TODO:
  * - ColorPicker
  * - Dropdown
+ * 
+ * @example
+ * ```
+    const Menu = require("./menu2.js");
+    const Other = require("./useful.js");
+    const options = {
+        name: 'MSD Sync',
+        size: { width: 580, height: 480 },
+        colors: {
+            background: [31, 31, 31, 255],
+            outline: [117, 117, 117, 125],
+            accent: [64, 64, 64, 255],
+            accent_color: [147, 94, 250, 255],
+            fields: [44, 46, 49, 255],
+            text: [241, 241, 241, 255],
+            shadow: [0, 0, 0, 255],
+
+            elements: {
+                checkbox: {
+                    inner_background: [32, 32, 32, 255]
+                },
+
+                button: {
+                    inner_background: [32, 32, 32, 255]
+                },
+
+                slider: {
+                    inner_background: [32, 32, 32, 255],
+                    inner_line: [52, 52, 52, 255]
+                },
+
+                dropdown: {
+                    inner_background: [32, 32, 32, 255]
+                }
+            }
+        }
+    }
+
+    const menu = new Menu.CreateMenu(options);
+
+    menu.AddTab("Misc");
+    menu.AddTab("Visuals");
+    menu.AddTab("Rage");
+
+    menu.AddCheckbox(["Rage", "General"], "Checkbox")
+    menu.AddButton(["Rage", "General"], "click to crack $$ neverlose $$")
+    menu.AddLabel(["Rage", "General"], "Label", "Eto kakoy-to pizdec, ya v ahue")
+    menu.AddButton(["Rage", "General"], "click to crack $$ fatality $$")
+
+    menu.AddCheckbox(["Rage", "Main"], "Enable Resolver")
+    menu.AddSlider(["Rage", "Main"], "Slider", -105, 100, 0)
+    menu.AddCheckbox(["Rage", "Main"], "Enable skeet UI")
+    menu.AddButton(["Rage", "Main"], "click to crack $$ gamesense $$")
+    menu.AddDropdown(["Rage", "Main"], "drop daun ))0)", ["Rage", "What?", "Ho Ho Ho", "Yes"])
+
+    function on_draw() {
+        const position = menu.GetPosition();
+
+        menu.Drag(position[0], position[1], 140, 45, options.name);
+        menu.DrawUI(true);
+    }
+
+    Cheat.RegisterCallback("Draw", "on_draw");
+ * ```
  */
 
 exports.CreateMenu = function(options) {
@@ -68,13 +132,18 @@ exports.CreateMenu = function(options) {
         labels: [],
         items: [],
         active: [] // Нет, passive
-    } // Пиздец какой-то честно говоря, сейчас 23:19 08.09.22 и я хуй знает как я буду делать элементы
+    }; // Пиздец какой-то честно говоря, сейчас 23:19 08.09.22 и я хуй знает как я буду делать элементы
 
     this.animations = {
         ui: {
             background: 0,
             fields: 0,
-            fonts: 0
+            fonts: 0,
+            elements: {
+                width: 0,
+                height: 0,
+                alpha: 0
+            }
         }
     };
 
@@ -209,9 +278,13 @@ exports.CreateMenu = function(options) {
         const animations = this.GetAnimations();
         const animationSpeed = UI.GetValue(["Rage", options.name, options.name, options.name + "_anim"])
 
-        animations.ui.background = Other.Math.Lerp(animations.ui.background, UI.IsMenuOpen() ? 1 : 0, 0.09 * animationSpeed);
+        animations.ui.background = Other.Math.Lerp(animations.ui.background, UI.IsMenuOpen() ? 1 : 0, 0.2 * animationSpeed);
         animations.ui.fields = Other.Math.Lerp(animations.ui.fields, UI.IsMenuOpen() ? 1 : 0, 0.1 * animationSpeed);
         animations.ui.fonts = Other.Math.Lerp(animations.ui.fonts, UI.IsMenuOpen() ? 1 : 0, 0.1 * animationSpeed);
+
+        animations.ui.elements.width = Other.Math.Lerp(animations.ui.elements.width, UI.IsMenuOpen() ? 1 : 0, 0.1 * animationSpeed);
+        animations.ui.elements.height = Other.Math.Lerp(animations.ui.elements.height, UI.IsMenuOpen() ? 1 : 0, 0.1 * animationSpeed);
+        animations.ui.elements.alpha = Other.Math.Lerp(animations.ui.elements.alpha, UI.IsMenuOpen() ? 1 : 0, 0.1 * animationSpeed);
 
         return animations;
     };
@@ -296,6 +369,7 @@ exports.CreateMenu = function(options) {
         const options = this.GetOptions();
         const scale = this.GetScale();
         const sizes = this.GetElementsSize();
+        const animations = this.GetAnimations();
 
         const colors = options.colors;
         const fonts = {
@@ -315,21 +389,33 @@ exports.CreateMenu = function(options) {
 
         var add_height = { "General": 0, "Main": 0 };
 
+        const AddWidth = function(Element) {
+            return (Element.path[1] == "General" ? 0 : size[0] / 2 - 5) * animations.ui.elements.width.toFixed(3);
+        };
+
+        const AddHeight = function(Element) {
+            return (add_height[Element.path[1]] * animations.ui.elements.height.toFixed(3));
+        };
+
+        const AddAlpha = function(color) {
+            return [color[0], color[1], color[2], color[3] * animations.ui.elements.alpha.toFixed(3)]
+        };
+
         const draw_checkbox = function(E, x, y) {
-            Render.FilledRect(x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + add_height[E.path[1]], (sizes.checkbox[0] * scale), (sizes.checkbox[1] * scale), colors.elements.checkbox.inner_background);
-            Render.Rect(x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + add_height[E.path[1]], (sizes.checkbox[0] * scale), (sizes.checkbox[1] * scale), colors.outline);
+            Render.FilledRect(x + AddWidth(E), y + AddHeight(E), (sizes.checkbox[0] * scale), (sizes.checkbox[1] * scale), AddAlpha(colors.elements.checkbox.inner_background));
+            Render.Rect(x + AddWidth(E), y + AddHeight(E), (sizes.checkbox[0] * scale), (sizes.checkbox[1] * scale), AddAlpha(colors.outline));
 
-            if(E.value) Render.FilledRect(x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + add_height[E.path[1]], (sizes.checkbox[0] * scale), (sizes.checkbox[1] * scale), colors.accent_color);
+            if(E.value) Render.FilledRect(x + AddWidth(E), y + AddHeight(E), (sizes.checkbox[0] * scale), (sizes.checkbox[1] * scale), AddAlpha(colors.accent_color));
 
-            Render.String(x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5) + (sizes.checkbox[0] * scale) + 8, y + 1 + add_height[E.path[1]], 0, E.name, colors.shadow, fonts.checkbox);
-            Render.String(x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5) + (sizes.checkbox[0] * scale) + 7, y + add_height[E.path[1]], 0, E.name, colors.text, fonts.checkbox);
+            Render.String(x + AddWidth(E) + (sizes.checkbox[0] * scale) + 8, y + 1 + AddHeight(E), 0, E.name, AddAlpha(colors.shadow), fonts.checkbox);
+            Render.String(x + AddWidth(E) + (sizes.checkbox[0] * scale) + 7, y + AddHeight(E), 0, E.name, AddAlpha(colors.text), fonts.checkbox);
 
             if(Other.Other.CursorBox(
                 Input.GetCursorPosition(),
-                x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5),
-                y + add_height[E.path[1]],
-                x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5) + (sizes.checkbox[0] * scale),
-                y + add_height[E.path[1]] + (sizes.checkbox[1] * scale)
+                x + AddWidth(E),
+                y + AddHeight(E),
+                x + AddWidth(E) + (sizes.checkbox[0] * scale),
+                y + AddHeight(E) + (sizes.checkbox[1] * scale)
             ) && !IsAnimating(E.animation)) {
                 if(Input.IsKeyPressed(0x01)) E.value = !E.value
             }
@@ -340,18 +426,18 @@ exports.CreateMenu = function(options) {
         };
 
         const draw_button = function(E, x, y) {
-            Render.FilledRect(x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + add_height[E.path[1]], (sizes.button[0] * scale), (sizes.button[1] * scale), colors.elements.button.inner_background);
-            Render.Rect(x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + add_height[E.path[1]], (sizes.button[0] * scale), (sizes.button[1] * scale), colors.outline);
+            Render.FilledRect(x + AddWidth(E), y + AddHeight(E), (sizes.button[0] * scale), (sizes.button[1] * scale), AddAlpha(colors.elements.button.inner_background));
+            Render.Rect(x + AddWidth(E), y + AddHeight(E), (sizes.button[0] * scale), (sizes.button[1] * scale), AddAlpha(colors.outline));
         
-            Render.String(x + 1 + ((sizes.button[0] * scale) / 2) + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + 1 + add_height[E.path[1]], 1, E.name, colors.shadow, fonts.button);
-            Render.String(x + ((sizes.button[0] * scale) / 2) + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + add_height[E.path[1]], 1, E.name, colors.text, fonts.button);
+            Render.String(x + 1 + ((sizes.button[0] * scale) / 2) + AddWidth(E), y + 1 + AddHeight(E), 1, E.name, AddAlpha(colors.shadow), fonts.button);
+            Render.String(x + ((sizes.button[0] * scale) / 2) + AddWidth(E), y + AddHeight(E), 1, E.name, AddAlpha(colors.text), fonts.button);
 
             if(Other.Other.CursorBox(
                 Input.GetCursorPosition(),
-                x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5),
-                y + add_height[E.path[1]],
-                x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5) + (sizes.button[0] * scale),
-                y + add_height[E.path[1]] + (sizes.button[1] * scale)
+                x + AddWidth(E),
+                y + AddHeight(E),
+                x + AddWidth(E) + (sizes.button[0] * scale),
+                y + AddHeight(E) + (sizes.button[1] * scale)
             ) && !IsAnimating(E.animation)) {
                 if(Input.IsKeyPressed(0x01)) E.value = true
             }
@@ -362,30 +448,30 @@ exports.CreateMenu = function(options) {
         };
 
         const draw_slider = function(E, x, y) {
-            Render.FilledRect(x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + 5 + add_height[E.path[1]], (sizes.slider[0] * scale), (sizes.slider[1] * scale), colors.elements.slider.inner_background);
-            Render.FilledRect(x + 3 + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + 3 + 5 + add_height[E.path[1]], (sizes.slider[0] * scale) - 6, (sizes.slider[1] * scale) - 6, colors.elements.slider.inner_line);
-            Render.Rect(x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + 5 + add_height[E.path[1]], (sizes.slider[0] * scale), (sizes.slider[1] * scale), colors.outline);
+            Render.FilledRect(x + AddWidth(E), y + 5 + AddHeight(E), (sizes.slider[0] * scale), (sizes.slider[1] * scale), AddAlpha(colors.elements.slider.inner_background));
+            Render.FilledRect(x + 3 + AddWidth(E), y + 3 + 5 + AddHeight(E), (sizes.slider[0] * scale) - 6, (sizes.slider[1] * scale) - 6, AddAlpha(colors.elements.slider.inner_line));
+            Render.Rect(x + AddWidth(E), y + 5 + AddHeight(E), (sizes.slider[0] * scale), (sizes.slider[1] * scale), AddAlpha(colors.outline));
 
-            Render.FilledRect(x + 3 + ((E.value - E.min) / (E.max - E.min) * ((sizes.slider[0] * scale) - 9)) + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + 5 + add_height[E.path[1]], 3, 8, colors.accent_color)
+            Render.FilledRect(x + 3 + ((E.value - E.min) / (E.max - E.min) * ((sizes.slider[0] * scale) - 9)) + AddWidth(E), y + 5 + AddHeight(E), 3, 8, AddAlpha(colors.accent_color))
 
-            Render.String(x + 1 + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y - 11 + add_height[E.path[1]], 0, E.name, colors.shadow, fonts.slider)
-            Render.String(x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y - 12 + add_height[E.path[1]], 0, E.name, colors.text, fonts.slider)
+            Render.String(x + 1 + AddWidth(E), y - 11 + AddHeight(E), 0, E.name, AddAlpha(colors.shadow), fonts.slider)
+            Render.String(x + AddWidth(E), y - 12 + AddHeight(E), 0, E.name, AddAlpha(colors.text), fonts.slider)
 
-            Render.String(x + 1 + ((sizes.slider[0] * scale) - Render.TextSize((E.value).toString(), fonts.slider)[0]) + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y - 11 + add_height[E.path[1]], 0, (E.value).toString(), colors.shadow, fonts.slider)
-            Render.String(x + ((sizes.slider[0] * scale) - Render.TextSize((E.value).toString(), fonts.slider)[0]) + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y - 12 + add_height[E.path[1]], 0, (E.value).toString(), colors.text, fonts.slider)
+            Render.String(x + 1 + ((sizes.slider[0] * scale) - Render.TextSize((E.value).toString(), fonts.slider)[0]) + AddWidth(E), y - 11 + AddHeight(E), 0, (E.value).toString(), AddAlpha(colors.shadow), fonts.slider)
+            Render.String(x + ((sizes.slider[0] * scale) - Render.TextSize((E.value).toString(), fonts.slider)[0]) + AddWidth(E), y - 12 + AddHeight(E), 0, (E.value).toString(), AddAlpha(colors.text), fonts.slider)
 
             const percent = ((sizes.slider[0] * scale) - 3) / Math.abs(E.min - E.max);
 
             if(Other.Other.CursorBox(
                 Input.GetCursorPosition(),
                 x + (E.path[1] == "General" ? 0 : size[0] / 2 - 6),
-                y + 5 + add_height[E.path[1]],
+                y + 5 + AddHeight(E),
                 x + (E.path[1] == "General" ? 0 : size[0] / 2 - 6) + (sizes.slider[0] * scale),
-                y + 5 + add_height[E.path[1]] + (sizes.slider[1] * scale)
+                y + 5 + AddHeight(E) + (sizes.slider[1] * scale)
             )) {
                 if(Input.IsKeyPressed(0x01)) {
                     const cursor = Input.GetCursorPosition();
-                    const value = Other.Math.Clamp(Math.round(((cursor[0] - (x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5))) / percent) + E.min), E.min, E.max)
+                    const value = Other.Math.Clamp(Math.round(((cursor[0] - (x + AddWidth(E))) / percent) + E.min), E.min, E.max)
                     
                     E.value = value
                 }
@@ -395,30 +481,28 @@ exports.CreateMenu = function(options) {
         };
 
         const draw_label = function(E, x, y) {
-            Render.String(x + 1 + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + 1 + add_height[E.path[1]], 0, E.name, colors.shadow, fonts.label.title);
-            Render.String(x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + add_height[E.path[1]], 0, E.name, colors.text, fonts.label.title);
+            Render.String(x + 1 + AddWidth(E), y + 1 + AddHeight(E), 0, E.name, AddAlpha(colors.shadow), fonts.label.title);
+            Render.String(x + AddWidth(E), y + AddHeight(E), 0, E.name, AddAlpha(colors.text), fonts.label.title);
         
-            Render.Line(x + 1 + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + add_height[E.path[1]] + 8 + Render.TextSize(E.name, fonts.label.title)[1], x + 1 + (E.path[1] == "General" ? 0 : size[0] / 2 - 5) + 198, y + add_height[E.path[1]] + 8 + Render.TextSize(E.name, fonts.label.title)[1], [71, 71, 71, 155]);
+            Render.Line(x + 1 + AddWidth(E), y + AddHeight(E) + 8 + Render.TextSize(E.name, fonts.label.title)[1], x + 1 + AddWidth(E) + 198, y + AddHeight(E) + 8 + Render.TextSize(E.name, fonts.label.title)[1], AddAlpha([71, 71, 71, 155]));
         
             Render.String(
-                x + 1 + (E.path[1] == "General" ? 0 : size[0] / 2 - 5),
-                y + 1 + add_height[E.path[1]] + 8 + 5 + Render.TextSize(E.name, fonts.label.title)[1],
+                x + 1 + AddWidth(E),
+                y + 1 + AddHeight(E) + 8 + 5 + Render.TextSize(E.name, fonts.label.title)[1],
                 0,
                 E.value,
-                colors.shadow,
+                AddAlpha(colors.shadow),
                 fonts.label.text
             )
 
             Render.String(
-                x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5),
-                y + add_height[E.path[1]] + 8 + 5 + Render.TextSize(E.name, fonts.label.title)[1],
+                x + AddWidth(E),
+                y + AddHeight(E) + 8 + 5 + Render.TextSize(E.name, fonts.label.title)[1],
                 0,
                 E.value,
-                colors.text,
+                AddAlpha(colors.text),
                 fonts.label.text
             );
-
-            const new_stroke = E.value.match("\n")
 
             add_height[E.path[1]] += (10 + (Render.TextSize(E.name, fonts.label.title)[1]) + 8 + 5 + Render.TextSize(E.value, fonts.label.text)[1] * scale)
         };
@@ -426,13 +510,13 @@ exports.CreateMenu = function(options) {
         const draw_dropdown = function(E, x, y) {
             // var add_height_dropdown = 0
 
-            // Render.FilledRect(x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + add_height[E.path[1]], (sizes.dropdown[0] * scale), (sizes.dropdown[1] * scale) + add_height_dropdown, colors.elements.dropdown.inner_background)
-            // Render.Rect(x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + add_height[E.path[1]], (sizes.dropdown[0] * scale), (sizes.dropdown[1] * scale) + add_height_dropdown, colors.outline)
+            // Render.FilledRect(x + AddWidth(E), y + AddHeight(E), (sizes.dropdown[0] * scale), (sizes.dropdown[1] * scale) + add_height_dropdown, colors.elements.dropdown.inner_background)
+            // Render.Rect(x + AddWidth(E), y + AddHeight(E), (sizes.dropdown[0] * scale), (sizes.dropdown[1] * scale) + add_height_dropdown, colors.outline)
             
-            // Render.String(x + 1 + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y - 17 + add_height[E.path[1]], 0, E.name, colors.shadow, fonts.dropdown.title)
-            // Render.String(x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y - 18 + add_height[E.path[1]], 0, E.name, colors.text, fonts.dropdown.title)
+            // Render.String(x + 1 + AddWidth(E), y - 17 + AddHeight(E), 0, E.name, colors.shadow, fonts.dropdown.title)
+            // Render.String(x + AddWidth(E), y - 18 + AddHeight(E), 0, E.name, colors.text, fonts.dropdown.title)
 
-            // Render.String(x + 3 + (E.path[1] == "General" ? 0 : size[0] / 2 - 5), y + add_height[E.path[1]], 0, E.current || "", colors.text, fonts.dropdown.title)
+            // Render.String(x + 3 + AddWidth(E), y + AddHeight(E), 0, E.current || "", colors.text, fonts.dropdown.title)
 
             // if(E.value) {
             //     Cheat.Print("Hello \n")
@@ -440,10 +524,10 @@ exports.CreateMenu = function(options) {
 
             // if(Other.Other.CursorBox(
             //     Input.GetCursorPosition(),
-            //     x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5),
-            //     y + add_height[E.path[1]],
-            //     x + (E.path[1] == "General" ? 0 : size[0] / 2 - 5) + (sizes.dropdown[0] * scale),
-            //     y + add_height[E.path[1]] + (sizes.dropdown[1] * scale)
+            //     x + AddWidth(E),
+            //     y + AddHeight(E),
+            //     x + AddWidth(E) + (sizes.dropdown[0] * scale),
+            //     y + AddHeight(E) + (sizes.dropdown[1] * scale)
             // ) && !IsAnimating(E.animation)) {
             //     if(Input.IsKeyPressed(0x01)) E.value = true
             // }
