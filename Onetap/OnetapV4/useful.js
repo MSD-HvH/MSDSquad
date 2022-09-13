@@ -500,5 +500,34 @@ exports.Other = {
     SetDropdownValue: function(value, index, enable) {
         var mask = 1 << index;
         return enable ? (value | mask) : (value &~ mask)
+    },
+
+    /**
+     * Форматирует строку с помощью RegExp
+     * 
+     * @param {string} string Строка для изменения
+     * @param {object} options Параметры в строке
+     * @returns {string}
+     * 
+     * @example
+     * ```
+     * 
+        const Other = require("./useful.js");
+
+        const string = Other.Other.FormatString("Hello, {{username}}", {
+            username: Cheat.GetUsername()
+        });
+
+        Cheat.Print(string); // Output: Hello, Mased
+     *  ```
+     */
+    FormatString: function(string, options) {
+        if(options) {
+            Object.keys(options).forEach(function(option) {
+                string = string.replace(new RegExp("{{" + option + "}}", "g"), options[option])
+            })
+        }
+
+        return string
     }
 }
