@@ -234,10 +234,10 @@ exports.CreateMenu = function(options) {
     };
 
     this.GetScale = function() {
-        // const options = this.GetOptions();
+        const options = this.GetOptions();
 
-        // return UI.GetValue(["Rage", options.name, options.name, options.name + "_scale"]);
-        return 0.8
+        return UI.GetValue(["Rage", options.name, options.name, options.name + "_scale"]);
+        // return 0.8
     };
 
     this.GetData = function() {
@@ -448,26 +448,26 @@ exports.CreateMenu = function(options) {
         };
 
         const draw_slider = function(E, x, y) {
-            Render.FilledRect(x + AddWidth(E), y + 5 + AddHeight(E), (sizes.slider[0] * scale), (sizes.slider[1] * scale), AddAlpha(colors.elements.slider.inner_background));
-            Render.FilledRect(x + 3 + AddWidth(E), y + 3 + 5 + AddHeight(E), (sizes.slider[0] * scale) - 6, (sizes.slider[1] * scale) - 6, AddAlpha(colors.elements.slider.inner_line));
-            Render.Rect(x + AddWidth(E), y + 5 + AddHeight(E), (sizes.slider[0] * scale), (sizes.slider[1] * scale), AddAlpha(colors.outline));
-
-            Render.FilledRect(x + 3 + ((E.value - E.min) / (E.max - E.min) * ((sizes.slider[0] * scale) - 9)) + AddWidth(E), y + 5 + AddHeight(E), 3, 8, AddAlpha(colors.accent_color))
-
             Render.String(x + 1 + AddWidth(E), y - 11 + AddHeight(E), 0, E.name, AddAlpha(colors.shadow), fonts.slider)
             Render.String(x + AddWidth(E), y - 12 + AddHeight(E), 0, E.name, AddAlpha(colors.text), fonts.slider)
 
             Render.String(x + 1 + ((sizes.slider[0] * scale) - Render.TextSize((E.value).toString(), fonts.slider)[0]) + AddWidth(E), y - 11 + AddHeight(E), 0, (E.value).toString(), AddAlpha(colors.shadow), fonts.slider)
             Render.String(x + ((sizes.slider[0] * scale) - Render.TextSize((E.value).toString(), fonts.slider)[0]) + AddWidth(E), y - 12 + AddHeight(E), 0, (E.value).toString(), AddAlpha(colors.text), fonts.slider)
 
+            Render.FilledRect(x + AddWidth(E), y - 5 + AddHeight(E) + Render.TextSize(E.name, fonts.slider)[1], (sizes.slider[0] * scale), (sizes.slider[1] * scale), AddAlpha(colors.elements.slider.inner_background));
+            Render.FilledRect(x + 3 + AddWidth(E), y - 5 + 3 + AddHeight(E) + Render.TextSize(E.name, fonts.slider)[1], (sizes.slider[0] * scale) - 6, (sizes.slider[1] * scale) - 6, AddAlpha(colors.elements.slider.inner_line));
+            Render.Rect(x + AddWidth(E), y - 5 + AddHeight(E) + Render.TextSize(E.name, fonts.slider)[1], (sizes.slider[0] * scale), (sizes.slider[1] * scale), AddAlpha(colors.outline));
+
+            Render.FilledRect(x + 3 + ((E.value - E.min) / (E.max - E.min) * ((sizes.slider[0] * scale) - 9)) + AddWidth(E), y - 5 + AddHeight(E) + Render.TextSize(E.name, fonts.slider)[1], 3 * scale, 9 * scale, AddAlpha(colors.accent_color))
+
             const percent = ((sizes.slider[0] * scale) - 3) / Math.abs(E.min - E.max);
 
             if(Other.Other.CursorBox(
                 Input.GetCursorPosition(),
                 x + (E.path[1] == "General" ? 0 : size[0] / 2 - 6),
-                y + 5 + AddHeight(E),
+                y - 5 + AddHeight(E) + Render.TextSize(E.name, fonts.slider)[1],
                 x + (E.path[1] == "General" ? 0 : size[0] / 2 - 6) + (sizes.slider[0] * scale),
-                y + 5 + AddHeight(E) + (sizes.slider[1] * scale)
+                y - 5 + AddHeight(E) + Render.TextSize(E.name, fonts.slider)[1] + (sizes.slider[1] * scale)
             )) {
                 if(Input.IsKeyPressed(0x01)) {
                     const cursor = Input.GetCursorPosition();
@@ -477,7 +477,7 @@ exports.CreateMenu = function(options) {
                 }
             }
 
-            add_height[E.path[1]] += (sizes.slider[1] * scale) + 20;
+            add_height[E.path[1]] += (sizes.slider[1] + 5 * scale) + (20 * scale);
         };
 
         const draw_label = function(E, x, y) {
@@ -645,5 +645,5 @@ exports.CreateMenu = function(options) {
 
         data.dropdowns.push(dropdown);
         data.items.push(dropdown);
-    }
+    };
 };
