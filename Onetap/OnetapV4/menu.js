@@ -234,10 +234,10 @@ exports.CreateMenu = function(options) {
     };
 
     this.GetScale = function() {
-        const options = this.GetOptions();
+        // const options = this.GetOptions();
 
-        return UI.GetValue(["Rage", options.name, options.name, options.name + "_scale"]);
-        // return 0.8
+        // return UI.GetValue(["Rage", options.name, options.name, options.name + "_scale"]);
+        return 0.8
     };
 
     this.GetData = function() {
@@ -458,7 +458,7 @@ exports.CreateMenu = function(options) {
             Render.FilledRect(x + 3 + AddWidth(E), y - 5 + 3 + AddHeight(E) + Render.TextSize(E.name, fonts.slider)[1], (sizes.slider[0] * scale) - 6, (sizes.slider[1] * scale) - 6, AddAlpha(colors.elements.slider.inner_line));
             Render.Rect(x + AddWidth(E), y - 5 + AddHeight(E) + Render.TextSize(E.name, fonts.slider)[1], (sizes.slider[0] * scale), (sizes.slider[1] * scale), AddAlpha(colors.outline));
 
-            Render.FilledRect(x + 3 + ((E.value - E.min) / (E.max - E.min) * ((sizes.slider[0] * scale) - 9)) + AddWidth(E), y - 5 + AddHeight(E) + Render.TextSize(E.name, fonts.slider)[1], 3 * scale, 9 * scale, AddAlpha(colors.accent_color))
+            Render.FilledRect(x + 3 + ((E.value - E.min) / (E.max - E.min) * ((sizes.slider[0] * scale) - 9)) + AddWidth(E), y - 5 + AddHeight(E) + Render.TextSize(E.name, fonts.slider)[1], (3 * scale), (9 * scale), AddAlpha(colors.accent_color))
 
             const percent = ((sizes.slider[0] * scale) - 3) / Math.abs(E.min - E.max);
 
@@ -484,7 +484,7 @@ exports.CreateMenu = function(options) {
             Render.String(x + 1 + AddWidth(E), y + 1 + AddHeight(E), 0, E.name, AddAlpha(colors.shadow), fonts.label.title);
             Render.String(x + AddWidth(E), y + AddHeight(E), 0, E.name, AddAlpha(colors.text), fonts.label.title);
         
-            Render.Line(x + 1 + AddWidth(E), y + AddHeight(E) + 8 + Render.TextSize(E.name, fonts.label.title)[1], x + 1 + AddWidth(E) + 198, y + AddHeight(E) + 8 + Render.TextSize(E.name, fonts.label.title)[1], AddAlpha([71, 71, 71, 155]));
+            Render.Line(x + 1 + AddWidth(E), y + AddHeight(E) + 8 + Render.TextSize(E.name, fonts.label.title)[1], x + 1 + AddWidth(E) + (200 * scale), y + AddHeight(E) + 8 + Render.TextSize(E.name, fonts.label.title)[1], AddAlpha([71, 71, 71, 155]));
         
             Render.String(
                 x + 1 + AddWidth(E),
