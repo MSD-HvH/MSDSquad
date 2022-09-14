@@ -30,6 +30,8 @@ const IsAnimating = function(anim) {
  * TODO:
  * - ColorPicker
  * - Dropdown
+ * - Hotkey
+ * - MultiDropDown
  * 
  * @example
  * ```
@@ -88,7 +90,7 @@ const IsAnimating = function(anim) {
     function on_draw() {
         const position = menu.GetPosition();
 
-        menu.Drag(position[0], position[1], 140, 45, options.name);
+        menu.Drag(position[0], position[1], 140, 45, this.options.name);
         menu.DrawUI(true);
     }
 
@@ -103,24 +105,24 @@ exports.CreateMenu = function(options) {
 
     var currentTab = tabs[0] || "";
 
-    UI.AddSubTab(["Rage", "SUBTAB_MGR"], options.name);
-    UI.AddSliderInt(["Rage", options.name, options.name], options.name + "_x", 0, screen[0]);
-    UI.AddSliderInt(["Rage", options.name, options.name], options.name + "_y", 0, screen[1]);
-    UI.AddSliderFloat(["Rage", options.name, options.name], options.name + "_scale", 0.80, 1.5);
-    UI.AddSliderFloat(["Rage", options.name, options.name], options.name + "_anim", 0.5, 3);
-    // Как много options.name, но это защита от даунов
-    this.ui = {
-        subtab: ["Rage", options.name, options.name],
-        pos_x: ["Rage", options.name, options.name, options.name + "_x"],
-        pos_y: ["Rage", options.name, options.name, options.name + "_y"],
-        scale: ["Rage", options.name, options.name, options.name + "_scale"],
-        animSpeed: ["Rage", options.name, options.name, options.name + "_anim"],
-    };
-
     this.options = {
         name: options.name,
         colors: options.colors,
         size: options.size
+    };
+
+    UI.AddSubTab(["Rage", "SUBTAB_MGR"], this.options.name);
+    UI.AddSliderInt(["Rage", this.options.name, this.options.name], this.options.name + "_x", 0, screen[0]);
+    UI.AddSliderInt(["Rage", this.options.name, this.options.name], this.options.name + "_y", 0, screen[1]);
+    UI.AddSliderFloat(["Rage", this.options.name, this.options.name], this.options.name + "_scale", 0.80, 1.5);
+    UI.AddSliderFloat(["Rage", this.options.name, this.options.name], this.options.name + "_anim", 0.5, 3);
+
+    this.ui = {
+        subtab: ["Rage", this.options.name, this.options.name],
+        pos_x: ["Rage", this.options.name, this.options.name, this.options.name + "_x"],
+        pos_y: ["Rage", this.options.name, this.options.name, this.options.name + "_y"],
+        scale: ["Rage", this.options.name, this.options.name, this.options.name + "_scale"],
+        animSpeed: ["Rage", this.options.name, this.options.name, this.options.name + "_anim"],
     };
 
     this.data = {
@@ -236,7 +238,7 @@ exports.CreateMenu = function(options) {
     this.GetScale = function() {
         // const options = this.GetOptions();
 
-        // return UI.GetValue(["Rage", options.name, options.name, options.name + "_scale"]);
+        // return UI.GetValue(["Rage", this.options.name, this.options.name, this.options.name + "_scale"]);
         return 0.8
     };
 
@@ -276,7 +278,7 @@ exports.CreateMenu = function(options) {
 
     this.DrawAnimations = function() {
         const animations = this.GetAnimations();
-        const animationSpeed = UI.GetValue(["Rage", options.name, options.name, options.name + "_anim"])
+        const animationSpeed = UI.GetValue(["Rage", this.options.name, this.options.name, this.options.name + "_anim"])
 
         animations.ui.background = Other.Math.Lerp(animations.ui.background, UI.IsMenuOpen() ? 1 : 0, 0.2 * animationSpeed);
         animations.ui.fields = Other.Math.Lerp(animations.ui.fields, UI.IsMenuOpen() ? 1 : 0, 0.1 * animationSpeed);
@@ -310,8 +312,8 @@ exports.CreateMenu = function(options) {
         };
     
         if (drag[item].is_dragging && UI.IsMenuOpen()) {
-            UI.SetValue(['Rage', options.name, options.name, item + '_x'], Input.GetCursorPosition()[0] + drag[item].drag_position[0]);
-            UI.SetValue(['Rage', options.name, options.name, item + '_y'], Input.GetCursorPosition()[1] + drag[item].drag_position[1]);
+            UI.SetValue(['Rage', this.options.name, this.options.name, item + '_x'], Input.GetCursorPosition()[0] + drag[item].drag_position[0]);
+            UI.SetValue(['Rage', this.options.name, this.options.name, item + '_y'], Input.GetCursorPosition()[1] + drag[item].drag_position[1]);
         };
 
         return [this.GetPosition()[0], this.GetPosition()[1]];
@@ -508,64 +510,99 @@ exports.CreateMenu = function(options) {
         };
 
         const draw_dropdown = function(E, x, y) {
-            // var add_height_dropdown = 0
+            var add_height_dropdown = 0
 
-            // Render.FilledRect(x + AddWidth(E), y + AddHeight(E), (sizes.dropdown[0] * scale), (sizes.dropdown[1] * scale) + add_height_dropdown, colors.elements.dropdown.inner_background)
-            // Render.Rect(x + AddWidth(E), y + AddHeight(E), (sizes.dropdown[0] * scale), (sizes.dropdown[1] * scale) + add_height_dropdown, colors.outline)
+            if(E.value) {
+                E.elements.forEach(function(element) {
+                    add_height_dropdown += (Render.TextSize(element, fonts.dropdown.element)[1] + 4)
+                })
+            }
+
+            Render.FilledRect(x + AddWidth(E), y + AddHeight(E), (sizes.dropdown[0] * scale), (sizes.dropdown[1] * scale) + (add_height_dropdown * E.animation.toFixed(3)), colors.elements.dropdown.inner_background)
+            Render.Rect(x + AddWidth(E), y + AddHeight(E), (sizes.dropdown[0] * scale), (sizes.dropdown[1] * scale) + (add_height_dropdown * E.animation.toFixed(3)), colors.outline)
             
-            // Render.String(x + 1 + AddWidth(E), y - 17 + AddHeight(E), 0, E.name, colors.shadow, fonts.dropdown.title)
-            // Render.String(x + AddWidth(E), y - 18 + AddHeight(E), 0, E.name, colors.text, fonts.dropdown.title)
+            Render.String(x + 1 + AddWidth(E), y - 17 + AddHeight(E), 0, E.name, colors.shadow, fonts.dropdown.title)
+            Render.String(x + AddWidth(E), y - 18 + AddHeight(E), 0, E.name, colors.text, fonts.dropdown.title)
 
-            // Render.String(x + 3 + AddWidth(E), y + AddHeight(E), 0, E.current || "", colors.text, fonts.dropdown.title)
+            Render.String(x + 3 + AddWidth(E), y + AddHeight(E), 0, E.current || "None...", colors.text, fonts.dropdown.title)
 
-            // if(E.value) {
-            //     Cheat.Print("Hello \n")
-            // }
+            if(Other.Other.CursorBox(
+                Input.GetCursorPosition(),
+                x + AddWidth(E),
+                y + AddHeight(E),
+                x + AddWidth(E) + (sizes.dropdown[0] * scale),
+                y + AddHeight(E) + (sizes.dropdown[1] * scale)
+            ) && !IsAnimating(E.animation)) {
+                if(Input.IsKeyPressed(0x01)) E.value = true
+            }
 
-            // if(Other.Other.CursorBox(
-            //     Input.GetCursorPosition(),
-            //     x + AddWidth(E),
-            //     y + AddHeight(E),
-            //     x + AddWidth(E) + (sizes.dropdown[0] * scale),
-            //     y + AddHeight(E) + (sizes.dropdown[1] * scale)
-            // ) && !IsAnimating(E.animation)) {
-            //     if(Input.IsKeyPressed(0x01)) E.value = true
-            // }
+            if(Other.Other.CursorBox(
+                Input.GetCursorPosition(),
+                x + AddWidth(E) + (sizes.dropdown[0] * scale),
+                y + AddHeight(E),
+                x + AddWidth(E) + 20 + (sizes.dropdown[0] * scale),
+                y + AddHeight(E) + (sizes.dropdown[1] * scale)
+            ) && !IsAnimating(E.animation)) {
+                if(Input.IsKeyPressed(0x01)) E.value = false
+            }
 
-            // add_height[E.path[1]] += (sizes.dropdown[1] * scale) + 20;
-        }
+            if(E.value) {
+                E.elements.forEach(function(element) {
+                    Render.String(x + 3 + AddWidth(E), y + ((Render.TextSize(element, fonts.dropdown.element)[1] + 4) + AddHeight(E)) * E.animation.toFixed(3), 0, element, colors.text, fonts.dropdown.title)
+
+                    if(E.current === element) Render.FilledRect(x + AddWidth(E), y + ((Render.TextSize(element, fonts.dropdown.element)[1] + 4) + AddHeight(E)) * E.animation.toFixed(3), (sizes.dropdown[0] * scale), (20 * scale), [171, 171, 171, 45])
+
+                    if(Other.Other.CursorBox(
+                        Input.GetCursorPosition(),
+                        x + AddWidth(E),
+                        y + (Render.TextSize(element, fonts.dropdown.element)[1] + 4) + AddHeight(E),
+                        x + AddWidth(E) + (sizes.dropdown[0] * scale),
+                        y + (Render.TextSize(element, fonts.dropdown.element)[1] + 4) + AddHeight(E) + (sizes.dropdown[1] * scale)
+                    ) && !IsAnimating(E.animation)) {
+                        if(Input.IsKeyPressed(0x01)) {
+                            E.current = element
+                        }
+                    }
+
+                    add_height[E.path[1]] += (Render.TextSize(element, fonts.dropdown.element)[1] + 4)
+                })
+            }
+
+            E.animation = Other.Math.Lerp(E.animation, E.value ? 1 : 0, 0.1)
+            add_height[E.path[1]] += (sizes.dropdown[1] * scale) + 25;
+        };
 
         elements.items.forEach(function(element, i) {
             switch (element.type.toLowerCase()) {
                 case "checkbox":
                     if(currentTab !== element.path[0]) return;
 
-                    draw_checkbox(element, position[0] + 20, position[1] + Render.TextSize(options.name, fonts.logo)[1] + 35)
+                    draw_checkbox(element, position[0] + 20, position[1] + Render.TextSize(this.options.name, fonts.logo)[1] + 35)
                 break;
 
                 case "button": 
                     if(currentTab !== element.path[0]) return;
                     if(element.value) element.value = false;
 
-                    draw_button(element, position[0] + 20, position[1] + Render.TextSize(options.name, fonts.logo)[1] + 35)
+                    draw_button(element, position[0] + 20, position[1] + Render.TextSize(this.options.name, fonts.logo)[1] + 35)
                 break;
 
                 case "slider":
                     if(currentTab !== element.path[0]) return;
 
-                    draw_slider(element, position[0] + 20, position[1] + Render.TextSize(options.name, fonts.logo)[1] + 45)
+                    draw_slider(element, position[0] + 20, position[1] + Render.TextSize(this.options.name, fonts.logo)[1] + 45)
                 break;
 
                 case "label":
                     if(currentTab !== element.path[0]) return;
 
-                    draw_label(element, position[0] + 20, position[1] + Render.TextSize(options.name, fonts.logo)[1] + 35)
+                    draw_label(element, position[0] + 20, position[1] + Render.TextSize(this.options.name, fonts.logo)[1] + 35)
                 break;
 
                 case "dropdown":
                     if(currentTab !== element.path[0]) return;
 
-                    draw_dropdown(element, position[0] + 20, position[1] + Render.TextSize(options.name, fonts.logo)[1] + 50)
+                    draw_dropdown(element, position[0] + 20, position[1] + Render.TextSize(this.options.name, fonts.logo)[1] + 55)
                 break;
             
                 default: break;
@@ -582,7 +619,7 @@ exports.CreateMenu = function(options) {
         const options = this.GetOptions();
         const scale = this.GetScale();
 
-        const name = options.name;
+        const name = this.options.name;
         const colors = options.colors;
         const fonts = {
             logo: Render.GetFont("Verdana.ttf", 21 * (textScaling ? scale : 1), true),
