@@ -24,77 +24,12 @@ const IsAnimating = function(anim) {
  * https://brokencore.club/members/1529
  * https://yougame.biz/members/228508
  * 
- * Текущая версия меню: 2.1.4
+ * Текущая версия меню: 2.2.4
  * 
  * ***************
  * TODO:
- * - ColorPicker
  * - Hotkey
  * - MultiDropDown
- * 
- * @example
- * ```
-    const Menu = require("./menu2.js");
-    const Other = require("./useful.js");
-    const options = {
-        name: 'MSD Sync',
-        size: { width: 580, height: 480 },
-        colors: {
-            background: [31, 31, 31, 255],
-            outline: [117, 117, 117, 125],
-            accent: [64, 64, 64, 255],
-            accent_color: [147, 94, 250, 255],
-            fields: [44, 46, 49, 255],
-            text: [241, 241, 241, 255],
-            shadow: [0, 0, 0, 255],
-
-            elements: {
-                checkbox: {
-                    inner_background: [32, 32, 32, 255]
-                },
-
-                button: {
-                    inner_background: [32, 32, 32, 255]
-                },
-
-                slider: {
-                    inner_background: [32, 32, 32, 255],
-                    inner_line: [52, 52, 52, 255]
-                },
-
-                dropdown: {
-                    inner_background: [32, 32, 32, 255]
-                }
-            }
-        }
-    }
-
-    const menu = new Menu.CreateMenu(options);
-
-    menu.AddTab("Misc");
-    menu.AddTab("Visuals");
-    menu.AddTab("Rage");
-
-    menu.AddCheckbox(["Rage", "General"], "Checkbox")
-    menu.AddButton(["Rage", "General"], "click to crack $$ neverlose $$")
-    menu.AddLabel(["Rage", "General"], "Label", "Eto kakoy-to pizdec, ya v ahue")
-    menu.AddButton(["Rage", "General"], "click to crack $$ fatality $$")
-
-    menu.AddCheckbox(["Rage", "Main"], "Enable Resolver")
-    menu.AddSlider(["Rage", "Main"], "Slider", -105, 100, 0)
-    menu.AddCheckbox(["Rage", "Main"], "Enable skeet UI")
-    menu.AddButton(["Rage", "Main"], "click to crack $$ gamesense $$")
-    menu.AddDropdown(["Rage", "Main"], "drop daun ))0)", ["Rage", "What?", "Ho Ho Ho", "Yes"])
-
-    function on_draw() {
-        const position = menu.GetPosition();
-
-        menu.Drag(position[0], position[1], 140, 45, this.options.name);
-        menu.DrawUI(true);
-    }
-
-    Cheat.RegisterCallback("Draw", "on_draw");
- * ```
  */
 
 exports.CreateMenu = function(options) {
@@ -105,9 +40,40 @@ exports.CreateMenu = function(options) {
     var currentTab = tabs[0] || "";
 
     this.options = {
-        name: options.name,
-        colors: options.colors,
-        size: options.size
+        name: 'MSD Sync',
+        colors: {
+            background: [31, 31, 31, 255],
+            outline: [117, 117, 117, 125],
+            accent: [64, 64, 64, 255],
+            accent_color: [147, 94, 250, 255],
+            fields: [44, 46, 49, 255],
+            text: [241, 241, 241, 255],
+            shadow: [0, 0, 0, 255],
+    
+            elements: {
+                checkbox: {
+                    inner_background: [32, 32, 32, 255]
+                },
+    
+                button: {
+                    inner_background: [32, 32, 32, 255]
+                },
+    
+                slider: {
+                    inner_background: [32, 32, 32, 255],
+                    inner_line: [52, 52, 52, 255]
+                },
+    
+                dropdown: {
+                    inner_background: [32, 32, 32, 255]
+                },
+    
+                colorpicker: {
+                    inner_background: [32, 32, 32, 255]
+                }
+            }
+        },
+        size: { width: 580, height: 480 }
     };
 
     UI.AddSubTab(["Rage", "SUBTAB_MGR"], this.options.name);
@@ -219,8 +185,8 @@ exports.CreateMenu = function(options) {
                 path: path,
                 name: name,
                 value: false,
-                color: [255, 255, 255, 255],
-                cached: [255, 255, 255, 255],
+                color: [1, 1, 1],
+                colorRGB: [255, 255, 255, 255],
                 animation: 0
             };
 
@@ -250,10 +216,10 @@ exports.CreateMenu = function(options) {
     };
 
     this.GetScale = function() {
-        const options = this.GetOptions();
+        // const options = this.GetOptions();
 
-        return UI.GetValue(["Rage", this.options.name, this.options.name, this.options.name + "_scale"]);
-        // return 0.8
+        // return UI.GetValue(["Rage", this.options.name, this.options.name, this.options.name + "_scale"]);
+        return 1
     };
 
     this.GetData = function() {
@@ -400,7 +366,8 @@ exports.CreateMenu = function(options) {
             dropdown: {
                 title: Render.GetFont("Verdana.ttf", 14 * (textScaling ? scale : 1), true),
                 element: Render.GetFont("Verdana.ttf", 13 * (textScaling ? scale : 1), true),
-            }
+            },
+            colorpicker: Render.GetFont("Verdana.ttf", 14 * (textScaling ? scale : 1), true)
         };
 
         var add_height = { "General": 0, "Main": 0 };
@@ -415,6 +382,56 @@ exports.CreateMenu = function(options) {
 
         const AddAlpha = function(color) {
             return [color[0], color[1], color[2], color[3] * animations.ui.elements.alpha.toFixed(3)]
+        };
+
+        const GetColor = function(color, opacity) {
+            var temp = [color[0], color[1], color[2]];
+            temp[3] = opacity;
+            return temp;
+        };
+
+        const HSVToRGB = function(h, s, v){
+            var r, g, b, i, f, p, q, t, a;
+            if (arguments.length === 1) {
+                s = h[1], v = h[2], a = h[3], h = h[0]
+            }
+            i = Math.floor(h * 6);
+            f = h * 6 - i;
+            p = v * (1 - s);
+            q = v * (1 - f * s);
+            t = v * (1 - (1 - f) * s);
+            switch (i % 6) {
+                case 0: r = v, g = t, b = p; break;
+                case 1: r = q, g = v, b = p; break;
+                case 2: r = p, g = v, b = t; break;
+                case 3: r = p, g = q, b = v; break;
+                case 4: r = t, g = p, b = v; break;
+                case 5: r = v, g = p, b = q; break;
+            }
+            return [
+                Math.round(r * 255),
+                Math.round(g * 255),
+                Math.round(b * 255),
+                a
+            ]
+        };
+
+        const RGBToHSV = function(col) {
+            var g = col[1], b = col[2], a = col[3], r = col[0];
+            var max = Math.max(r, g, b), min = Math.min(r, g, b),
+                d = max - min,
+                h,
+                s = (max === 0 ? 0 : d / max),
+                v = max / 255;
+        
+            switch (max) {
+                case min: h = 0; break;
+                case r: h = (g - b) + d * (g < b ? 6: 0); h /= 6 * d; break;
+                case g: h = (b - r) + d * 2; h /= 6 * d; break;
+                case b: h = (r - g) + d * 4; h /= 6 * d; break;
+            }
+        
+            return [h, s, v, a];
         };
 
         const draw_checkbox = function(E, x, y) {
@@ -480,9 +497,9 @@ exports.CreateMenu = function(options) {
 
             if(Other.Other.CursorBox(
                 Input.GetCursorPosition(),
-                x + (E.path[1] == "General" ? 0 : size[0] / 2 - 6),
+                x + (AddWidth(E) - 6),
                 y - 5 + AddHeight(E) + Render.TextSize(E.name, fonts.slider)[1],
-                x + (E.path[1] == "General" ? 0 : size[0] / 2 - 6) + (sizes.slider[0] * scale),
+                x + (AddWidth(E) - 6) + (sizes.slider[0] * scale),
                 y - 5 + AddHeight(E) + Render.TextSize(E.name, fonts.slider)[1] + (sizes.slider[1] * scale)
             )) {
                 if(Input.IsKeyPressed(0x01)) {
@@ -562,6 +579,7 @@ exports.CreateMenu = function(options) {
 
             if(E.value) {
                 E.elements.forEach(function(element) {
+                    Render.String(x + 4 + AddWidth(E), y + 1 + Render.TextSize(E.name, fonts.dropdown.title)[1] + ((Render.TextSize(element, fonts.dropdown.element)[1] + 4) + AddHeight(E)) * E.animation.toFixed(3), 0, element, colors.shadow, fonts.dropdown.title)
                     Render.String(x + 3 + AddWidth(E), y + Render.TextSize(E.name, fonts.dropdown.title)[1] + ((Render.TextSize(element, fonts.dropdown.element)[1] + 4) + AddHeight(E)) * E.animation.toFixed(3), 0, element, colors.text, fonts.dropdown.title)
 
                     if(E.current === element) Render.FilledRect(x + AddWidth(E), y + Render.TextSize(E.name, fonts.dropdown.title)[1] + ((Render.TextSize(element, fonts.dropdown.element)[1] + 4) + AddHeight(E)) * E.animation.toFixed(3), (sizes.dropdown[0] * scale), (20 * scale), [171, 171, 171, 45])
@@ -587,12 +605,85 @@ exports.CreateMenu = function(options) {
         };
 
         const draw_colorpicker = function(E, x, y) {
-            Render.FilledRect(x + AddWidth(E), y + AddHeight(E), (sizes.colorpicker[0] * scale), (sizes.colorpicker[1] * scale), E.color);
+            Render.FilledRect(x + AddWidth(E), y + AddHeight(E), (sizes.colorpicker[0] * scale), (sizes.colorpicker[1] * scale), E.colorRGB);
             Render.Rect(x + AddWidth(E), y + AddHeight(E), (sizes.colorpicker[0] * scale), (sizes.colorpicker[1] * scale), colors.outline);
-        
+
+            Render.String(x + AddWidth(E) + (sizes.colorpicker[0] * scale) + 8 + 1, y + AddHeight(E) + 1, 0, E.name, colors.shadow, fonts.colorpicker)
+            Render.String(x + AddWidth(E) + (sizes.colorpicker[0] * scale) + 8, y + AddHeight(E), 0, E.name, colors.text, fonts.colorpicker)
+
             if(E.value) {
-                Render.FilledRect(x + (sizes.colorpicker[0] * scale) + 5 + AddWidth(E), y + AddHeight(E), (160 * scale), (200 * scale), colors.elements.colorpicker.inner_background);
-                Render.Rect(x + (sizes.colorpicker[0] * scale) + 5 + AddWidth(E), y + AddHeight(E), (160 * scale), (200 * scale), colors.outline);
+                Render.FilledRect(x + (sizes.colorpicker[0] * scale) + 5 + AddWidth(E), y + AddHeight(E), (160 * scale), (190 * scale), colors.elements.colorpicker.inner_background);
+                Render.Rect(x + (sizes.colorpicker[0] * scale) + 5 + AddWidth(E), y + AddHeight(E), (160 * scale), (190 * scale), colors.outline);
+
+                for(v = 0; v < (150 * scale); v++){
+                    var opacity = Other.Math.Clamp(255 * 2 - v, 0, 255);
+                    
+                    Render.GradientRect(x + (sizes.colorpicker[0] * scale) + 5 + (5 * scale) + AddWidth(E), y + (5 * scale) + AddHeight(E) + v, (150 * scale), 1, 1, 
+                        GetColor(HSVToRGB(E.color[0], 0, 1 - (v / (150 * scale))), opacity), 
+                        GetColor(HSVToRGB(E.color[0], 1, 1 - (v / (150 * scale))), opacity)
+                    );
+                };
+
+                if(Other.Other.CursorBox(Input.GetCursorPosition(), x + (sizes.colorpicker[0] * scale) + 5 + (5 * scale) + AddWidth(E), y + (5 * scale) + AddHeight(E), x + (sizes.colorpicker[0] * scale) + 5 + (5 * scale) + AddWidth(E) + (150 * scale) + 2, y + (5 * scale) + AddHeight(E) + (150 * scale) + 2)){
+                    if(Input.IsKeyPressed(0x01)){
+                        E.color[1] = Other.Math.Clamp(((Input.GetCursorPosition()[0] - (x + (sizes.colorpicker[0] * scale) + 5 + (5 * scale) + AddWidth(E))) / (150 * scale)), 0, 1);
+                        E.color[2] = Other.Math.Clamp(((Input.GetCursorPosition()[1] - (y + 5 + (5 * scale) + AddHeight(E))) / (150 * scale)), 0, 1);
+
+                        E.colorRGB = HSVToRGB([E.color[0], E.color[1], 1 - E.color[2], E.color[3] || 255])
+                    }
+                }
+
+                for(h = 0; h < 3; h++) {
+
+                    // Я блять даже не понимаю что это за пиздец
+                    // Я всё это хаваю, у меня нет выбора
+
+                    Render.GradientRect(
+                        x + (sizes.colorpicker[0] * scale) + 5 + (5 * scale) + AddWidth(E) + (h * ((1 / 5.1) * 255)), 
+                        y + (5 * scale) + AddHeight(E) + 10 + (145 * scale), 
+                        255 * (1 / 5.1), 
+                        10, 
+                        1, 
+                        GetColor(HSVToRGB(h * (1 / 3), 1, 1), 255), 
+                        GetColor(HSVToRGB((h + 1) * (1 / 3), 1, 1), 255)
+                    );
+                };
+
+                if(Other.Other.CursorBox(Input.GetCursorPosition(), 
+                    x + (sizes.colorpicker[0] * scale) + 5 + (5 * scale) + AddWidth(E),
+                    y + (5 * scale) + AddHeight(E) + 10 + (145 * scale),
+                    x + (sizes.colorpicker[0] * scale) + 5 + (5 * scale) + AddWidth(E) + (150 * scale),
+                    y + (5 * scale) + AddHeight(E) + 10 + (145 * scale) + 10
+                )) {
+                    if(Input.IsKeyPressed(0x01)) {
+                        E.color[0] = Other.Math.Clamp((Input.GetCursorPosition()[0] - (x + (sizes.colorpicker[0] * scale) + 5 + (5 * scale) + AddWidth(E))) / (150 * scale), 0, 1);
+
+                        E.colorRGB = HSVToRGB([E.color[0], E.color[1], 1 - E.color[2], E.color[3] || 255])
+                    }
+                }
+
+                Render.GradientRect(
+                    x + (sizes.colorpicker[0] * scale) + 5 + (5 * scale) + AddWidth(E), 
+                    y + (5 * scale) + AddHeight(E) + 10 + (160 * scale), 
+                    (150 * scale), 
+                    10, 
+                    1, 
+                    [E.colorRGB[0], E.colorRGB[1], E.colorRGB[2], 0], 
+                    GetColor(E.colorRGB, 255)
+                );
+
+                if(Other.Other.CursorBox(Input.GetCursorPosition(), 
+                    x + (sizes.colorpicker[0] * scale) + 5 + (5 * scale) + AddWidth(E),
+                    y + (5 * scale) + AddHeight(E) + 10 + (145 * scale) + 15,
+                    x + (sizes.colorpicker[0] * scale) + 5 + (5 * scale) + AddWidth(E) + (150 * scale),
+                    y + (5 * scale) + AddHeight(E) + 10 + (145 * scale) + 25
+                )) {
+                    if(Input.IsKeyPressed(0x01)) {
+                        E.color[3] = Other.Math.Clamp(Math.round((Input.GetCursorPosition()[0] - (x + (sizes.colorpicker[0] * scale) + 6 + (5 * scale) + AddWidth(E))) / ((148 * scale) / 255), 0, 255));
+
+                        E.colorRGB = HSVToRGB([E.color[0], E.color[1], 1 - E.color[2], E.color[3] || 255])
+                    }
+                }
             };
 
             if(Other.Other.CursorBox(
@@ -613,38 +704,38 @@ exports.CreateMenu = function(options) {
                 case "checkbox":
                     if(currentTab !== element.path[0]) return;
 
-                    draw_checkbox(element, position[0] + 20, position[1] + Render.TextSize(this.options.name, fonts.logo)[1] + 35)
+                    draw_checkbox(element, position[0] + 20, position[1] + Render.TextSize(options.name, fonts.logo)[1] + 35)
                 break;
 
                 case "button": 
                     if(currentTab !== element.path[0]) return;
                     if(element.value) element.value = false;
 
-                    draw_button(element, position[0] + 20, position[1] + Render.TextSize(this.options.name, fonts.logo)[1] + 35)
+                    draw_button(element, position[0] + 20, position[1] + Render.TextSize(options.name, fonts.logo)[1] + 35)
                 break;
 
                 case "slider":
                     if(currentTab !== element.path[0]) return;
 
-                    draw_slider(element, position[0] + 20, position[1] + Render.TextSize(this.options.name, fonts.logo)[1] + 45)
+                    draw_slider(element, position[0] + 20, position[1] + Render.TextSize(options.name, fonts.logo)[1] + 45)
                 break;
 
                 case "label":
                     if(currentTab !== element.path[0]) return;
 
-                    draw_label(element, position[0] + 20, position[1] + Render.TextSize(this.options.name, fonts.logo)[1] + 35)
+                    draw_label(element, position[0] + 20, position[1] + Render.TextSize(options.name, fonts.logo)[1] + 35)
                 break;
 
                 case "dropdown":
                     if(currentTab !== element.path[0]) return;
 
-                    draw_dropdown(element, position[0] + 20, position[1] + Render.TextSize(this.options.name, fonts.logo)[1] + 40)
+                    draw_dropdown(element, position[0] + 20, position[1] + Render.TextSize(options.name, fonts.logo)[1] + 40)
                 break;
 
                 case "colorpicker":
                     if(currentTab !== element.path[0]) return;
 
-                    draw_colorpicker(element, position[0] + 20, position[1] + Render.TextSize(this.options.name, fonts.logo)[1] + 35)
+                    draw_colorpicker(element, position[0] + 20, position[1] + Render.TextSize(options.name, fonts.logo)[1] + 35)
                 break;
             
                 default: break;
@@ -661,7 +752,7 @@ exports.CreateMenu = function(options) {
         const options = this.GetOptions();
         const scale = this.GetScale();
 
-        const name = this.options.name;
+        const name = options.name;
         const colors = options.colors;
         const fonts = {
             logo: Render.GetFont("Verdana.ttf", 21 * (textScaling ? scale : 1), true),
@@ -732,5 +823,18 @@ exports.CreateMenu = function(options) {
 
         data.colorPickers.push(colorpicker);
         data.items.push(colorpicker);
+    };
+
+    this.GetValue = function(type, path, name) {
+        const data = this.GetData();
+        var result = undefined;
+
+        data[type].forEach(function(element) {
+            if(element.path.toString() == path.toString() && element.name == name) {
+                result = (element.colorRGB || element.current || element.value)
+            }
+        })
+
+        return result;
     };
 };
