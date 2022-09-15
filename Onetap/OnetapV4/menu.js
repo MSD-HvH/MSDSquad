@@ -29,7 +29,6 @@ const IsAnimating = function(anim) {
  * ***************
  * TODO:
  * - ColorPicker
- * - Dropdown
  * - Hotkey
  * - MultiDropDown
  * 
@@ -212,6 +211,20 @@ exports.CreateMenu = function(options) {
             };
 
             return data;
+        },
+
+        colorpicker: function(path, name) {
+            const data = {
+                type: "colorpicker",
+                path: path,
+                name: name,
+                value: false,
+                color: [255, 255, 255, 255],
+                cached: [255, 255, 255, 255],
+                animation: 0
+            };
+
+            return data;
         }
     };
 
@@ -219,7 +232,8 @@ exports.CreateMenu = function(options) {
         checkbox: [20, 20],
         button: [250, 20],
         slider: [250, 10],
-        dropdown: [250, 20]
+        dropdown: [250, 20],
+        colorpicker: [20, 20]
     };
 
     /**
@@ -236,10 +250,10 @@ exports.CreateMenu = function(options) {
     };
 
     this.GetScale = function() {
-        // const options = this.GetOptions();
+        const options = this.GetOptions();
 
-        // return UI.GetValue(["Rage", this.options.name, this.options.name, this.options.name + "_scale"]);
-        return 0.8
+        return UI.GetValue(["Rage", this.options.name, this.options.name, this.options.name + "_scale"]);
+        // return 0.8
     };
 
     this.GetData = function() {
@@ -518,46 +532,46 @@ exports.CreateMenu = function(options) {
                 })
             }
 
-            Render.FilledRect(x + AddWidth(E), y + AddHeight(E), (sizes.dropdown[0] * scale), (sizes.dropdown[1] * scale) + (add_height_dropdown * E.animation.toFixed(3)), colors.elements.dropdown.inner_background)
-            Render.Rect(x + AddWidth(E), y + AddHeight(E), (sizes.dropdown[0] * scale), (sizes.dropdown[1] * scale) + (add_height_dropdown * E.animation.toFixed(3)), colors.outline)
-            
-            Render.String(x + 1 + AddWidth(E), y - 17 + AddHeight(E), 0, E.name, colors.shadow, fonts.dropdown.title)
-            Render.String(x + AddWidth(E), y - 18 + AddHeight(E), 0, E.name, colors.text, fonts.dropdown.title)
+            Render.String(x + 1 + AddWidth(E), y - 7 + AddHeight(E), 0, E.name, colors.shadow, fonts.dropdown.title)
+            Render.String(x + AddWidth(E), y - 8 + AddHeight(E), 0, E.name, colors.text, fonts.dropdown.title)
 
-            Render.String(x + 3 + AddWidth(E), y + AddHeight(E), 0, E.current || "None...", colors.text, fonts.dropdown.title)
+            Render.FilledRect(x + AddWidth(E), y + AddHeight(E) + Render.TextSize(E.name, fonts.dropdown.title)[1], (sizes.dropdown[0] * scale), (sizes.dropdown[1] * scale) + (add_height_dropdown * E.animation.toFixed(3)), colors.elements.dropdown.inner_background)
+            Render.Rect(x + AddWidth(E), y + AddHeight(E) + Render.TextSize(E.name, fonts.dropdown.title)[1], (sizes.dropdown[0] * scale), (sizes.dropdown[1] * scale) + (add_height_dropdown * E.animation.toFixed(3)), colors.outline)
+
+            Render.String(x + 3 + AddWidth(E), y + AddHeight(E) + Render.TextSize(E.name, fonts.dropdown.title)[1], 0, E.current || "None...", colors.text, fonts.dropdown.title)
 
             if(Other.Other.CursorBox(
                 Input.GetCursorPosition(),
                 x + AddWidth(E),
-                y + AddHeight(E),
+                y + AddHeight(E) + Render.TextSize(E.name, fonts.dropdown.title)[1],
                 x + AddWidth(E) + (sizes.dropdown[0] * scale),
-                y + AddHeight(E) + (sizes.dropdown[1] * scale)
+                y + AddHeight(E) + (sizes.dropdown[1] * scale) + Render.TextSize(E.name, fonts.dropdown.title)[1]
             ) && !IsAnimating(E.animation)) {
-                if(Input.IsKeyPressed(0x01)) E.value = true
+                if(Input.IsKeyPressed(0x01)) E.value = !E.value
             }
 
-            if(Other.Other.CursorBox(
-                Input.GetCursorPosition(),
-                x + AddWidth(E) + (sizes.dropdown[0] * scale),
-                y + AddHeight(E),
-                x + AddWidth(E) + 20 + (sizes.dropdown[0] * scale),
-                y + AddHeight(E) + (sizes.dropdown[1] * scale)
-            ) && !IsAnimating(E.animation)) {
-                if(Input.IsKeyPressed(0x01)) E.value = false
-            }
+            // if(Other.Other.CursorBox(
+            //     Input.GetCursorPosition(),
+            //     x + AddWidth(E) + (sizes.dropdown[0] * scale),
+            //     y + AddHeight(E),
+            //     x + AddWidth(E) + 20 + (sizes.dropdown[0] * scale),
+            //     y + AddHeight(E) + (sizes.dropdown[1] * scale)
+            // ) && !IsAnimating(E.animation)) {
+            //     if(Input.IsKeyPressed(0x01)) E.value = false
+            // }
 
             if(E.value) {
                 E.elements.forEach(function(element) {
-                    Render.String(x + 3 + AddWidth(E), y + ((Render.TextSize(element, fonts.dropdown.element)[1] + 4) + AddHeight(E)) * E.animation.toFixed(3), 0, element, colors.text, fonts.dropdown.title)
+                    Render.String(x + 3 + AddWidth(E), y + Render.TextSize(E.name, fonts.dropdown.title)[1] + ((Render.TextSize(element, fonts.dropdown.element)[1] + 4) + AddHeight(E)) * E.animation.toFixed(3), 0, element, colors.text, fonts.dropdown.title)
 
-                    if(E.current === element) Render.FilledRect(x + AddWidth(E), y + ((Render.TextSize(element, fonts.dropdown.element)[1] + 4) + AddHeight(E)) * E.animation.toFixed(3), (sizes.dropdown[0] * scale), (20 * scale), [171, 171, 171, 45])
+                    if(E.current === element) Render.FilledRect(x + AddWidth(E), y + Render.TextSize(E.name, fonts.dropdown.title)[1] + ((Render.TextSize(element, fonts.dropdown.element)[1] + 4) + AddHeight(E)) * E.animation.toFixed(3), (sizes.dropdown[0] * scale), (20 * scale), [171, 171, 171, 45])
 
                     if(Other.Other.CursorBox(
                         Input.GetCursorPosition(),
                         x + AddWidth(E),
-                        y + (Render.TextSize(element, fonts.dropdown.element)[1] + 4) + AddHeight(E),
+                        y + (Render.TextSize(element, fonts.dropdown.element)[1] + 4) + Render.TextSize(E.name, fonts.dropdown.title)[1] + AddHeight(E),
                         x + AddWidth(E) + (sizes.dropdown[0] * scale),
-                        y + (Render.TextSize(element, fonts.dropdown.element)[1] + 4) + AddHeight(E) + (sizes.dropdown[1] * scale)
+                        y + (Render.TextSize(element, fonts.dropdown.element)[1] + 4) + Render.TextSize(E.name, fonts.dropdown.title)[1] + AddHeight(E) + (sizes.dropdown[1] * scale)
                     ) && !IsAnimating(E.animation)) {
                         if(Input.IsKeyPressed(0x01)) {
                             E.current = element
@@ -568,8 +582,30 @@ exports.CreateMenu = function(options) {
                 })
             }
 
-            E.animation = Other.Math.Lerp(E.animation, E.value ? 1 : 0, 0.1)
-            add_height[E.path[1]] += (sizes.dropdown[1] * scale) + 25;
+            E.animation = Other.Math.Lerp(E.animation, E.value ? 1 : 0, 0.2)
+            add_height[E.path[1]] += (sizes.dropdown[1] * scale) + Render.TextSize(E.name, fonts.dropdown.title)[1] + 10;
+        };
+
+        const draw_colorpicker = function(E, x, y) {
+            Render.FilledRect(x + AddWidth(E), y + AddHeight(E), (sizes.colorpicker[0] * scale), (sizes.colorpicker[1] * scale), E.color);
+            Render.Rect(x + AddWidth(E), y + AddHeight(E), (sizes.colorpicker[0] * scale), (sizes.colorpicker[1] * scale), colors.outline);
+        
+            if(E.value) {
+                Render.FilledRect(x + (sizes.colorpicker[0] * scale) + 5 + AddWidth(E), y + AddHeight(E), (160 * scale), (200 * scale), colors.elements.colorpicker.inner_background);
+                Render.Rect(x + (sizes.colorpicker[0] * scale) + 5 + AddWidth(E), y + AddHeight(E), (160 * scale), (200 * scale), colors.outline);
+            };
+
+            if(Other.Other.CursorBox(
+                Input.GetCursorPosition(),
+                x + AddWidth(E),
+                y + AddHeight(E),
+                x + AddWidth(E) + (sizes.colorpicker[0] * scale),
+                y + AddHeight(E) + (sizes.colorpicker[1] * scale)
+            ) && !IsAnimating(E.animation)) {
+                if(Input.IsKeyPressed(0x01)) E.value = !E.value
+            }
+
+            E.animation = Other.Math.Lerp(E.animation, E.value ? 1 : 0, 0.2)
         };
 
         elements.items.forEach(function(element, i) {
@@ -602,7 +638,13 @@ exports.CreateMenu = function(options) {
                 case "dropdown":
                     if(currentTab !== element.path[0]) return;
 
-                    draw_dropdown(element, position[0] + 20, position[1] + Render.TextSize(this.options.name, fonts.logo)[1] + 55)
+                    draw_dropdown(element, position[0] + 20, position[1] + Render.TextSize(this.options.name, fonts.logo)[1] + 40)
+                break;
+
+                case "colorpicker":
+                    if(currentTab !== element.path[0]) return;
+
+                    draw_colorpicker(element, position[0] + 20, position[1] + Render.TextSize(this.options.name, fonts.logo)[1] + 35)
                 break;
             
                 default: break;
@@ -682,5 +724,13 @@ exports.CreateMenu = function(options) {
 
         data.dropdowns.push(dropdown);
         data.items.push(dropdown);
+    };
+
+    this.AddColorPicker = function(path, name) {
+        const data = this.GetData();
+        const colorpicker = this.schemas.colorpicker(path, name);
+
+        data.colorPickers.push(colorpicker);
+        data.items.push(colorpicker);
     };
 };
