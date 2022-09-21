@@ -1,16 +1,16 @@
 ---https://yougame.biz/threads/266379/
----@diagnostic disable: undefined-global, cast-local-type
-local test_array = {}
+
+local a = {}
 _DEBUG = true
-ffi.cdef[[
-    typedef struct {
+ffi.cdef [[
+    typedef struct
+    {
         uint8_t r;
         uint8_t g;
         uint8_t b;
         uint8_t a;
     } color_struct_t;
-
-    typedef void (__cdecl* console_color_print)(void*,const color_struct_t&, const char*, ...);
+    typedef void (__cdecl* console_color_print)(void*, color_struct_t&, const char* text, ...);
     typedef struct {
         char    pad_0x0000[4];
         char*   console_name;
@@ -146,259 +146,941 @@ ffi.cdef[[
         char    pad_0x023a[2];
     } ccs_weapon_info_t;
 ]]
-local ya_typoy = "discord.gg/chernobylnl" -- убрать, если не хотите рекламу справа сверху
---- @region: libs
-local function a(b,c,type)return ffi.cast(type,ffi.cast("void***",b)[0][c])end;local function d(c,e)local f=ffi.typeof(e)return function(b,...)assert(b~=nil)if b then return a(b,c,f)(b,...)end end end;local g={"console_name","primary_clip_size","secondary_clip_size","primary_default_clip_size","secondary_default_clip_size","primary_reserve_ammo_max","secondary_reserve_ammo_max","model_world","model_player","model_dropped","sound_empty","sound_single_shot","sound_single_shot_accurate","sound_burst","sound_reload","sound_special1","sound_special2","sound_special3","sound_nearlyempty","primary_ammo","secondary_ammo","item_name","item_class","itemflag_exhaustible","model_right_handed","is_melee_weapon","weapon_weight","item_gear_slot_position","weapon_type_int","in_game_price","kill_award","player_animation_extension","cycletime","cycletime_alt","time_to_idle","idle_interval","is_full_auto","damage","headshot_multiplier","armor_ratio","bullets","penetration","flinch_velocity_modifier_large","flinch_velocity_modifier_small","range","range_modifier","throw_velocity","has_silencer","crosshair_min_distance","crosshair_delta_distance","max_player_speed","max_player_speed_alt","attack_movespeed_factor","spread","spread_alt","inaccuracy_crouch","inaccuracy_crouch_alt","inaccuracy_stand","inaccuracy_stand_alt","inaccuracy_jump_initial","inaccuracy_jump_apex","inaccuracy_jump","inaccuracy_jump_alt","inaccuracy_land","inaccuracy_land_alt","inaccuracy_ladder","inaccuracy_ladder_alt","inaccuracy_fire","inaccuracy_fire_alt","inaccuracy_move","inaccuracy_move_alt","inaccuracy_reload","recoil_seed","recoil_angle","recoil_angle_alt","recoil_angle_variance","recoil_angle_variance_alt","recoil_magnitude","recoil_magnitude_alt","recoil_magnitude_variance","recoil_magnitude_variance_alt","spread_seed","recovery_time_crouch","recovery_time_stand","recovery_time_crouch_final","recovery_time_stand_final","recovery_transition_start_bullet","recovery_transition_end_bullet","unzoom_after_shot","hide_view_model_zoomed","zoom_levels","zoom_fov_1","zoom_fov_2","zoom_time_0","zoom_time_1","zoom_time_2","addon_location","addon_scale","eject_brass_effect","tracer_effect","tracer_frequency","tracer_frequency_alt","muzzle_flash_effect_1st_person","muzzle_flash_effect_1st_person_alt","muzzle_flash_effect_3rd_person","muzzle_flash_effect_3rd_person_alt","heat_effect","heat_per_shot","zoom_in_sound","zoom_out_sound","inaccuracy_alt_sound_threshold","bot_audible_range","has_burst_mode","is_revolver"}local h={[0]="knife",[1]="pistol",[2]="smg",[3]="rifle",[4]="shotgun",[5]="sniperrifle",[6]="machinegun",[7]="c4",[9]="grenade",[11]="stackableitem",[12]="fists",[13]="breachcharge",[14]="bumpmine",[15]="tablet",[16]="melee",[19]="equipment"}local i=ffi.typeof("char*")local j=utils.opcode_scan("client.dll","8B 35 ? ? ? ? FF 10 0F B7 C0")or error("IWeaponSystem signature invalid")local k=ffi.cast("void****",ffi.cast("char*",j)+0x2)[0]local l=d(2,"ccs_weapon_info_t*(__thiscall*)(void*, unsigned int)")or error("invalid GetCSWeaponInfo index")local weapons,n={},{}for o=1,600 do local p=l(k,o)if p~=nil then local q={}for r=1,#g do local s=g[r]local t=p[s]local u,v=pcall(ffi.typeof,t)q[s]=u and v==i and ffi.string(t)or t end;q.idx=o;q.type=o==31 and"taser"or h[p.weapon_type_int]q.raw=p;weapons[o]=q;n[q.console_name]=q end end;local function w(x,y)if x~=weapons or type(y)~="number"or y<0 or y>8191 then return end;local o=bit.band(y:GetProp("m_iItemDefinitionIndex"),0xFFFF)return weapons[o]end;setmetatable(weapons,{__index=n,__metatable=false,__call=w})
-local easing = {} function easing.expo_in(t, b, c, d) if t == 0 then return b else return c * math.pow(2, 10 * (t / d - 1)) + b - c * 0.001 end end function easing.quad_in_out(t, b, c, d) t = t / d * 2 if t < 1 then return c / 2 * math.pow(t, 2) + b else return -c / 2 * ((t - 1) * (t - 3) - 1) + b end end function easing.sine_in_out(t, b, c, d)     return -c / 2 * (math.cos(math.pi * t / d) - 1) + b end function easing.quart_out(t, b, c, d) t = t / d - 1 return -c * (math.pow(t, 4) - 1) + b end function easing.sine_out(t, b, c, d) return c * math.sin(t / d * (math.pi / 2)) + b end function easing.cubic_in(t, b, c, d) t = t / d return c * math.pow(t, 3) + b end
-local http_lib = require("neverlose/http_lib")
-
-local http = http_lib.new({
-    task_interval = 0.3, -- polling intervals
-    enable_debug = true, -- print http request s to the console
-    timeout = 10 -- request expiration time
-})
-
-local table_gen = {}
-
-local table_insert, table_concat, string_rep, string_len, string_sub = table.insert, table.concat, string.rep, string.len, string.sub
-local math_max, math_floor, math_ceil = math.max, math.floor, math.ceil
-
-local function len(str)
-    local _, count = string.gsub(tostring(str), "[^\128-\193]", "")
-    return count
+local function b(c, d, type)
+    return ffi.cast(type, ffi.cast("void***", c)[0][d])
 end
+local function e(d, f)
+    local g = ffi.typeof(f)
+    return function(c, ...)
+        assert(c ~= nil)
+        if c then
+            return b(c, d, g)(c, ...)
+        end
+    end
+end
+local h = {
+    "console_name",
+    "primary_clip_size",
+    "secondary_clip_size",
+    "primary_default_clip_size",
+    "secondary_default_clip_size",
+    "primary_reserve_ammo_max",
+    "secondary_reserve_ammo_max",
+    "model_world",
+    "model_player",
+    "model_dropped",
+    "sound_empty",
+    "sound_single_shot",
+    "sound_single_shot_accurate",
+    "sound_burst",
+    "sound_reload",
+    "sound_special1",
+    "sound_special2",
+    "sound_special3",
+    "sound_nearlyempty",
+    "primary_ammo",
+    "secondary_ammo",
+    "item_name",
+    "item_class",
+    "itemflag_exhaustible",
+    "model_right_handed",
+    "is_melee_weapon",
+    "weapon_weight",
+    "item_gear_slot_position",
+    "weapon_type_int",
+    "in_game_price",
+    "kill_award",
+    "player_animation_extension",
+    "cycletime",
+    "cycletime_alt",
+    "time_to_idle",
+    "idle_interval",
+    "is_full_auto",
+    "damage",
+    "headshot_multiplier",
+    "armor_ratio",
+    "bullets",
+    "penetration",
+    "flinch_velocity_modifier_large",
+    "flinch_velocity_modifier_small",
+    "range",
+    "range_modifier",
+    "throw_velocity",
+    "has_silencer",
+    "crosshair_min_distance",
+    "crosshair_delta_distance",
+    "max_player_speed",
+    "max_player_speed_alt",
+    "attack_movespeed_factor",
+    "spread",
+    "spread_alt",
+    "inaccuracy_crouch",
+    "inaccuracy_crouch_alt",
+    "inaccuracy_stand",
+    "inaccuracy_stand_alt",
+    "inaccuracy_jump_initial",
+    "inaccuracy_jump_apex",
+    "inaccuracy_jump",
+    "inaccuracy_jump_alt",
+    "inaccuracy_land",
+    "inaccuracy_land_alt",
+    "inaccuracy_ladder",
+    "inaccuracy_ladder_alt",
+    "inaccuracy_fire",
+    "inaccuracy_fire_alt",
+    "inaccuracy_move",
+    "inaccuracy_move_alt",
+    "inaccuracy_reload",
+    "recoil_seed",
+    "recoil_angle",
+    "recoil_angle_alt",
+    "recoil_angle_variance",
+    "recoil_angle_variance_alt",
+    "recoil_magnitude",
+    "recoil_magnitude_alt",
+    "recoil_magnitude_variance",
+    "recoil_magnitude_variance_alt",
+    "spread_seed",
+    "recovery_time_crouch",
+    "recovery_time_stand",
+    "recovery_time_crouch_final",
+    "recovery_time_stand_final",
+    "recovery_transition_start_bullet",
+    "recovery_transition_end_bullet",
+    "unzoom_after_shot",
+    "hide_view_model_zoomed",
+    "zoom_levels",
+    "zoom_fov_1",
+    "zoom_fov_2",
+    "zoom_time_0",
+    "zoom_time_1",
+    "zoom_time_2",
+    "addon_location",
+    "addon_scale",
+    "eject_brass_effect",
+    "tracer_effect",
+    "tracer_frequency",
+    "tracer_frequency_alt",
+    "muzzle_flash_effect_1st_person",
+    "muzzle_flash_effect_1st_person_alt",
+    "muzzle_flash_effect_3rd_person",
+    "muzzle_flash_effect_3rd_person_alt",
+    "heat_effect",
+    "heat_per_shot",
+    "zoom_in_sound",
+    "zoom_out_sound",
+    "inaccuracy_alt_sound_threshold",
+    "bot_audible_range",
+    "has_burst_mode",
+    "is_revolver"
+}
+local i = {
+    [0] = "knife",
+    [1] = "pistol",
+    [2] = "smg",
+    [3] = "rifle",
+    [4] = "shotgun",
+    [5] = "sniperrifle",
+    [6] = "machinegun",
+    [7] = "c4",
+    [9] = "grenade",
+    [11] = "stackableitem",
+    [12] = "fists",
+    [13] = "breachcharge",
+    [14] = "bumpmine",
+    [15] = "tablet",
+    [16] = "melee",
+    [19] = "equipment"
+}
+local j = ffi.typeof("char*")
+local k = utils.opcode_scan("client.dll", "8B 35 ? ? ? ? FF 10 0F B7 C0") or error("IWeaponSystem signature invalid")
+local l = ffi.cast("void****", ffi.cast("char*", k) + 0x2)[0]
+local m = e(2, "ccs_weapon_info_t*(__thiscall*)(void*, unsigned int)") or error("invalid GetCSWeaponInfo index")
+local n, o = {}, {}
+for p = 1, 600 do
+    local q = m(l, p)
+    if q ~= nil then
+        local r = {}
+        for s = 1, #h do
+            local t = h[s]
+            local u = q[t]
+            local v, w = pcall(ffi.typeof, u)
+            r[t] = v and w == j and ffi.string(u) or u
+        end
+        r.idx = p
+        r.type = p == 31 and "taser" or i[q.weapon_type_int]
+        r.raw = q
+        n[p] = r
+        o[r.console_name] = r
+    end
+end
+local function x(y, z)
+    if y ~= n or type(z) ~= "number" or z < 0 or z > 8191 then
+        return
+    end
+    local p = bit.band(z["m_iItemDefinitionIndex"], 0xFFFF)
+    return n[p]
+end
+setmetatable(n, {__index = o, __metatable = false, __call = x})
+local A = {}
+function A.expo_in(u, c, d, e)
+    if u == 0 then
+        return c
+    else
+        return d * math.pow(2, 10 * (u / e - 1)) + c - d * 0.001
+    end
+end
+function A.quad_in_out(u, c, d, e)
+    u = u / e * 2
+    if u < 1 then
+        return d / 2 * math.pow(u, 2) + c
+    else
+        return -d / 2 * ((u - 1) * (u - 3) - 1) + c
+    end
+end
+function A.sine_in_out(u, c, d, e)
+    return -d / 2 * (math.cos(math.pi * u / e) - 1) + c
+end
+function A.quart_out(u, c, d, e)
+    u = u / e - 1
+    return -d * (math.pow(u, 4) - 1) + c
+end
+function A.sine_out(u, c, d, e)
+    return d * math.sin(u / e * math.pi / 2) + c
+end
+function A.cubic_in(u, c, d, e)
+    u = u / e
+    return d * math.pow(u, 3) + c
+end
+local base64 = {} base64.extract = function(v, from, width)     return bit.band(bit.shr(v, from), bit.shl(1, width) - 1) end function base64.makeencoder(alphabet)     local encoder, decoder = {}, {}     for i = 1, 65 do         local chr = string.byte(string.sub(alphabet, i, i)) or 32         if decoder[chr] ~= nil then             error("invalid alphabet: duplicate character " .. tostring(chr), 3)         end         encoder[i - 1] = chr         decoder[chr] = i - 1     end     return encoder, decoder end base64.encoders, base64.decoders = {}, {} base64.encoders["base64"], base64.decoders["base64"] = base64.makeencoder("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=") base64.encoders["base64url"], base64.decoders["base64url"] = base64.makeencoder("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_") local alphabet_mt = {__index = function(tbl, key)         if type(key) == "string" and key:len() == 64 or key:len() == 65 then             base64.encoders[key], base64.decoders[key] = base64.makeencoder(key)             return tbl[key]         end     end} setmetatable(base64.encoders, alphabet_mt) setmetatable(base64.decoders, alphabet_mt) function base64.encode(str, encoder)     encoder = base64.encoders[encoder or "base64"] or error("invalid alphabet specified", 2)     str = tostring(str)     local t, k, n = {}, 1, #str     local lastn = n % 3     local cache = {}     for i = 1, n - lastn, 3 do         local a, b, c = string.byte(str, i, i + 2)         local v = a * 0x10000 + b * 0x100 + c         local s = cache[v]         if not s then             s =                 string.char(                 encoder[base64.extract(v, 18, 6)],                 encoder[base64.extract(v, 12, 6)],                 encoder[base64.extract(v, 6, 6)],                 encoder[base64.extract(v, 0, 6)]             )             cache[v] = s         end         t[k] = s         k = k + 1     end     if lastn == 2 then         local a, b = string.byte(str, n - 1, n)         local v = a * 0x10000 + b * 0x100         t[k] = string.char(encoder[base64.extract(v, 18, 6)], encoder[base64.extract(v, 12, 6)], encoder[base64.extract(v, 6, 6)], encoder[64])     elseif lastn == 1 then         local v = string.byte(str, n) * 0x10000         t[k] = string.char(encoder[base64.extract(v, 18, 6)], encoder[base64.extract(v, 12, 6)], encoder[64], encoder[64])     end     return table.concat(t) end function base64.decode(b64, decoder)     decoder = base64.decoders[decoder or "base64"] or error("invalid alphabet specified", 2)     local pattern = "[^%w%+%/%=]"     if decoder then         local s62, s63         for charcode, b64code in pairs(decoder) do             if b64code == 62 then                 s62 = charcode             elseif b64code == 63 then                 s63 = charcode             end         end         pattern = string.format("[^%%w%%%s%%%s%%=]", string.char(s62), string.char(s63))     end     b64 = string.gsub(tostring(b64), pattern, "")     local cache = {}     local t, k = {}, 1     local n = #b64     local padding = string.sub(b64, -2) == "==" and 2 or string.sub(b64, -1) == "=" and 1 or 0     for i = 1, padding > 0 and n - 4 or n, 4 do         local a, b, c, d = string.byte(b64, i, i + 3)         local v0 = a * 0x1000000 + b * 0x10000 + c * 0x100 + d         local s = cache[v0]         if not s then             local v = decoder[a] * 0x40000 + decoder[b] * 0x1000 + decoder[c] * 0x40 + decoder[d]             s = string.char(base64.extract(v, 16, 8), base64.extract(v, 8, 8), base64.extract(v, 0, 8))             cache[v0] = s         end         t[k] = s         k = k + 1     end     if padding == 1 then         local a, b, c = string.byte(b64, n - 3, n - 1)         local v = decoder[a] * 0x40000 + decoder[b] * 0x1000 + decoder[c] * 0x40         t[k] = string.char(base64.extract(v, 16, 8), base64.extract(v, 8, 8))     elseif padding == 2 then         local a, b = string.byte(b64, n - 3, n - 2)         local v = decoder[a] * 0x40000 + decoder[b] * 0x1000         t[k] = string.char(base64.extract(v, 16, 8))     end     return table.concat(t) end
+local http_library = {} do     if not pcall(ffi.sizeof, "SteamAPICall_t") then         ffi.cdef(             [[         typedef uint64_t SteamAPICall_t;         struct SteamAPI_callback_base_vtbl {             void(__thiscall *run1)(struct SteamAPI_callback_base *, void *, bool, uint64_t);             void(__thiscall *run2)(struct SteamAPI_callback_base *, void *);             int(__thiscall *get_size)(struct SteamAPI_callback_base *);         };         struct SteamAPI_callback_base {             struct SteamAPI_callback_base_vtbl *vtbl;             uint8_t flags;             int id;             uint64_t api_call_handle;             struct SteamAPI_callback_base_vtbl vtbl_storage[1];         };         ]]         )     end     http_library.ESteamAPICallFailure = {         [-1] = "No failure",         [0] = "Steam gone",         [1] = "Network failure",         [2] = "Invalid handle",         [3] = "Mismatched callback"     }     http_library.callback_base = ffi.typeof("struct SteamAPI_callback_base")     http_library.sizeof_callback_base = ffi.sizeof(http_library.callback_base)     http_library.callback_base_array = ffi.typeof("struct SteamAPI_callback_base[1]")     http_library.callback_base_ptr = ffi.typeof("struct SteamAPI_callback_base*")     http_library.uintptr_t = ffi.typeof("uintptr_t")     http_library.api_call_handlers = {}     http_library.pending_call_results = {}     http_library.registered_callbacks = {}     function http_library.pointer_key(p)         return tostring(tonumber(ffi.cast(http_library.uintptr_t, p)))     end     function http_library.callback_base_run_common(self, param, io_failure)         if io_failure then             io_failure = http_library.ESteamAPICallFailure[GetAPICallFailureReason(self.api_call_handle)] or "Unknown error"         end         self.api_call_handle = 0         xpcall(             function()                 local key = http_library.pointer_key(self)                 local handler = http_library.api_call_handlers[key]                 if handler ~= nil then                     xpcall(handler, print_raw, param, io_failure)                 end                 if http_library.pending_call_results[key] ~= nil then                     http_library.api_call_handlers[key] = nil                     http_library.pending_call_results[key] = nil                 end             end,             print_raw         )     end     function http_library.callback_base_run1(self, param, io_failure, api_call_handle)         if api_call_handle == self.api_call_handle then             http_library.callback_base_run_common(self, param, io_failure)         end     end     function http_library.callback_base_run2(self, param)         http_library.callback_base_run_common(self, param, false)     end     function http_library.callback_base_get_size(self)         return http_library.sizeof_callback_base     end     function http_library.call_result_cancel(self)         if self.api_call_handle ~= 0 then             http_library.SteamAPI_UnregisterCallResult(self, self.api_call_handle)             self.api_call_handle = 0             local key = http_library.pointer_key(self)             http_library.api_call_handlers[key] = nil             http_library.pending_call_results[key] = nil         end     end     pcall(ffi.metatype, http_library.callback_base, {__gc = http_library.call_result_cancel, __index = {cancel = http_library.call_result_cancel}})     http_library.callback_base_run1_ct = ffi.cast("void(__thiscall *)(struct SteamAPI_callback_base *, void *, bool, uint64_t)", http_library.callback_base_run1)     http_library.callback_base_run2_ct = ffi.cast("void(__thiscall *)(struct SteamAPI_callback_base *, void *)", http_library.callback_base_run2)     http_library.callback_base_get_size_ct = ffi.cast("int(__thiscall *)(struct SteamAPI_callback_base *)", http_library.callback_base_get_size)     function http_library.register_call_result(api_call_handle, handler, id)         assert(api_call_handle ~= 0)         local instance_storage = http_library.callback_base_array()         local instance = ffi.cast(http_library.callback_base_ptr, instance_storage)         instance.vtbl_storage[0].run1 = http_library.callback_base_run1_ct         instance.vtbl_storage[0].run2 = http_library.callback_base_run2_ct         instance.vtbl_storage[0].get_size = http_library.callback_base_get_size_ct         instance.vtbl = instance.vtbl_storage         instance.api_call_handle = api_call_handle         instance.id = id         local key = http_library.pointer_key(instance)         http_library.api_call_handlers[key] = handler         http_library.pending_call_results[key] = instance_storage         http_library.SteamAPI_RegisterCallResult(instance, api_call_handle)         return instance     end     function http_library.register_callback(id, handler)         assert(http_library.registered_callbacks[id] == nil)         local instance_storage = http_library.callback_base_array()         local instance = ffi.cast(http_library.callback_base_ptr, instance_storage)         instance.vtbl_storage[0].run1 = http_library.callback_base_run1_ct         instance.vtbl_storage[0].run2 = http_library.callback_base_run2_ct         instance.vtbl_storage[0].get_size = http_library.callback_base_get_size_ct         instance.vtbl = instance.vtbl_storage         instance.api_call_handle = 0         instance.id = id         local key = http_library.pointer_key(instance)         http_library.api_call_handlers[key] = handler         http_library.registered_callbacks[id] = instance_storage         http_library.SteamAPI_RegisterCallback(instance, id)     end     function http_library.find_sig(mdlname, pattern, typename, offset, deref_count)         local raw_match = utils.opcode_scan(mdlname, pattern) or error("signature not found", 2)         local match = ffi.cast("uintptr_t", raw_match)         if offset ~= nil and offset ~= 0 then             match = match + offset         end         if deref_count ~= nil then             for i = 1, deref_count do                 match = ffi.cast("uintptr_t*", match)[0]                 if match == nil then                     return error("signature not found")                 end             end         end         return ffi.cast(typename, match)     end     function http_library.vtable_entry(instance, index, type)         return ffi.cast(type, (ffi.cast("void***", instance)[0])[index])     end     http_library.SteamAPI_RegisterCallResult =         http_library.find_sig(         "steam_api.dll",         "55 8B EC 83 3D ? ? ? ? ? 7E 0D 68 ? ? ? ? FF 15 ? ? ? ? 5D C3 FF 75 10",         "void(__cdecl*)(struct SteamAPI_callback_base *, uint64_t)"     )     http_library.SteamAPI_UnregisterCallResult =         http_library.find_sig(         "steam_api.dll",         "55 8B EC FF 75 10 FF 75 0C",         "void(__cdecl*)(struct SteamAPI_callback_base *, uint64_t)"     )     http_library.SteamAPI_RegisterCallback =         http_library.find_sig(         "steam_api.dll",         "55 8B EC 83 3D ? ? ? ? ? 7E 0D 68 ? ? ? ? FF 15 ? ? ? ? 5D C3 C7 05",         "void(__cdecl*)(struct SteamAPI_callback_base *, int)"     )     http_library.steam_client_context = http_library.find_sig("client.dll", "B9 ? ? ? ? E8 ? ? ? ? 83 3D ? ? ? ? ? 0F 84", "uintptr_t", 1, 1)     http_library.steamutils = ffi.cast("uintptr_t*", http_library.steam_client_context)[3]     http_library.GetAPICallFailureReason = http_library.vtable_entry(http_library.steamutils, 12, "int(__thiscall*)(void*, SteamAPICall_t)")     function GetAPICallFailureReason(handle)         return http_library.GetAPICallFailureReason(http_library.steamutils, handle)     end     events.shutdown:set(         function()             for key, value in pairs(http_library.pending_call_results) do                 local instance = ffi.cast(http_library.callback_base_ptr, value)                 http_library.call_result_cancel(instance)             end             for key, value in pairs(http_library.registered_callbacks) do                 local instance = ffi.cast(http_library.callback_base_ptr, value)             end         end     ) end if not pcall(ffi.sizeof, "http_HTTPRequestHandle") then     ffi.cdef(         [[     typedef uint32_t http_HTTPRequestHandle;     typedef uint32_t http_HTTPCookieContainerHandle;     enum http_EHTTPMethod {         k_EHTTPMethodInvalid,         k_EHTTPMethodGET,         k_EHTTPMethodHEAD,         k_EHTTPMethodPOST,         k_EHTTPMethodPUT,         k_EHTTPMethodDELETE,         k_EHTTPMethodOPTIONS,         k_EHTTPMethodPATCH,     };     struct http_ISteamHTTPVtbl {         http_HTTPRequestHandle(__thiscall *CreateHTTPRequest)(uintptr_t, enum http_EHTTPMethod, const char *);         bool(__thiscall *SetHTTPRequestContextValue)(uintptr_t, http_HTTPRequestHandle, uint64_t);         bool(__thiscall *SetHTTPRequestNetworkActivityTimeout)(uintptr_t, http_HTTPRequestHandle, uint32_t);         bool(__thiscall *SetHTTPRequestHeaderValue)(uintptr_t, http_HTTPRequestHandle, const char *, const char *);         bool(__thiscall *SetHTTPRequestGetOrPostParameter)(uintptr_t, http_HTTPRequestHandle, const char *, const char *);         bool(__thiscall *SendHTTPRequest)(uintptr_t, http_HTTPRequestHandle, SteamAPICall_t *);         bool(__thiscall *SendHTTPRequestAndStreamResponse)(uintptr_t, http_HTTPRequestHandle, SteamAPICall_t *);         bool(__thiscall *DeferHTTPRequest)(uintptr_t, http_HTTPRequestHandle);         bool(__thiscall *PrioritizeHTTPRequest)(uintptr_t, http_HTTPRequestHandle);         bool(__thiscall *GetHTTPResponseHeaderSize)(uintptr_t, http_HTTPRequestHandle, const char *, uint32_t *);         bool(__thiscall *GetHTTPResponseHeaderValue)(uintptr_t, http_HTTPRequestHandle, const char *, uint8_t *, uint32_t);         bool(__thiscall *GetHTTPResponseBodySize)(uintptr_t, http_HTTPRequestHandle, uint32_t *);         bool(__thiscall *GetHTTPResponseBodyData)(uintptr_t, http_HTTPRequestHandle, uint8_t *, uint32_t);         bool(__thiscall *GetHTTPStreamingResponseBodyData)(uintptr_t, http_HTTPRequestHandle, uint32_t, uint8_t *, uint32_t);         bool(__thiscall *ReleaseHTTPRequest)(uintptr_t, http_HTTPRequestHandle);         bool(__thiscall *GetHTTPDownloadProgressPct)(uintptr_t, http_HTTPRequestHandle, float *);         bool(__thiscall *SetHTTPRequestRawPostBody)(uintptr_t, http_HTTPRequestHandle, const char *, uint8_t *, uint32_t);         http_HTTPCookieContainerHandle(__thiscall *CreateCookieContainer)(uintptr_t, bool);         bool(__thiscall *ReleaseCookieContainer)(uintptr_t, http_HTTPCookieContainerHandle);         bool(__thiscall *SetCookie)(uintptr_t, http_HTTPCookieContainerHandle, const char *, const char *, const char *);         bool(__thiscall *SetHTTPRequestCookieContainer)(uintptr_t, http_HTTPRequestHandle, http_HTTPCookieContainerHandle);         bool(__thiscall *SetHTTPRequestUserAgentInfo)(uintptr_t, http_HTTPRequestHandle, const char *);         bool(__thiscall *SetHTTPRequestRequiresVerifiedCertificate)(uintptr_t, http_HTTPRequestHandle, bool);         bool(__thiscall *SetHTTPRequestAbsoluteTimeoutMS)(uintptr_t, http_HTTPRequestHandle, uint32_t);         bool(__thiscall *GetHTTPRequestWasTimedOut)(uintptr_t, http_HTTPRequestHandle, bool *pbWasTimedOut);     };     ]]     ) end http_library.method_name_to_enum = {     get = ffi.C.k_EHTTPMethodGET,     head = ffi.C.k_EHTTPMethodHEAD,     post = ffi.C.k_EHTTPMethodPOST,     put = ffi.C.k_EHTTPMethodPUT,     delete = ffi.C.k_EHTTPMethodDELETE,     options = ffi.C.k_EHTTPMethodOPTIONS,     patch = ffi.C.k_EHTTPMethodPATCH } http_library.status_code_to_message = {     [100] = "Continue",     [101] = "Switching Protocols",     [102] = "Processing",     [200] = "OK",     [201] = "Created",     [202] = "Accepted",     [203] = "Non-Authoritative Information",     [204] = "No Content",     [205] = "Reset Content",     [206] = "Partial Content",     [207] = "Multi-Status",     [208] = "Already Reported",     [250] = "Low on Storage Space",     [226] = "IM Used",     [300] = "Multiple Choices",     [301] = "Moved Permanently",     [302] = "Found",     [303] = "See Other",     [304] = "Not Modified",     [305] = "Use Proxy",     [306] = "Switch Proxy",     [307] = "Temporary Redirect",     [308] = "Permanent Redirect",     [400] = "Bad Request",     [401] = "Unauthorized",     [402] = "Payment Required",     [403] = "Forbidden",     [404] = "Not Found",     [405] = "Method Not Allowed",     [406] = "Not Acceptable",     [407] = "Proxy Authentication Required",     [408] = "Request Timeout",     [409] = "Conflict",     [410] = "Gone",     [411] = "Length Required",     [412] = "Precondition Failed",     [413] = "Request Entity Too Large",     [414] = "Request-URI Too Long",     [415] = "Unsupported Media Type",     [416] = "Requested Range Not Satisfiable",     [417] = "Expectation Failed",     [418] = "I'm a teapot",     [420] = "Enhance Your Calm",     [422] = "Unprocessable Entity",     [423] = "Locked",     [424] = "Failed Dependency",     [424] = "Method Failure",     [425] = "Unordered Collection",     [426] = "Upgrade Required",     [428] = "Precondition Required",     [429] = "Too Many Requests",     [431] = "Request Header Fields Too Large",     [444] = "No Response",     [449] = "Retry With",     [450] = "Blocked by Windows Parental Controls",     [451] = "Parameter Not Understood",     [451] = "Unavailable For Legal Reasons",     [451] = "Redirect",     [452] = "Conference Not Found",     [453] = "Not Enough Bandwidth",     [454] = "Session Not Found",     [455] = "Method Not Valid in This State",     [456] = "Header Field Not Valid for Resource",     [457] = "Invalid Range",     [458] = "Parameter Is Read-Only",     [459] = "Aggregate Operation Not Allowed",     [460] = "Only Aggregate Operation Allowed",     [461] = "Unsupported Transport",     [462] = "Destination Unreachable",     [494] = "Request Header Too Large",     [495] = "Cert Error",     [496] = "No Cert",     [497] = "HTTP to HTTPS",     [499] = "Client Closed Request",     [500] = "Internal Server Error",     [501] = "Not Implemented",     [502] = "Bad Gateway",     [503] = "Service Unavailable",     [504] = "Gateway Timeout",     [505] = "HTTP Version Not Supported",     [506] = "Variant Also Negotiates",     [507] = "Insufficient Storage",     [508] = "Loop Detected",     [509] = "Bandwidth Limit Exceeded",     [510] = "Not Extended",     [511] = "Network Authentication Required",     [551] = "Option not supported",     [598] = "Network read timeout error",     [599] = "Network connect timeout error" } http_library.single_allowed_keys = {"params", "body", "json"} http_library.CALLBACK_HTTPRequestCompleted = 2101 http_library.CALLBACK_HTTPRequestHeadersReceived = 2102 http_library.CALLBACK_HTTPRequestDataReceived = 2103 function http_library.find_isteamhttp()     local steamhttp = ffi.cast("uintptr_t*", http_library.steam_client_context)[12]     if steamhttp == 0 or steamhttp == nil then         return error("http_library.find_isteamhttp failed")     end     local vmt = ffi.cast("struct http_ISteamHTTPVtbl**", steamhttp)[0]     if vmt == 0 or vmt == nil then         return error("http_library.find_isteamhttp failed")     end     return steamhttp, vmt end function http_library.func_bind(func, arg)     return function(...)         return func(arg, ...)     end end http_library.HTTPRequestCompleted_t_ptr = ffi.typeof([[ struct { http_HTTPRequestHandle m_hRequest; uint64_t m_ulContextValue; bool m_bRequestSuccessful; int m_eStatusCode; uint32_t m_unBodySize; } * ]]) http_library.HTTPRequestHeadersReceived_t_ptr = ffi.typeof([[ struct { http_HTTPRequestHandle m_hRequest; uint64_t m_ulContextValue; } * ]]) http_library.HTTPRequestDataReceived_t_ptr = ffi.typeof([[ struct { http_HTTPRequestHandle m_hRequest; uint64_t m_ulContextValue; uint32_t m_cOffset; uint32_t m_cBytesReceived; } * ]]) http_library.CookieContainerHandle_t = ffi.typeof([[ struct { http_HTTPCookieContainerHandle m_hCookieContainer; } ]]) http_library.SteamAPICall_t_arr = ffi.typeof("SteamAPICall_t[1]") http_library.unit8_ptr = ffi.typeof("uint8_t[?]") http_library.uint_ptr = ffi.typeof("unsigned int[?]") http_library.bool_ptr = ffi.typeof("bool[1]") http_library.float_ptr = ffi.typeof("float[1]") http_library.steam_http, http_library.steam_http_vtable = http_library.find_isteamhttp() http_library.CreateHTTPRequest = http_library.func_bind(http_library.steam_http_vtable.CreateHTTPRequest, http_library.steam_http) http_library.SetHTTPRequestNetworkActivityTimeout = http_library.func_bind(http_library.steam_http_vtable.SetHTTPRequestNetworkActivityTimeout, http_library.steam_http) http_library.SetHTTPRequestHeaderValue = http_library.func_bind(http_library.steam_http_vtable.SetHTTPRequestHeaderValue, http_library.steam_http) http_library.SetHTTPRequestGetOrPostParameter = http_library.func_bind(http_library.steam_http_vtable.SetHTTPRequestGetOrPostParameter, http_library.steam_http) http_library.SendHTTPRequest = http_library.func_bind(http_library.steam_http_vtable.SendHTTPRequest, http_library.steam_http) http_library.SendHTTPRequestAndStreamResponse = http_library.func_bind(http_library.steam_http_vtable.SendHTTPRequestAndStreamResponse, http_library.steam_http) http_library.DeferHTTPRequest = http_library.func_bind(http_library.steam_http_vtable.DeferHTTPRequest, http_library.steam_http) http_library.PrioritizeHTTPRequest = http_library.func_bind(http_library.steam_http_vtable.PrioritizeHTTPRequest, http_library.steam_http) http_library.GetHTTPResponseHeaderSize = http_library.func_bind(http_library.steam_http_vtable.GetHTTPResponseHeaderSize, http_library.steam_http) http_library.GetHTTPResponseHeaderValue = http_library.func_bind(http_library.steam_http_vtable.GetHTTPResponseHeaderValue, http_library.steam_http) http_library.GetHTTPResponseBodyData = http_library.func_bind(http_library.steam_http_vtable.GetHTTPResponseBodyData, http_library.steam_http) http_library.GetHTTPStreamingResponseBodyData = http_library.func_bind(http_library.steam_http_vtable.GetHTTPStreamingResponseBodyData, http_library.steam_http) http_library.ReleaseHTTPRequest = http_library.func_bind(http_library.steam_http_vtable.ReleaseHTTPRequest, http_library.steam_http) http_library.GetHTTPDownloadProgressPct = http_library.func_bind(http_library.steam_http_vtable.GetHTTPDownloadProgressPct, http_library.steam_http) http_library.SetHTTPRequestRawPostBody = http_library.func_bind(http_library.steam_http_vtable.SetHTTPRequestRawPostBody, http_library.steam_http) http_library.CreateCookieContainer = http_library.func_bind(http_library.steam_http_vtable.CreateCookieContainer, http_library.steam_http) http_library.ReleaseCookieContainer = http_library.func_bind(http_library.steam_http_vtable.ReleaseCookieContainer, http_library.steam_http) http_library.SetCookie = http_library.func_bind(http_library.steam_http_vtable.SetCookie, http_library.steam_http) http_library.SetHTTPRequestCookieContainer = http_library.func_bind(http_library.steam_http_vtable.SetHTTPRequestCookieContainer, http_library.steam_http) http_library.SetHTTPRequestUserAgentInfo = http_library.func_bind(http_library.steam_http_vtable.SetHTTPRequestUserAgentInfo, http_library.steam_http) http_library.SetHTTPRequestRequiresVerifiedCertificate = http_library.func_bind(http_library.steam_http_vtable.SetHTTPRequestRequiresVerifiedCertificate, http_library.steam_http) http_library.SetHTTPRequestAbsoluteTimeoutMS = http_library.func_bind(http_library.steam_http_vtable.SetHTTPRequestAbsoluteTimeoutMS, http_library.steam_http) http_library.GetHTTPRequestWasTimedOut = http_library.func_bind(http_library.steam_http_vtable.GetHTTPRequestWasTimedOut, http_library.steam_http) http_library.completed_callbacks, http_library.is_in_callback = {}, false http_library.headers_received_callback_registered, http_library.headers_received_callbacks = false, {} http_library.data_received_callback_registered, http_library.data_received_callbacks = false, {} http_library.cookie_containers = setmetatable({}, {__mode = "k"}) http_library.headers_request_handles, http_library.request_handles_headers = setmetatable({}, {__mode = "k"}), setmetatable({}, {__mode = "v"}) http_library.response_headers_mt = {__index = function(req_key, name)         local req = http_library.headers_request_handles[req_key]         if req == nil then             return         end         name = tostring(name)         if req.m_hRequest ~= 0 then             local header_size = http_library.uint_ptr(1)             if http_library.GetHTTPResponseHeaderSize(req.m_hRequest, name, header_size) then                 if header_size ~= nil then                     header_size = header_size[0]                     if header_size < 0 then                         return                     end                     local buffer = http_library.unit8_ptr(header_size)                     if http_library.GetHTTPResponseHeaderValue(req.m_hRequest, name, buffer, header_size) then                         req_key[name] = ffi.string(buffer, header_size - 1)                         return req_key[name]                     end                 end             end         end     end, __metatable = false} http_library.cookie_container_mt = {__index = {set_cookie = function(handle_key, host, url, name, value)             local handle = http_library.cookie_containers[handle_key]             if handle == nil or handle.m_hCookieContainer == 0 then                 return             end             http_library.SetCookie(handle.m_hCookieContainer, host, url, tostring(name) .. "=" .. tostring(value))         end}, __metatable = false} function http_library.cookie_container_gc(handle)     if handle.m_hCookieContainer ~= 0 then         http_library.ReleaseCookieContainer(handle.m_hCookieContainer)         handle.m_hCookieContainer = 0     end end function http_library.http_request_gc(req)     if req.m_hRequest ~= 0 then         http_library.ReleaseHTTPRequest(req.m_hRequest)         req.m_hRequest = 0     end end function http_library.http_request_error(req_handle, ...)     http_library.ReleaseHTTPRequest(req_handle)     return error(...) end function http_library.http_request_callback_common(req, callback, successful, data, ...)     local headers = http_library.request_handles_headers[req.m_hRequest]     if headers == nil then         headers = setmetatable({}, http_library.response_headers_mt)         http_library.request_handles_headers[req.m_hRequest] = headers     end     http_library.headers_request_handles[headers] = req     data.headers = headers     http_library.is_in_callback = true     xpcall(callback, print_raw, successful, data, ...)     http_library.is_in_callback = false end function http_library.http_request_completed(param, io_failure)     if param == nil then         return     end     local req = ffi.cast(http_library.HTTPRequestCompleted_t_ptr, param)     if req.m_hRequest ~= 0 then         local callback = http_library.completed_callbacks[req.m_hRequest]         if callback ~= nil then             http_library.completed_callbacks[req.m_hRequest] = nil             http_library.data_received_callbacks[req.m_hRequest] = nil             http_library.headers_received_callbacks[req.m_hRequest] = nil             if callback then                 local successful = io_failure == false and req.m_bRequestSuccessful                 local status = req.m_eStatusCode                 local response = {status = status}                 local body_size = req.m_unBodySize                 if successful and body_size > 0 then                     local buffer = http_library.unit8_ptr(body_size)                     if http_library.GetHTTPResponseBodyData(req.m_hRequest, buffer, body_size) then                         response.body = ffi.string(buffer, body_size)                     end                 elseif not req.m_bRequestSuccessful then                     local timed_out = http_library.bool_ptr()                     http_library.GetHTTPRequestWasTimedOut(req.m_hRequest, timed_out)                     response.timed_out = timed_out ~= nil and timed_out[0] == true                 end                 if status > 0 then                     response.status_message = http_library.status_code_to_message[status] or "Unknown status"                 elseif io_failure then                     response.status_message = string_format("IO Failure: %s", io_failure)                 else                     response.status_message = response.timed_out and "Timed out" or "Unknown error"                 end                 http_library.http_request_callback_common(req, callback, successful, response)             end             http_library.http_request_gc(req)         end     end end function http_library.http_request_headers_received(param, io_failure)     if param == nil then         return     end     local req = ffi.cast(http_library.HTTPRequestHeadersReceived_t_ptr, param)     if req.m_hRequest ~= 0 then         local callback = http_library.headers_received_callbacks[req.m_hRequest]         if callback then             http_library.http_request_callback_common(req, callback, io_failure == false, {})         end     end end function http_library.http_request_data_received(param, io_failure)     if param == nil then         return     end     local req = ffi.cast(http_library.HTTPRequestDataReceived_t_ptr, param)     if req.m_hRequest ~= 0 then         local callback = http_library.data_received_callbacks[req.m_hRequest]         if http_library.data_received_callbacks[req.m_hRequest] then             local data = {}             local download_percentage_prt = http_library.float_ptr()             if http_library.GetHTTPDownloadProgressPct(req.m_hRequest, download_percentage_prt) then                 data.download_progress = tonumber(download_percentage_prt[0])             end             local buffer = http_library.unit8_ptr(req.m_cBytesReceived)             if http_library.GetHTTPStreamingResponseBodyData(req.m_hRequest, req.m_cOffset, buffer, req.m_cBytesReceived) then                 data.body = ffi.string(buffer, req.m_cBytesReceived)             end             http_library.http_request_callback_common(req, callback, io_failure == false, data)         end     end end function http_library.http_request_new(method, url, options, callbacks) if type(options) == "function" and callbacks == nil then callbacks = options options = {} end options = options or {} local method = http_library.method_name_to_enum[string.lower(tostring(method))] if method == nil then return error("invalid HTTP method") end if type(url) ~= "string" then return error("URL has to be a string") end local completed_callback, headers_received_callback, data_received_callback if type(callbacks) == "function" then completed_callback = callbacks elseif type(callbacks) == "table" then completed_callback = callbacks.completed or callbacks.complete headers_received_callback = callbacks.headers_received or callbacks.headers data_received_callback = callbacks.data_received or callbacks.data if completed_callback ~= nil and type(completed_callback) ~= "function" then return error("callbacks.completed callback has to be a function") elseif headers_received_callback ~= nil and type(headers_received_callback) ~= "function" then return error("callbacks.headers_received callback has to be a function") elseif data_received_callback ~= nil and type(data_received_callback) ~= "function" then return error("callbacks.data_received callback has to be a function") end else return error("callbacks has to be a function or table") end local req_handle = http_library.CreateHTTPRequest(method, url) if req_handle == 0 then     return error("Failed to create HTTP request") end local set_one = false for i, key in ipairs(http_library.single_allowed_keys) do     if options[key] ~= nil then         if set_one then             return error("can only set options.params, options.body or options.json")         else             set_one = true         end     end end local json_body if options.json ~= nil then     local success     success, json_body = pcall(json.stringify, options.json)     if not success then         return error("options.json is invalid: " .. json_body)     end end local network_timeout = options.network_timeout if network_timeout == nil then     network_timeout = 10 end if type(network_timeout) == "number" and network_timeout > 0 then     if not http_library.SetHTTPRequestNetworkActivityTimeout(req_handle, network_timeout) then         return http_library.http_request_error(req_handle, "failed to set network_timeout")     end elseif network_timeout ~= nil then     return http_library.http_request_error(req_handle, "options.network_timeout has to be of type number and greater than 0") end local absolute_timeout = options.absolute_timeout if absolute_timeout == nil then     absolute_timeout = 30 end if type(absolute_timeout) == "number" and absolute_timeout > 0 then     if not http_library.SetHTTPRequestAbsoluteTimeoutMS(req_handle, absolute_timeout * 1000) then         return http_library.http_request_error(req_handle, "failed to set absolute_timeout")     end elseif absolute_timeout ~= nil then     return http_library.http_request_error(req_handle, "options.absolute_timeout has to be of type number and greater than 0") end local content_type = json_body ~= nil and "application/json" or "text/plain" local authorization_set local headers = options.headers if type(headers) == "table" then     for name, value in pairs(headers) do         name = tostring(name)         value = tostring(value)         local name_lower = string.lower(name)         if name_lower == "content-type" then             content_type = value         elseif name_lower == "authorization" then             authorization_set = true         end         if not http_library.SetHTTPRequestHeaderValue(req_handle, name, value) then             return http_library.http_request_error(req_handle, "failed to set header " .. name)         end     end elseif headers ~= nil then     return http_library.http_request_error(req_handle, "options.headers has to be of type table") end local authorization = options.authorization if type(authorization) == "table" then     if authorization_set then         return http_library.http_request_error(             req_handle,             "Cannot set both options.authorization and the 'Authorization' header."         )     end     local username, password = authorization[1], authorization[2]     local header_value =         string_format(         "Basic %s",         base64.encode(string_format("%s:%s", tostring(username), tostring(password)), "base64")     )     if not http_library.SetHTTPRequestHeaderValue(req_handle, "Authorization", header_value) then         return http_library.http_request_error(req_handle, "failed to apply options.authorization")     end elseif authorization ~= nil then     return http_library.http_request_error(req_handle, "options.authorization has to be of type table") end local body = json_body or options.body if type(body) == "string" then     local len = string_len(body)     if not http_library.SetHTTPRequestRawPostBody(req_handle, content_type, ffi.cast("unsigned char*", body), len) then         return http_library.http_request_error(req_handle, "failed to set post body")     end elseif body ~= nil then     return http_library.http_request_error(req_handle, "options.body has to be of type string") end local params = options.params if type(params) == "table" then     for name, value in pairs(params) do         name = tostring(name)         if not http_library.SetHTTPRequestGetOrPostParameter(req_handle, name, tostring(value)) then             return http_library.http_request_error(req_handle, "failed to set parameter " .. name)         end     end elseif params ~= nil then     return http_library.http_request_error(req_handle, "options.params has to be of type table") end local require_ssl = options.require_ssl if type(require_ssl) == "boolean" then     if not http_library.SetHTTPRequestRequiresVerifiedCertificate(req_handle, require_ssl == true) then         return http_library.http_request_error(req_handle, "failed to set require_ssl")     end elseif require_ssl ~= nil then     return http_library.http_request_error(req_handle, "options.require_ssl has to be of type boolean") end local user_agent_info = options.user_agent_info if type(user_agent_info) == "string" then     if not http_library.SetHTTPRequestUserAgentInfo(req_handle, tostring(user_agent_info)) then         return http_library.http_request_error(req_handle, "failed to set user_agent_info")     end elseif user_agent_info ~= nil then     return http_library.http_request_error(req_handle, "options.user_agent_info has to be of type string") end local cookie_container = options.cookie_container if type(cookie_container) == "table" then     local handle = http_library.cookie_containers[cookie_container]     if handle ~= nil and handle.m_hCookieContainer ~= 0 then         if not http_library.SetHTTPRequestCookieContainer(req_handle, handle.m_hCookieContainer) then             return http_library.http_request_error(req_handle, "failed to set user_agent_info")         end     else         return http_library.http_request_error(req_handle, "options.cookie_container has to a valid cookie container")     end elseif cookie_container ~= nil then     return http_library.http_request_error(req_handle, "options.cookie_container has to a valid cookie container") end local send_func = http_library.SendHTTPRequest local stream_response = options.stream_response if type(stream_response) == "boolean" then     if stream_response then         send_func = http_library.SendHTTPRequestAndStreamResponse         if completed_callback == nil and headers_received_callback == nil and data_received_callback == nil then             return http_library.http_request_error(                 req_handle,                 "a 'completed', 'headers_received' or 'data_received' callback is required"             )         end     else         if completed_callback == nil then             return http_library.http_request_error(req_handle, "'completed' callback has to be set for non-streamed requests")         elseif headers_received_callback ~= nil or data_received_callback ~= nil then             return http_library.http_request_error(req_handle, "non-streamed requests only support 'completed' callbacks")         end     end elseif stream_response ~= nil then     return http_library.http_request_error(req_handle, "options.stream_response has to be of type boolean") end if headers_received_callback ~= nil or data_received_callback ~= nil then     http_library.headers_received_callbacks[req_handle] = headers_received_callback or false     if headers_received_callback ~= nil then         if not http_library.headers_received_callback_registered then             http_library.register_callback(http_library.CALLBACK_HTTPRequestHeadersReceived, http_library.http_request_headers_received)             http_library.headers_received_callback_registered = true         end     end     http_library.data_received_callbacks[req_handle] = data_received_callback or false     if data_received_callback ~= nil then         if not http_library.data_received_callback_registered then             http_library.register_callback(http_library.CALLBACK_HTTPRequestDataReceived, http_library.http_request_data_received)             http_library.data_received_callback_registered = true         end     end end local call_handle = http_library.SteamAPICall_t_arr() if not send_func(req_handle, call_handle) then     http_library.ReleaseHTTPRequest(req_handle)     if completed_callback ~= nil then         completed_callback(false, {status = 0, status_message = "Failed to send request"})     end     return end if options.priority == "defer" or options.priority == "prioritize" then local func = options.priority == "prioritize" and http_library.PrioritizeHTTPRequest or http_library.DeferHTTPRequest if not func(req_handle) then return http_library.http_request_error(req_handle, "failed to set priority") end elseif options.priority ~= nil then return http_library.http_request_error(req_handle, "options.priority has to be 'defer' of 'prioritize'") end http_library.completed_callbacks[req_handle] = completed_callback or false if completed_callback ~= nil then http_library.register_call_result(call_handle[0], http_library.http_request_completed, http_library.CALLBACK_HTTPRequestCompleted) end end function http_library.cookie_container_new(allow_modification) if allow_modification ~= nil and type(allow_modification) ~= "boolean" then return error("allow_modification has to be of type boolean") end local handle_raw = http_library.CreateCookieContainer(allow_modification == true) if handle_raw ~= nil then local handle = http_library.CookieContainerHandle_t(handle_raw) ffi.gc(handle, http_library.cookie_container_gc) local key = setmetatable({}, http_library.cookie_container_mt) http_library.cookie_containers[key] = handle return key end end local http = {request = http_library.http_request_new, create_cookie_container = http_library.cookie_container_new} for method in pairs(http_library.method_name_to_enum) do http[method] = function(...) return http_library.http_request_new(method, ...) end end
 
-local styles = {
-    --                     1    2     3    4    5     6    7    8     9    10   11
+local D = {}
+local E, F, G, H, I = table.insert, table.concat, string.rep, string.len, string.sub
+local J, K, L = math.max, math.floor, math.ceil
+local function M(N)
+    local O, P = string.gsub(tostring(N), "[^\128-\193]", "")
+    return P
+end
+local Q = {
     ["ASCII"] = {"-", "|", "+"},
     ["Compact"] = {"-", " ", " ", " ", " ", " ", " ", " "},
-    ["ASCII (Girder)"] = {"=", "||",  "//", "[]", "\\\\",  "|]", "[]", "[|",  "\\\\", "[]", "//"},
-    ["Unicode"] = {"═", "║",  "╔", "╦", "╗",  "╠", "╬", "╣",  "╚", "╩", "╝"},
-    ["Unicode (Single Line)"] = {"─", "│",  "┌", "┬", "┐",  "├", "┼", "┤",  "└", "┴", "┘"},
+    ["ASCII (Girder)"] = {"=", "||", "//", "[]", "\\\\", "|]", "[]", "[|", "\\\\", "[]", "//"},
+    ["Unicode"] = {"═", "║", "╔", "╦", "╗", "╠", "╬", "╣", "╚", "╩", "╝"},
+    ["Unicode (Single Line)"] = {"─", "│", "┌", "┬", "┐", "├", "┼", "┤", "└", "┴", "┘"},
     ["table_genarkdown (Github)"] = {"-", "|", "|"}
 }
-
---initialize missing style values (ascii etc)
-for _, style in pairs(styles) do
-    if #style == 3 then
-        for j=4, 11 do
-            style[j] = style[3]
+for O, R in pairs(Q) do
+    if #R == 3 then
+        for k = 4, 11 do
+            R[k] = R[3]
         end
     end
 end
-
-local function justify_center(text, width)
-    text = string_sub(text, 1, width)
-    local length = len(text)
-    return string_rep(" ", math_floor(width/2-length/2)) .. text .. string_rep(" ", math_ceil(width/2-length/2))
+local function S(T, U)
+    T = I(T, 1, U)
+    local V = M(T)
+    return G(" ", K(U / 2 - V / 2)) .. T .. G(" ", L(U / 2 - V / 2))
 end
-
-local function justify_left(text, width)
-    text = string_sub(text, 1, width)
-    return text .. string_rep(" ", width-len(text))
+local function W(T, U)
+    T = I(T, 1, U)
+    return T .. G(" ", U - M(T))
 end
-
-function table_gen.generate_table(rows, headings, options)
-    if type(options) == "string" or options == nil then
-        options = {
-            style=options or "ASCII",
-        }
+function D.generate_table(X, Y, Z)
+    if type(Z) == "string" or Z == nil then
+        Z = {style = Z or "ASCII"}
     end
-
-    if options.top_line == nil then
-        options.top_line = options.style ~= "table_genarkdown (Github)"
+    if Z.top_line == nil then
+        Z.top_line = Z.style ~= "table_genarkdown (Github)"
     end
-
-    if options.bottom_line == nil then
-        options.bottom_line = options.style ~= "table_genarkdown (Github)"
+    if Z.bottom_line == nil then
+        Z.bottom_line = Z.style ~= "table_genarkdown (Github)"
     end
-
-    if options.header_seperator_line == nil then
-        options.header_seperator_line = true
+    if Z.header_seperator_line == nil then
+        Z.header_seperator_line = true
     end
-
-    local seperators = styles[options.style] or styles["ASCII"]
-
-    local rows_out, columns_width, columns_count = {}, {}, 0
-    local has_headings = headings ~= nil and #headings > 0
-
-    if has_headings then
-        for i=1, #headings do
-            columns_width[i] = len(headings[i])+2
+    local _ = Q[Z.style] or Q["ASCII"]
+    local a0, a1, a2 = {}, {}, 0
+    local a3 = Y ~= nil and #Y > 0
+    if a3 then
+        for j = 1, #Y do
+            a1[j] = M(Y[j]) + 2
         end
-        columns_count = #headings
+        a2 = #Y
     else
-        for i=1, #rows do
-            columns_count = math_max(columns_count, #rows[i])
+        for j = 1, #X do
+            a2 = J(a2, #X[j])
         end
     end
-
-    for i=1, #rows do
-        local row = rows[i]
-        for c=1, columns_count do
-            columns_width[c] = math_max(columns_width[c] or 2, len(row[c])+2)
+    for j = 1, #X do
+        local a4 = X[j]
+        for d = 1, a2 do
+            a1[d] = J(a1[d] or 2, M(a4[d]) + 2)
         end
     end
-
-    local column_seperator_rows = {}
-    for i=1, columns_count do
-        table_insert(column_seperator_rows, string_rep(seperators[1], columns_width[i]))
+    local a5 = {}
+    for j = 1, a2 do
+        E(a5, G(_[1], a1[j]))
     end
-    if options.top_line then
-        table_insert(rows_out, seperators[3] .. table_concat(column_seperator_rows, seperators[4]) .. seperators[5])
+    if Z.top_line then
+        E(a0, _[3] .. F(a5, _[4]) .. _[5])
     end
-
-    if has_headings then
-        local headings_justified = {}
-        for i=1, columns_count do
-            headings_justified[i] = justify_center(headings[i], columns_width[i])
+    if a3 then
+        local a6 = {}
+        for j = 1, a2 do
+            a6[j] = S(Y[j], a1[j])
         end
-        table_insert(rows_out, seperators[2] .. table_concat(headings_justified, seperators[2]) .. seperators[2])
-        if options.header_seperator_line then
-            table_insert(rows_out, seperators[6] .. table_concat(column_seperator_rows, seperators[7]) .. seperators[8])
+        E(a0, _[2] .. F(a6, _[2]) .. _[2])
+        if Z.header_seperator_line then
+            E(a0, _[6] .. F(a5, _[7]) .. _[8])
         end
     end
-
-    for i=1, #rows do
-        local row, row_out = rows[i], {}
-        if #row == 0 then
-            table_insert(rows_out, seperators[6] .. table_concat(column_seperator_rows, seperators[7]) .. seperators[8])
+    for j = 1, #X do
+        local a4, a7 = X[j], {}
+        if #a4 == 0 then
+            E(a0, _[6] .. F(a5, _[7]) .. _[8])
         else
-            for j=1, columns_count do
-                local justified = options.value_justify == "center" and justify_center(row[j] or "", columns_width[j]-2) or justify_left(row[j] or "", columns_width[j]-2)
-                row_out[j] = " " .. justified .. " "
+            for k = 1, a2 do
+                local a8 = Z.value_justify == "center" and S(a4[k] or "", a1[k] - 2) or W(a4[k] or "", a1[k] - 2)
+                a7[k] = " " .. a8 .. " "
             end
-            table_insert(rows_out, seperators[2] .. table_concat(row_out, seperators[2]) .. seperators[2])
+            E(a0, _[2] .. F(a7, _[2]) .. _[2])
         end
     end
-
-    if options.bottom_line and seperators[9] then
-        table_insert(rows_out, seperators[9] .. table_concat(column_seperator_rows, seperators[10]) .. seperators[11])
+    if Z.bottom_line and _[9] then
+        E(a0, _[9] .. F(a5, _[10]) .. _[11])
     end
-
-    return table_concat(rows_out, "\n")
+    return F(a0, "\n")
 end
-
-setmetatable(table_gen, {
-    __call = function(_, ...)
-        return table_gen.generate_table(...)
+setmetatable(
+    D,
+    {__call = function(O, ...)
+            return D.generate_table(...)
+        end}
+)
+local a9
+do
+    local aa = {["char[?]"] = ffi.typeof "char[?]"}
+    local ab =
+        utils.get_vfunc("filesystem_stdio", "VBaseFileSystem011", 0, "int(__thiscall*)(void*, void*, int, void*)")
+    local ac =
+        utils.get_vfunc(
+        "filesystem_stdio",
+        "VBaseFileSystem011",
+        2,
+        "void*(__thiscall*)(void*, const char*, const char*, const char*)"
+    )
+    local ad = utils.get_vfunc("filesystem_stdio", "VBaseFileSystem011", 3, "void(__thiscall*)(void*, void*)")
+    local ae = utils.get_vfunc("filesystem_stdio", "VBaseFileSystem011", 7, "unsigned int(__thiscall*)(void*, void*)")
+    function a9(j)
+        local k = ac(j, "r", "MOD")
+        if k == nil then
+            return nil
+        end
+        local l = ae(k)
+        if l == 0 then
+            ad(k)
+            return nil
+        end
+        local m = aa["char[?]"](l + 1)
+        if ab(m, l, k) == 0 then
+            ad(k)
+            return nil
+        end
+        ad(k)
+        return ffi.string(m, l)
     end
-})
-
-
-local game_dir = string.sub(common.get_game_directory(), 0 , -5)
-local encode local escape_char_map = {   [ "\\" ] = "\\",   [ "\"" ] = "\"",   [ "\b" ] = "b",   [ "\f" ] = "f",   [ "\n" ] = "n",   [ "\r" ] = "r",   [ "\t" ] = "t", } local escape_char_map_inv = { [ "/" ] = "/" } for k, v in pairs(escape_char_map) do escape_char_map_inv[v] = k end local function escape_char(c) return "\\" .. (escape_char_map[c] or string.format("u%04x", c:byte())) end local function encode_nil(val) return "null" end local function encode_table(val, stack) local res = {} stack = stack or {} if stack[val] then error("circular reference") end stack[val] = true if rawget(val, 1) ~= nil or next(val) == nil then local n = 0 for k in pairs(val) do if type(k) ~= "number" then error("invalid table: mixed or invalid key types") end n = n + 1 end if n ~= #val then error("invalid table: sparse array") end for i, v in ipairs(val) do table.insert(res, encode(v, stack)) end stack[val] = nil return "[" .. table.concat(res, ",") .. "]" else for k, v in pairs(val) do if type(k) ~= "string" then error("invalid table: mixed or invalid key types") end table.insert(res, encode(k, stack) .. ":" .. encode(v, stack)) end stack[val] = nil return "{" .. table.concat(res, ",") .. "}" end end local function encode_string(val) return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"' end local function encode_number(val) if val ~= val or val <= -math.huge or val >= math.huge then error("unexpected number value '" .. tostring(val) .. "'") end return string.format("%.14g", val) end local type_func_map = { [ "nil"     ] = encode_nil, [ "table"   ] = encode_table, [ "string"  ] = encode_string, [ "number"  ] = encode_number, [ "boolean" ] = tostring, } encode = function(val, stack) local t = type(val) local f = type_func_map[t] if f then return f(val, stack) end error("unexpected type '" .. t .. "'") end function json.encode(val) return( encode(val) ) end
-local database = {} local db = json.parse(files.read(game_dir.."/database.json") or "[]") or {} function database.read(key) return db[key] end function database.write(key, value) db[key] = value files.write(game_dir.."/database.json", json.encode(db)) end function database.flush() for key in pairs(db) do db[key] = nil end end
-local vectorlib={}local b={__index=vectorlib}function vectorlib.new(c,d,e)return setmetatable({x=c~=nil and c or 0,y=d~=nil and d or 0,z=e~=nil and e or 0},b)end;function vectorlib:offset(f,g,h)f=f or 0;g=g or 0;h=h or 0;self.x=self.x+f;self.y=self.y+g;self.z=self.z+h end;function vectorlib:unpack()return self.x,self.y,self.z end;function vectorlib:nullify()self.x=0;self.y=0;self.z=0 end;function b.__tostring(i)return string.format("%s, %s, %s",i.x,i.y,i.z)end;function b.__concat(i)return string.format("%s, %s, %s",i.x,i.y,i.z)end;function b.__eq(i,j)return i.x==j.x and i.y==j.y and i.z==j.z end;function b.__lt(i,j)if type(i)=="number"then return i<j.x or i<j.y or i<j.z end;if type(j)=="number"then return i.x<j or i.y<j or i.z<j end;return i.x<j.x or i.y<j.y or i.z<j.z end;function b.__le(i,j)if type(i)=="number"then return i<=j.x or i<=j.y or i<=j.z end;if type(j)=="number"then return i.x<=j or i.y<=j or i.z<=j end;return i.x<=j.x or i.y<=j.y or i.z<=j.z end;function b.__add(i,j)if type(i)=="number"then return vectorlib.new(i+j.x,i+j.y,i+j.z)end;if type(j)=="number"then return vectorlib.new(i.x+j,i.y+j,i.z+j)end;return vectorlib.new(i.x+j.x,i.y+j.y,i.z+j.z)end;function b.__sub(i,j)if type(i)=="number"then return vectorlib.new(i-j.x,i-j.y,i-j.z)end;if type(j)=="number"then return vectorlib.new(i.x-j,i.y-j,i.z-j)end;return vectorlib.new(i.x-j.x,i.y-j.y,i.z-j.z)end;function b.__mul(i,j)if type(i)=="number"then return vectorlib.new(i*j.x,i*j.y,i*j.z)end;if type(j)=="number"then return vectorlib.new(i.x*j,i.y*j,i.z*j)end;return vectorlib.new(i.x*j.x,i.y*j.y,i.z*j.z)end;function b.__div(i,j)if type(i)=="number"then return vectorlib.new(i/j.x,i/j.y,i/j.z)end;if type(j)=="number"then return vectorlib.new(i.x/j,i.y/j,i.z/j)end;return vectorlib.new(i.x/j.x,i.y/j.y,i.z/j.z)end;function b.__pow(i,j)if type(i)=="number"then return vectorlib.new(math.pow(i,j.x),math.pow(i,j.y),math.pow(i,j.z))end;if type(j)=="number"then return vectorlib.new(math.pow(i.x,j),math.pow(i.y,j),math.pow(i.z,j))end;return vectorlib.new(math.pow(i.x,j.x),math.pow(i.y,j.y),math.pow(i.z,j.z))end;function b.__mod(i,j)if type(i)=="number"then return vectorlib.new(i%j.x,i%j.y,i%j.z)end;if type(j)=="number"then return vectorlib.new(i.x%j,i.y%j,i.z%j)end;return vectorlib.new(i.x%j.x,i.y%j.y,i.z%j.z)end;function b.__unm(i)return vectorlib.new(-i.x,-i.y,-i.z)end;function vectorlib:length2_squared()return self.x*self.x+self.y*self.y end;function vectorlib:length2()return math.sqrt(self:length2_squared())end;function vectorlib:length_squared()return self.x*self.x+self.y*self.y+self.z*self.z end;function vectorlib:length()return math.sqrt(self:length_squared())end;function vectorlib:dot_product(k)return self.x*k.x+self.y*k.y+self.z*k.z end;function vectorlib:cross_product(k)return vectorlib.new(self.y*k.z-self.z*k.y,self.z*k.x-self.x*k.z,self.x*k.y-self.y*k.x)end;function vectorlib:dist_to_2d(k)return(k-self):length2()end;function vectorlib:dist_to(k)return(k-self):length()end;function vectorlib:dist_to_2d_sqr(k)return(k-self):length2_squared()end;function vectorlib:dist_to_sqr(k)return(k-self):length_squared()end;function vectorlib:lerp(l,m)return self+(l-self)*m end;function vectorlib:angles()local n,o,p=0,0,0;if self.y==0 and self.x==0 then p=0;if self.z>0 then o=270 else o=90 end else p=math.atan2(self.y,self.x)*180/math.pi;if p<0 then p=p+360 end;n=math.sqrt(self.x*self.x+self.y*self.y)o=math.atan2(-self.z,n)*180/math.pi;if o<0 then o=o+360 end end;return o,p end;function vectorlib:init_from_angles(o,p)local q=function(r)return r*math.pi/180 end;local s=math.sin(q(o))local t=math.cos(q(o))local u=math.sin(q(p))local v=math.cos(q(p))return vectorlib.new(t*v,t*u,-s)end;function vectorlib:normalized()local w=self:length()if w~=0 then return vectorlib.new(self.x/w,self.y/w,self.z/w)else return vectorlib.new(0,0,1)end end;function vectorlib:to_vec()return vec3_t(self:unpack())end;function vectorlib.from_vec(x)return vectorlib.new(x.x,x.y,x.z)end
-local pretty_json={}local b,unpack,tostring=print,unpack,tostring;local c,d,e=table.concat,table.insert,table.remove;local f,g,h=string.sub,string.rep,string.len;local i,j,k,l={221,221,221},{180,230,30},{96,160,220},{218,230,30}local function m(n,o,p,q)o=o+#n:match('^%s*',o)if n:sub(o,o)~=p then if q then error('Expected '..p..' near position '..o)end;return o,false end;return o+1,true end;local function r(n,o,s)s=s or''local t='End of input found while parsing string.'if o>#n then error(t)end;local u=n:sub(o,o)if u=='"'then return s,o+1 end;if u~='\\'then return r(n,o+1,s..u)end;local v={b='\b',f='\f',n='\n',r='\r',t='\t'}local w=n:sub(o+1,o+1)if not w then error(t)end;return r(n,o+2,s..(v[w]or w))end;local function x(n,o)local y=n:match('^-?%d+%.?%d*[eE]?[+-]?%d*',o)local s=tonumber(y)if not s then error('Error parsing number at position '..o..'.')end;return s,o+#y end;function pretty_json.format(z,A,B,C)z=tostring(z)A,B,C=tostring(A or"\n"),tostring(B or"\t"),tostring(C or" ")local D,E,F,G,H,I,J=1,0,0,h(z),{},nil,nil;local K=f(C,-1)=="\n"for L=1,G do local u=f(z,L,L)if not J and(u=="{"or u=="[")then H[D]=I==":"and u..A or g(B,E)..u..A;E=E+1 elseif not J and(u=="}"or u=="]")then E=E-1;if I=="{"or I=="["then D=D-1;H[D]=g(B,E)..I..u else H[D]=A..g(B,E)..u end elseif not J and u==","then H[D]=u..A;F=-1 elseif not J and u==":"then H[D]=u..C;if K then D=D+1;H[D]=g(B,E)end else if u=='"'and I~="\\"then J=not J and true or nil end;if E~=F then H[D]=g(B,E)D,F=D+1,E end;H[D]=u end;I,D=u,D+1 end;return c(H)end;function pretty_json.highlight(z,M,N,O,P)M,O,P,N=M or i,O or j,P or k,N or l;z=tostring(z)local D,G,Q,R,S=1,h(z),{},nil,nil;local T,U=M,{}for L=1,G do local u=f(z,L,L)local V;if not S and(u=="{"or u=="[")then V=M;d(U,u)elseif not S and(u=="}"or u=="]")then V=M;if R=="{"or R=="["then d(U,c(R,u))else d(U,u)end elseif not S and(u==","or u==":")then V=M;d(U,u)else if u=='"'and R~="\\"then S=not S and true or nil;V=N elseif T==N then V=S and O or P elseif T==M and(u~=" "and u~="\n"and u~="\t")then V=S and O or P end;d(U,u)end;if V~=nil and V~=T then local W={e(U,#U)}d(Q,{T[1],T[2],T[3],c(U)})T,U=V,W end;R=u end;if#U>0 then d(Q,{T[1],T[2],T[3],c(U)})end;return Q end;local X=pretty_json.highlight;function pretty_json.print_highlighted(z,M,N,O,P)local Y=X(z,M,O,P,N)local Z=#Y;for D=1,Z do local H,_,a0,n=unpack(Y[D])if D~=Z then b(n..'\0')else b(n)end end;return Y end;function pretty_json.stringify(a1,A,B,C)local a2,z=pcall(json.encode,a1)if not a2 then error(z,2)return end;return pretty_json.format(z,A,B,C)end;function pretty_json.parse(n,o,a3)o=o or 1;if o>#n then error('Reached unexpected end of input.')end;local o=o+#n:match('^%s*',o)local a4=n:sub(o,o)if a4=='{'then local a5,a6,a7={},true,true;o=o+1;while true do a6,o=pretty_json.parse(n,o,'}')if a6==nil then return a5,o end;if not a7 then error('Comma missing between object items.')end;o=m(n,o,':',true)a5[a6],o=pretty_json.parse(n,o)o,a7=m(n,o,',')end elseif a4=='['then local a8,s,a7={},true,true;o=o+1;while true do s,o=pretty_json.parse(n,o,']')if s==nil then return a8,o end;if not a7 then error('Comma missing between array items.')end;a8[#a8+1]=s;o,a7=m(n,o,',')end elseif a4=='"'then return r(n,o+1)elseif a4=='-'or a4:match('%d')then return x(n,o)elseif a4==a3 then return nil,o+1 else local a9={['true']=true,['false']=false,['null']=json.null}for aa,ab in pairs(a9)do local ac=o+#aa-1;if n:sub(o,ac)==aa then return ab,ac+1 end end;local ad='position '..o..': '..n:sub(o,o+10)error('Invalid json syntax starting at '..ad)end end;
---- @endregion
-local default_locations = '{"cs_agency":[{"name":["Unnamed","Table"],"weapon":"weapon_molotov","position":[-1073.0045166016,-328.01284790039,512.03125],"viewangles":[-11.550261497498,62.745376586914],"grenade":{"run":2}}]}'
-if not files.read(game_dir.."/helper_data.json") then
-    files.write(game_dir.."/helper_data.json", default_locations)
 end
-
-if not files.read(game_dir.."/database.json") then
-    files.write(game_dir.."/database.json", "{}")
+local af = setmetatable({}, {__mode = "k"})
+function a.get_panorama_image(o)
+    if af[o] == nil then
+        local p = o:gsub("%z", ""):gsub("%c", ""):gsub("\\", "/"):gsub("%.%./", ""):gsub("^/+", "")
+        local q = a9("materials/panorama/images/" .. p)
+        if q then
+            local r = render.load_image(q)
+            af[o] = r
+        else
+            af[o] = false
+        end
+    end
+    if af[o] then
+        return af[o]
+    end
 end
-
-function test_array.vtable_entry(instance, index, type)
-    return ffi.cast(type, (ffi.cast("void***", instance)[0])[index])
+local ag = setmetatable({}, {__mode = "k"})
+function a.get_weapon_icon(t)
+    if ag[t] == nil then
+        local u
+        local v = type(t)
+        if v == "table" and t.console_name ~= nil then
+            u = t.console_name
+        elseif v == "number" then
+            local w = weapons[t]
+            if w == nil then
+                ag[t] = false
+                return
+            end
+            u = w.console_name
+        elseif v == "string" then
+            u = tostring(t)
+        elseif t ~= nil then
+            ag[t] = nil
+            return
+        else
+            return
+        end
+        u = u:gsub("^weapon_", ""):gsub("^item_", "")
+        local r = a.get_panorama_image("icons/equipment/" .. u .. ".svg")
+        ag[t] = r or false
+    end
+    if ag[t] then
+        return ag[t]
+    end
 end
-
-function test_array.vtable_bind(module, interface, index, typestring)
-    local instance = utils.create_interface(module, interface) or error("invalid interface")
-    local fnptr = test_array.vtable_entry(instance, index, ffi.typeof(typestring)) or error("invalid vtable")
+local ah = string.sub(common.get_game_directory(), 0, -5)
+local ai
+local aj = {["\\"] = "\\", ['"'] = '"', ["\b"] = "b", ["\f"] = "f", ["\n"] = "n", ["\r"] = "r", ["\t"] = "t"}
+local ak = {["/"] = "/"}
+for l, w in pairs(aj) do
+    ak[w] = l
+end
+local function al(d)
+    return "\\" .. (aj[d] or string.format("u%04x", d:byte()))
+end
+local function am(an)
+    return "null"
+end
+local function ao(an, ap)
+    local aq = {}
+    ap = ap or {}
+    if ap[an] then
+        error("circular reference")
+    end
+    ap[an] = true
+    if rawget(an, 1) ~= nil or next(an) == nil then
+        local o = 0
+        for l in pairs(an) do
+            if type(l) ~= "number" then
+                error("invalid table: mixed or invalid key types")
+            end
+            o = o + 1
+        end
+        if o ~= #an then
+            error("invalid table: sparse array")
+        end
+        for j, w in ipairs(an) do
+            table.insert(aq, ai(w, ap))
+        end
+        ap[an] = nil
+        return "[" .. table.concat(aq, ",") .. "]"
+    else
+        for l, w in pairs(an) do
+            if type(l) ~= "string" then
+                error("invalid table: mixed or invalid key types")
+            end
+            table.insert(aq, ai(l, ap) .. ":" .. ai(w, ap))
+        end
+        ap[an] = nil
+        return "{" .. table.concat(aq, ",") .. "}"
+    end
+end
+local function ar(an)
+    return '"' .. an:gsub('[%z\1-\31\\"]', al) .. '"'
+end
+local function as(an)
+    if an ~= an or an <= -math.huge or an >= math.huge then
+        error("unexpected number value '" .. tostring(an) .. "'")
+    end
+    return string.format("%.14g", an)
+end
+local at = {["nil"] = am, ["table"] = ao, ["string"] = ar, ["number"] = as, ["boolean"] = tostring}
+ai = function(an, ap)
+    local u = type(an)
+    local g = at[u]
+    if g then
+        return g(an, ap)
+    end
+    error("unexpected type '" .. u .. "'")
+end
+function json.encode(an)
+    return ai(an)
+end
+local au = {}
+local av = json.parse(files.read(ah .. "/database.json") or "[]") or {}
+function au.read(aw)
+    return av[aw]
+end
+function au.write(aw, ax)
+    av[aw] = ax
+    files.write(ah .. "/database.json", json.encode(av))
+end
+function au.flush()
+    for aw in pairs(av) do
+        av[aw] = nil
+    end
+end
+local ay = {}
+local c = {__index = ay}
+function ay.new(d, e, f)
+    return setmetatable({x = d ~= nil and d or 0, y = e ~= nil and e or 0, z = f ~= nil and f or 0}, c)
+end
+function ay:offset(g, h, i)
+    g = g or 0
+    h = h or 0
+    i = i or 0
+    self.x = self.x + g
+    self.y = self.y + h
+    self.z = self.z + i
+end
+function ay:unpack()
+    return self.x, self.y, self.z
+end
+function ay:nullify()
+    self.x = 0
+    self.y = 0
+    self.z = 0
+end
+function c.__tostring(j)
+    return string.format("%s, %s, %s", j.x, j.y, j.z)
+end
+function c.__concat(j)
+    return string.format("%s, %s, %s", j.x, j.y, j.z)
+end
+function c.__eq(j, k)
+    return j.x == k.x and j.y == k.y and j.z == k.z
+end
+function c.__lt(j, k)
+    if type(j) == "number" then
+        return j < k.x or j < k.y or j < k.z
+    end
+    if type(k) == "number" then
+        return j.x < k or j.y < k or j.z < k
+    end
+    return j.x < k.x or j.y < k.y or j.z < k.z
+end
+function c.__le(j, k)
+    if type(j) == "number" then
+        return j <= k.x or j <= k.y or j <= k.z
+    end
+    if type(k) == "number" then
+        return j.x <= k or j.y <= k or j.z <= k
+    end
+    return j.x <= k.x or j.y <= k.y or j.z <= k.z
+end
+function c.__add(j, k)
+    if type(j) == "number" then
+        return ay.new(j + k.x, j + k.y, j + k.z)
+    end
+    if type(k) == "number" then
+        return ay.new(j.x + k, j.y + k, j.z + k)
+    end
+    return ay.new(j.x + k.x, j.y + k.y, j.z + k.z)
+end
+function c.__sub(j, k)
+    if type(j) == "number" then
+        return ay.new(j - k.x, j - k.y, j - k.z)
+    end
+    if type(k) == "number" then
+        return ay.new(j.x - k, j.y - k, j.z - k)
+    end
+    return ay.new(j.x - k.x, j.y - k.y, j.z - k.z)
+end
+function c.__mul(j, k)
+    if type(j) == "number" then
+        return ay.new(j * k.x, j * k.y, j * k.z)
+    end
+    if type(k) == "number" then
+        return ay.new(j.x * k, j.y * k, j.z * k)
+    end
+    return ay.new(j.x * k.x, j.y * k.y, j.z * k.z)
+end
+function c.__div(j, k)
+    if type(j) == "number" then
+        return ay.new(j / k.x, j / k.y, j / k.z)
+    end
+    if type(k) == "number" then
+        return ay.new(j.x / k, j.y / k, j.z / k)
+    end
+    return ay.new(j.x / k.x, j.y / k.y, j.z / k.z)
+end
+function c.__pow(j, k)
+    if type(j) == "number" then
+        return ay.new(math.pow(j, k.x), math.pow(j, k.y), math.pow(j, k.z))
+    end
+    if type(k) == "number" then
+        return ay.new(math.pow(j.x, k), math.pow(j.y, k), math.pow(j.z, k))
+    end
+    return ay.new(math.pow(j.x, k.x), math.pow(j.y, k.y), math.pow(j.z, k.z))
+end
+function c.__mod(j, k)
+    if type(j) == "number" then
+        return ay.new(j % k.x, j % k.y, j % k.z)
+    end
+    if type(k) == "number" then
+        return ay.new(j.x % k, j.y % k, j.z % k)
+    end
+    return ay.new(j.x % k.x, j.y % k.y, j.z % k.z)
+end
+function c.__unm(j)
+    return ay.new(-j.x, -j.y, -j.z)
+end
+function ay:length2_squared()
+    return self.x * self.x + self.y * self.y
+end
+function ay:length2()
+    return math.sqrt(self:length2_squared())
+end
+function ay:length_squared()
+    return self.x * self.x + self.y * self.y + self.z * self.z
+end
+function ay:length()
+    return math.sqrt(self:length_squared())
+end
+function ay:dot_product(l)
+    return self.x * l.x + self.y * l.y + self.z * l.z
+end
+function ay:cross_product(l)
+    return ay.new(self.y * l.z - self.z * l.y, self.z * l.x - self.x * l.z, self.x * l.y - self.y * l.x)
+end
+function ay:dist_to_2d(l)
+    return (l - self):length2()
+end
+function ay:dist_to(l)
+    return (l - self):length()
+end
+function ay:dist_to_2d_sqr(l)
+    return (l - self):length2_squared()
+end
+function ay:dist_to_sqr(l)
+    return (l - self):length_squared()
+end
+function ay:lerp(m, az)
+    return self + (m - self) * az
+end
+function ay:angles()
+    local o, p, q = 0, 0, 0
+    if self.y == 0 and self.x == 0 then
+        q = 0
+        if self.z > 0 then
+            p = 270
+        else
+            p = 90
+        end
+    else
+        q = math.atan2(self.y, self.x) * 180 / math.pi
+        if q < 0 then
+            q = q + 360
+        end
+        o = math.sqrt(self.x * self.x + self.y * self.y)
+        p = math.atan2(-self.z, o) * 180 / math.pi
+        if p < 0 then
+            p = p + 360
+        end
+    end
+    return p, q
+end
+function ay:init_from_angles(p, q)
+    local r = function(s)
+        return s * math.pi / 180
+    end
+    local t = math.sin(r(p))
+    local u = math.cos(r(p))
+    local v = math.sin(r(q))
+    local w = math.cos(r(q))
+    return ay.new(u * w, u * v, -t)
+end
+function ay:normalized()
+    local x = self:length()
+    if x ~= 0 then
+        return ay.new(self.x / x, self.y / x, self.z / x)
+    else
+        return ay.new(0, 0, 1)
+    end
+end
+function ay:to_vec()
+    return vec3_t(self:unpack())
+end
+function ay.from_vec(y)
+    return ay.new(y.x, y.y, y.z)
+end
+local aA = {}
+local aB = ffi.typeof("uintptr_t**")
+local aC = ffi.typeof("color_struct_t")
+local aD = function(aE, color)
+    aE = tostring(aE)
+    local aF = ffi.cast(aB, utils.create_interface("vstdlib.dll", "VEngineCvar007"))
+    local aG = ffi.cast("console_color_print", aF[0][25])
+    aG(aF, aC(color.r, color.g, color.b, color.a), aE)
+end
+local c, unpack, tostring = aD, unpack, tostring
+local d, e, f = table.concat, table.insert, table.remove
+local g, h, i = string.sub, string.rep, string.len
+local j, k, l, m = {221, 221, 221}, {180, 230, 30}, {96, 160, 220}, {218, 230, 30}
+local function az(o, p, q, r)
+    p = p + #o:match("^%s*", p)
+    if o:sub(p, p) ~= q then
+        if r then
+            error("Expected " .. q .. " near position " .. p)
+        end
+        return p, false
+    end
+    return p + 1, true
+end
+local function s(o, p, t)
+    t = t or ""
+    local u = "End of input found while parsing string."
+    if p > #o then
+        error(u)
+    end
+    local v = o:sub(p, p)
+    if v == '"' then
+        return t, p + 1
+    end
+    if v ~= "\\" then
+        return s(o, p + 1, t .. v)
+    end
+    local w = {b = "\b", f = "\f", n = "\n", r = "\r", t = "\t"}
+    local x = o:sub(p + 1, p + 1)
+    if not x then
+        error(u)
+    end
+    return s(o, p + 2, t .. (w[x] or x))
+end
+local function y(o, p)
+    local z = o:match("^-?%d+%.?%d*[eE]?[+-]?%d*", p)
+    local t = tonumber(z)
+    if not t then
+        error("Error parsing number at position " .. p .. ".")
+    end
+    return t, p + #z
+end
+function aA.format(aH, aI, aJ, aK)
+    aH = tostring(aH)
+    aI, aJ, aK = tostring(aI or "\n"), tostring(aJ or "\t"), tostring(aK or " ")
+    local aL, aM, aN, aO, aP, aQ, aR = 1, 0, 0, i(aH), {}, nil, nil
+    local aS = g(aK, -1) == "\n"
+    for aT = 1, aO do
+        local v = g(aH, aT, aT)
+        if not aR and (v == "{" or v == "[") then
+            aP[aL] = aQ == ":" and v .. aI or h(aJ, aM) .. v .. aI
+            aM = aM + 1
+        elseif not aR and (v == "}" or v == "]") then
+            aM = aM - 1
+            if aQ == "{" or aQ == "[" then
+                aL = aL - 1
+                aP[aL] = h(aJ, aM) .. aQ .. v
+            else
+                aP[aL] = aI .. h(aJ, aM) .. v
+            end
+        elseif not aR and v == "," then
+            aP[aL] = v .. aI
+            aN = -1
+        elseif not aR and v == ":" then
+            aP[aL] = v .. aK
+            if aS then
+                aL = aL + 1
+                aP[aL] = h(aJ, aM)
+            end
+        else
+            if v == '"' and aQ ~= "\\" then
+                aR = not aR and true or nil
+            end
+            if aM ~= aN then
+                aP[aL] = h(aJ, aM)
+                aL, aN = aL + 1, aM
+            end
+            aP[aL] = v
+        end
+        aQ, aL = v, aL + 1
+    end
+    return d(aP)
+end
+function aA.highlight(aH, aU, aV, aW, aX)
+    aU, aW, aX, aV = aU or j, aW or k, aX or l, aV or m
+    aH = tostring(aH)
+    local aL, aO, aY, aZ, a_ = 1, i(aH), {}, nil, nil
+    local b0, b1 = aU, {}
+    for aT = 1, aO do
+        local v = g(aH, aT, aT)
+        local b2
+        if not a_ and (v == "{" or v == "[") then
+            b2 = aU
+            e(b1, v)
+        elseif not a_ and (v == "}" or v == "]") then
+            b2 = aU
+            if aZ == "{" or aZ == "[" then
+                e(b1, d(aZ, v))
+            else
+                e(b1, v)
+            end
+        elseif not a_ and (v == "," or v == ":") then
+            b2 = aU
+            e(b1, v)
+        else
+            if v == '"' and aZ ~= "\\" then
+                a_ = not a_ and true or nil
+                b2 = aV
+            elseif b0 == aV then
+                b2 = a_ and aW or aX
+            elseif b0 == aU and (v ~= " " and v ~= "\n" and v ~= "\t") then
+                b2 = a_ and aW or aX
+            end
+            e(b1, v)
+        end
+        if b2 ~= nil and b2 ~= b0 then
+            local b3 = {f(b1, #b1)}
+            e(aY, {b0[1], b0[2], b0[3], d(b1)})
+            b0, b1 = b2, b3
+        end
+        aZ = v
+    end
+    if #b1 > 0 then
+        e(aY, {b0[1], b0[2], b0[3], d(b1)})
+    end
+    return aY
+end
+local b4 = aA.highlight
+function aA.print_highlighted(aH, aU, aV, aW, aX)
+    local b5 = b4(aH, aU, aW, aX, aV)
+    local b6 = #b5
+    for aL = 1, b6 do
+        local aP, O, b7, o = unpack(b5[aL])
+        if aL ~= b6 then
+            c(o .. "\0", color(aP, O, b7))
+        else
+            c(o, color(aP, O, b7))
+        end
+    end
+    return b5
+end
+function aA.stringify(b8, aI, aJ, aK)
+    local b9, aH = pcall(json.encode, b8)
+    if not b9 then
+        error(aH, 2)
+        return
+    end
+    return aA.format(aH, aI, aJ, aK)
+end
+function aA.parse(o, p, ba)
+    p = p or 1
+    if p > #o then
+        error("Reached unexpected end of input.")
+    end
+    local p = p + #o:match("^%s*", p)
+    local bb = o:sub(p, p)
+    if bb == "{" then
+        local bc, bd, be = {}, true, true
+        p = p + 1
+        while true do
+            bd, p = aA.parse(o, p, "}")
+            if bd == nil then
+                return bc, p
+            end
+            if not be then
+                error("Comma missing between object items.")
+            end
+            p = az(o, p, ":", true)
+            bc[bd], p = aA.parse(o, p)
+            p, be = az(o, p, ",")
+        end
+    elseif bb == "[" then
+        local bf, t, be = {}, true, true
+        p = p + 1
+        while true do
+            t, p = aA.parse(o, p, "]")
+            if t == nil then
+                return bf, p
+            end
+            if not be then
+                error("Comma missing between array items.")
+            end
+            bf[#bf + 1] = t
+            p, be = az(o, p, ",")
+        end
+    elseif bb == '"' then
+        return s(o, p + 1)
+    elseif bb == "-" or bb:match("%d") then
+        return y(o, p)
+    elseif bb == ba then
+        return nil, p + 1
+    else
+        local bg = {["true"] = true, ["false"] = false, ["null"] = json.null}
+        for bh, bi in pairs(bg) do
+            local bj = p + #bh - 1
+            if o:sub(p, bj) == bh then
+                return bi, bj + 1
+            end
+        end
+        local bk = "position " .. p .. ": " .. o:sub(p, p + 10)
+        error("Invalid json syntax starting at " .. bk)
+    end
+end
+local bl =
+    '{"cs_agency":[{"name":["Unnamed","Table"],"weapon":"weapon_molotov","position":[-1073.0045166016,-328.01284790039,512.03125],"viewangles":[-11.550261497498,62.745376586914],"grenade":{"run":2}}]}'
+if not files.read(ah .. "/helper_data.json") then
+    files.write(ah .. "/helper_data.json", bl)
+end
+if not files.read(ah .. "/database.json") then
+    files.write(ah .. "/database.json", "{}")
+end
+function a.vtable_entry(bm, bn, type)
+    return ffi.cast(type, ffi.cast("void***", bm)[0][bn])
+end
+function a.vtable_bind(bo, bp, bn, bq)
+    local bm = utils.create_interface(bo, bp) or error("invalid interface")
+    local br = a.vtable_entry(bm, bn, ffi.typeof(bq)) or error("invalid vtable")
     return function(...)
-        return fnptr(tonumber(ffi.cast("void***", instance)), ...)
+        return br(tonumber(ffi.cast("void***", bm)), ...)
     end
 end
-
-local client = {}
-function client.error_log(text)
+local bs = {}
+function bs.error_log(T)
     utils.console_exec("play resource/warning.wav")
-    return print(text)--ffi_handler.color_print(color(255, 35, 35), text..'\n')
+    return print_raw(T)
 end
-
-function test_array.table_clear(tbl)
-    for key in pairs(tbl) do
-        tbl[key] = nil
+function a.table_clear(bt)
+    for aw in pairs(bt) do
+        bt[aw] = nil
     end
 end
-
-function test_array.table_map(tbl, callback)
-    local new = {}
-
-    for key, value in pairs(tbl) do
-        new[key] = callback(value)
+function a.table_map(bt, bu)
+    local bv = {}
+    for aw, ax in pairs(bt) do
+        bv[aw] = bu(ax)
     end
-
-    return new
+    return bv
 end
-
-function test_array.table_map_assoc(tbl, callback)
-    local new = {}
-
-    for key, value in pairs(tbl) do
-        local new_key, new_value = callback(key, value)
-
-        new[new_key] = new_value
+function a.table_map_assoc(bt, bu)
+    local bv = {}
+    for aw, ax in pairs(bt) do
+        local bw, bx = bu(aw, ax)
+        bv[bw] = bx
     end
-
-    return new
+    return bv
 end
-
-local fonts = {
-    verdana_bold = render.load_font("verdana", 12, 'ba')
-}
-
-local Paint = {}
-Paint.RectFilled = function(xy, wh, clr)
-    return render.rect(vector(xy.x, xy.y), vector(xy.x+wh.x, xy.y+wh.y), clr)
+local by = {verdana_bold = render.load_font("verdana", 12, "ba")}
+local bz = {}
+bz.RectFilled = function(bA, bB, bC)
+    return render.rect(vector(bA.x, bA.y), vector(bA.x + bB.x, bA.y + bB.y), bC)
 end
-
-Paint.Rect = function(xy, wh, clr)
-    return render.rect_outline(vector(xy.x, xy.y), vector(xy.x+wh.x, xy.y+wh.y), clr)
+bz.Rect = function(bA, bB, bC)
+    return render.rect_outline(vector(bA.x, bA.y), vector(bA.x + bB.x, bA.y + bB.y), bC)
 end
-
-Paint.Text = function(font, str, vec, clr, font_size)
-    font_size = font_size or 12
-    render.text(font, vector(vec.x, vec.y), clr, 'd', str)
+bz.Text = function(bD, N, bE, bC, bF)
+    bF = bF or 12
+    render.text(bD, vector(bE.x, bE.y), bC, "d", N)
 end
-
-Paint.CircleFilled = function(xy, rad, clr)
-    return render.circle(vector(math.floor(xy.x), math.floor(xy.y)), clr, rad, 0, 1)
+bz.CircleFilled = function(bA, bG, bC)
+    return render.circle(vector(math.floor(bA.x), math.floor(bA.y)), bC, bG, 0, 1)
 end
-
-Paint.Circle = function(xy, rad, clr)
-    return render.circle_outline(vector(math.floor(xy.x), math.floor(xy.y)), clr, rad, 0, 1)
+bz.Circle = function(bA, bG, bC)
+    return render.circle_outline(vector(math.floor(bA.x), math.floor(bA.y)), bC, bG, 0, 1)
 end
-
-local SOURCE_TYPE_NAMES = {
-    ["remote"] = "Remote",
-    ["local"] = "Local",
-    ["local_file"] = "Local file"
-}
-
-local LOCATION_TYPE_NAMES = {
-    grenade = "Grenade",
-    wallbang = "Wallbang",
-    movement = "Movement"
-}
-
-local YAW_DIRECTION_OFFSETS = {
-    ['Forward'] = 0,
-    ['Back'] = 180,
-    ['Left'] = 90,
-    ['Right'] = -90
-}
-local YAW_DIRECTION_OFFSETS_RECOVERY = {
-    ['Forward'] = 0,
-    ['Back'] = 180,
-    ['Left'] = 90,
-    ['Right'] = -90
-}
-
-local MOVEMENT_BUTTONS_CHARS = {
+local bH = {["remote"] = "Remote", ["local"] = "Local", ["local_file"] = "Local file"}
+local bI = {grenade = "Grenade", wallbang = "Wallbang", movement = "Movement"}
+local bJ = {["Forward"] = 0, ["Back"] = 180, ["Left"] = 90, ["Right"] = -90}
+local bK = {["Forward"] = 0, ["Back"] = 180, ["Left"] = 90, ["Right"] = -90}
+local bL = {
     ["in_attack"] = "A",
     ["in_jump"] = "J",
     ["in_duck"] = "D",
@@ -410,52 +1092,61 @@ local MOVEMENT_BUTTONS_CHARS = {
     ["in_attack2"] = "Z",
     ["in_speed"] = "S"
 }
-
-local GRENADE_WEAPON_NAMES = setmetatable({
-    [weapons.weapon_smokegrenade] = "Smoke",
-    [weapons.weapon_flashbang] = "Flashbang",
-    [weapons.weapon_hegrenade] = "HE",
-    [weapons.weapon_molotov] = "Molotov",
-    [weapons.weapon_incgrenade] = "Molotov",
-}, {
-    __index = function(tbl, key)
-        if type(key) == "table" and key.name ~= nil then
-            tbl[key] = key.name
-            return tbl[key]
-        end
-    end
-})
-
-local GRENADE_WEAPON_NAMES_UI = setmetatable({
-    [weapons.weapon_smokegrenade] = "Smoke",
-    [weapons.weapon_flashbang] = "Flashbang",
-    [weapons.weapon_hegrenade] = "High Explosive",
-    [weapons.weapon_molotov] = "Molotov",
-    [weapons.weapon_incgrenade] = "Molotov",
-}, {
-    __index = GRENADE_WEAPON_NAMES
-})
-
-local CUSTOM_ICONS = {}
-CUSTOM_ICONS.vectors = {}
-
-CUSTOM_ICONS.weapon_flashbang = '\x89\x50\x4E\x47\x0D\x0A\x1A\x0A\x00\x00\x00\x0D\x49\x48\x44\x52\x00\x00\x00\x50\x00\x00\x00\x64\x08\x06\x00\x00\x00\x11\xFA\xB7\x16\x00\x00\x00\x04\x73\x42\x49\x54\x08\x08\x08\x08\x7C\x08\x64\x88\x00\x00\x00\x09\x70\x48\x59\x73\x00\x00\x2E\x23\x00\x00\x2E\x23\x01\x78\xA5\x3F\x76\x00\x00\x00\x19\x74\x45\x58\x74\x53\x6F\x66\x74\x77\x61\x72\x65\x00\x77\x77\x77\x2E\x69\x6E\x6B\x73\x63\x61\x70\x65\x2E\x6F\x72\x67\x9B\xEE\x3C\x1A\x00\x00\x09\x11\x49\x44\x41\x54\x78\x9C\xED\x9D\x5B\x6C\x1D\x47\x19\xC7\x7F\x9F\x63\xA7\x49\x6D\x27\xB5\x73\x69\x13\xA7\x49\x7A\x8B\x43\x52\x25\x81\xA2\x42\x2F\x20\x24\xD4\xC2\x43\x1F\xCA\x45\x15\x14\x09\xA4\x4A\x40\x41\xBC\x20\x04\x42\x80\x04\x4F\x08\x09\x24\x9E\x10\x42\xCA\x13\x48\xF0\x80\x10\x15\x54\xE2\xAD\xA5\x11\x0A\x15\x05\x52\xA7\x6D\x20\xA4\x38\x4D\xDB\xC4\xB4\x4E\xEA\xE6\x62\x3B\xC1\x4E\xFE\x3C\xCC\x9C\x70\x72\x7C\xCE\x9E\xDD\x99\x39\xBB\xC7\xAE\x7F\xD2\xCA\xD6\x7A\x77\x66\xF6\xBF\x73\xFD\xBE\x6F\xD6\xB0\xCC\xE2\x46\xD2\x8D\x55\x97\x21\x86\x9E\x2A\x33\x97\xD4\x07\xBC\x57\xD2\x9A\x2A\xCB\x11\x43\xA5\x02\x02\xEB\x7C\x19\xDE\x23\x69\x45\xC5\x65\x09\xA2\x1B\x04\x04\x18\x04\x76\x55\x59\x90\x50\xAA\x16\x70\xB8\xEE\xF7\xED\x92\x6E\xAA\xAC\x24\x81\x54\x26\xA0\xA4\x5E\x60\x6D\xC3\xE9\x7D\x92\x56\x57\x51\x9E\x50\xAA\xAC\x81\x43\x80\x35\x9C\xEB\x03\xDE\x2D\xA9\xF1\x7C\xD7\x52\xA5\x80\xEB\x32\xCE\xDF\xDA\xC9\x8C\x25\xAD\x97\x74\x47\x8A\xB4\x7A\x53\x24\x12\x48\x2B\x01\x01\x76\x4A\x3A\x63\x66\x6F\xA7\xCC\x50\xD2\x30\x30\x0A\xAC\x07\x8E\xA7\x48\xB3\x12\x01\x25\xF5\x00\x37\x64\x5C\x52\x9B\xDA\x1C\x30\xB3\xF9\x04\xF9\x6D\xC0\x09\x37\x54\x77\xFA\x42\x6C\xBA\x50\x5D\x0D\x1C\xA2\x7D\xF7\xD1\x0F\xEC\x06\xC6\x42\x33\xF1\xAB\x9C\x1D\x34\x7F\x59\x8B\x5A\xC0\xE1\xF6\x97\x00\xB0\x55\xD2\xA4\x99\x9D\xCA\x9B\xB0\x1F\x80\x36\xE2\x6A\x5C\xE3\x28\x5F\xCF\x74\xDE\x34\xB3\xA8\x4A\xC0\xAC\xFE\xAF\x91\x3D\x92\xA6\xCC\x6C\x36\xEB\x22\x2F\xDC\x26\x9C\x70\x03\x6D\xD2\xBC\xDC\x2E\xBD\xBC\x94\x2E\xA0\x7F\xD0\xA1\xB6\x17\xFE\x9F\x3E\x5C\x7F\x78\xD0\xCC\xD4\x24\xBD\x1E\x60\x33\xAE\xA9\xF6\xE7\x4C\x33\x49\xED\x83\x16\x02\xFA\xC5\xFD\x65\x60\xD6\xCC\xAE\xA4\xCA\xCC\xB3\xB6\x55\xBE\x19\x0C\x03\xB7\x03\xC7\x6A\x27\xBC\x70\x37\xFB\xF3\xD7\x17\x4C\x2F\x49\xFF\x07\xAD\x1F\x64\x25\x70\x0F\x80\xA4\x39\xE0\xBC\x3F\x66\xFC\x31\x0D\xCC\x98\xD9\x5C\x40\x9E\x45\x9A\x6F\x3D\xA3\x92\x4E\x03\x67\x71\xC2\xED\x00\x56\x05\xA6\xD5\x59\x01\xCD\xEC\xB4\xA4\x57\x81\xAD\xB8\x26\x34\x4C\x93\x8E\x5F\xD2\x25\xEA\x04\xAD\xFF\x69\x66\x97\x5A\xE4\x99\x77\x00\x59\x50\x2C\xE0\x2E\xFF\x33\x54\xB8\x1A\x1D\xAF\x81\x00\x47\x80\x0D\x40\xD6\xDA\xF4\x3A\x7F\x2C\xE8\xD3\x24\xCD\x73\x6D\x8D\xAD\x89\x1B\x2A\x20\x6D\xCA\x52\x84\xCE\xF6\x81\x00\x66\x36\x27\x69\x0C\x78\x7F\x44\xDA\x6B\xFC\xD1\x6D\x24\xAB\x81\x99\x93\x59\x33\x9B\x04\x5E\x4D\x95\x59\x97\x70\x31\xC5\xEA\xA6\x46\x9E\xD1\xF0\x08\x6E\x62\x1A\xDB\xEF\x34\xE6\xFB\x2E\xDC\x0A\x21\x64\x2A\xF5\x1A\xF0\x72\x60\xDE\xC9\x9A\x2F\xE4\x28\x7C\x5D\x53\x7E\x5F\xA2\x3C\x57\x01\x3F\x20\xCE\xE2\x32\x05\x3C\x0E\x84\x4C\x86\x93\x35\x5F\xC8\x69\xCE\x32\xB3\x37\x71\x6F\x3D\x05\xBB\x88\x37\x57\x0D\x01\x9F\x0E\xBC\xB7\x7C\x01\x3D\x2F\x01\x17\x13\xE4\xF9\xDF\x04\x69\x00\x3C\x8C\x9B\x0B\x16\x65\xBD\xA4\xED\xDE\x26\x18\xDD\x2D\x15\xB2\xFC\x4A\xDA\x48\x7C\x53\x5E\x09\x7C\x9F\xB0\x87\x6F\xE4\x15\xE0\x6B\x40\xC8\x84\xBE\xC6\x3C\xAE\x5F\xBC\xE0\x8F\xAB\xBF\x9B\xD9\xE5\x76\x37\x17\x36\x9D\x4B\xDA\x87\x5B\x09\xC4\xD0\x03\xDC\x0B\x3C\x44\xBC\x37\x6E\x3F\xF0\xBB\xC8\x34\x5A\x31\xCB\xB5\xE2\xD6\x04\x9E\xAD\xAD\xCB\x43\x04\xEC\x03\x3E\x44\x9A\x51\xF9\x41\xE0\x2B\x91\x69\xCC\xFB\x34\x72\x9B\xBC\x12\x30\x0F\x8C\x99\xD9\xA9\xC2\x3E\x11\xBF\xFE\x0D\x36\x72\x76\x80\x5E\xDC\x88\x5C\x96\x7F\xE7\x02\xF0\xE7\x9A\x8D\x32\x28\xD3\xC4\xA3\x72\x0A\xF6\x01\xF7\x95\x90\xCF\x09\xE0\x40\xBD\xAF\x26\xE6\xAD\xA5\x1A\x95\x53\xF1\x38\xC5\xEC\x8C\x45\x98\x01\x0E\x9A\xD9\xE1\xC6\x81\x25\x58\x40\xDF\x94\x0F\x47\x16\x6C\x7D\xE4\xFD\xF5\x0C\x02\x8F\x26\x4C\xAF\xC6\x09\xE0\x19\x33\x3B\xD3\xEC\x8F\x51\xFD\x86\x99\xBD\x01\xBC\x1E\x72\x2B\xF0\x49\xE0\x53\x31\xF9\x37\xE1\x23\xB8\xE6\x9C\x82\x4B\xC0\x5F\x7C\xAD\x6B\xB9\x76\x8E\x8E\x00\x08\x18\x95\xFB\x80\x2F\xE2\x46\xE0\x4E\x70\x12\xF8\x2A\x71\xDD\xCB\x29\xE0\x70\x1E\x83\x71\x92\x10\x0A\xEF\x3E\xBC\x3B\xE3\x92\x11\x5C\x73\x35\xE0\xE3\xA4\xAB\x25\xAD\xF8\x95\x3F\x8A\x72\x09\x78\xC1\xCC\x26\xF2\xDE\x10\xED\x54\x92\xB4\x0E\x27\x90\x68\xFE\x42\x76\xE1\x56\x1E\x65\x86\x91\x3C\x02\x3C\x4B\xB1\xE8\x83\x09\x5C\xAD\x2B\xB4\xD4\x0C\x12\xD0\x37\xDB\x9B\x81\x6D\xB4\x77\x21\x6E\xA5\xFC\x18\x9C\x15\xC0\x17\x80\x6F\x03\xED\x9C\x62\x73\xB8\x5A\x77\x32\x24\xA3\x42\x02\x4A\x5A\x8B\x13\x6D\x8B\x2F\x64\x1E\x56\x16\x2D\x54\x22\x76\xE3\x06\x95\x3F\x64\x5C\x33\x09\x3C\x6F\x66\xC1\xFD\x65\x5B\x01\x7D\x1C\xDF\x08\xB0\x9D\x30\xF3\x7C\x5F\xC0\x3D\x45\x19\xC3\x99\xC8\x06\x1B\xCE\x7F\x16\x78\x0E\x38\xDD\x70\xFE\x32\xF0\x4F\x33\x1B\x8F\xCD\xB8\x65\xD3\x92\x74\x83\xA4\xBD\xB8\xD1\x72\x0F\xDD\xE9\xDB\xA8\x71\x00\xF8\x12\xF0\x6B\xAE\x6D\xB2\xFD\xC0\x27\x1A\xAE\x3D\x03\xFC\x31\x85\x78\xD0\x50\x03\xEB\x6A\xDB\x36\xB2\xE3\x4A\xBA\x0D\x01\xE7\x80\x5F\x00\xBF\x07\x3E\x07\x7C\xD8\xFF\xAD\x31\x5A\x61\xD2\xCC\x66\x52\x65\xDC\x0B\x57\x23\x11\xB6\xE3\xC4\xAB\x32\x66\x30\x94\xFA\x5A\xF7\x36\xF0\x63\x9C\x0B\xF4\xDE\x26\xD7\xEE\xF4\x7D\xF9\xF3\x29\x9C\x4B\xBD\x92\x6E\xC3\x39\x78\x16\x4D\x58\x6D\x13\x1A\x47\xDA\x1E\xB2\x8D\xAC\x9B\x80\x01\x49\xCF\x99\x59\x94\x93\xA9\xC7\xCC\xFE\x0D\x3C\x83\x9B\x7D\x2F\x08\xDE\x59\x24\x84\xC4\xEF\x0C\x02\x1F\x88\xDD\x29\xD5\x03\x60\x66\xE7\xCD\xEC\x6F\x38\x21\x4F\x92\x56\xC8\x83\xB8\xE9\x42\xA7\x18\x07\xFE\x1A\x78\x6F\x1F\x70\xB7\xA4\xD1\xD0\xC0\xF6\x6B\x46\x61\x2F\xE4\xDF\x81\xA7\x70\x56\x88\x14\x42\x4E\x00\xDF\xC4\xBD\x98\xD4\x1C\x05\xBE\x8B\x33\x37\xB5\x22\x8F\x30\x3B\x70\x42\x16\x9E\x72\x35\x9D\xC6\x98\xD9\x8C\x99\x1D\x06\x9E\xC6\x59\x5B\x62\x85\x9C\x04\xBE\x45\x5A\x11\x8F\xE0\xC4\x3B\x9B\x28\xBD\x8D\xB8\x26\xDD\x38\x97\xCC\xA4\x5D\x68\xC7\xB4\x99\x1D\x22\x4D\x8D\x9C\xC2\x79\xD1\x52\x71\x94\xEC\x9A\x17\x42\x3F\x70\xBF\xA4\xCD\x79\x6F\xC8\xEB\x58\xAF\xD5\xC8\xA7\x70\x0B\xF4\xD0\xA0\xCB\x94\x7D\x6B\x8C\x2B\x33\x8B\x5E\xE0\x2E\x49\x7B\xF2\xF4\x8B\x85\x16\xF9\x5E\xC8\x17\x09\x17\x32\x65\xB4\x6B\x2A\x07\x7D\x2B\xB6\x01\xF7\x48\xBA\x2E\xEB\xA2\x50\xA7\xD2\xAC\x17\xF2\x69\x8A\xB9\x13\x17\x93\x80\xE0\xA2\x69\xEF\xF7\x13\xEF\xA6\xC4\x9A\xF4\x67\x28\x16\x6B\x92\x52\xC0\xB2\x4C\x64\xD7\x03\xF7\x49\xDA\xD2\xA9\x42\x8C\x14\xB8\xF6\x09\xE0\x97\x09\xF2\x7C\x02\xE7\x15\x2C\x8B\x15\xB8\x4D\x90\x77\xFA\xE0\xF6\xAB\x44\x09\xE8\xF7\x9E\xE5\xDD\x5A\x00\x6E\x14\x7E\x25\x26\x4F\xCF\x0B\xB8\x51\xB8\x6C\x6E\xC1\xF5\x8B\x57\xFD\x3F\xB1\x86\x83\xA6\xD5\x7A\x89\x21\x9C\x83\x6A\xA6\xEE\x18\xF0\xE7\xC2\x05\xF4\x55\x79\x53\x82\x02\x76\x03\x57\x70\x82\xD4\x02\xE1\xEB\x83\xE3\x33\xA3\xB4\x62\x6A\xE0\x8D\x54\x67\xAE\x8F\x65\x1C\x37\xB1\xAF\x6D\xC9\x08\x9E\x53\xC6\x08\xB8\x98\x9B\xEF\x54\x91\x0D\x8C\x59\x04\x0D\x22\x92\x56\xE2\xD6\x8E\x45\x79\x0C\xE7\x54\x8F\xE5\xCB\x2C\x34\xD5\x17\x21\x99\x7B\x22\x74\x14\xDE\x1C\x78\xEF\x00\xE1\x5B\xBD\xEA\x59\x87\xDB\xE0\x13\x4A\xE5\x02\x76\x43\xF3\x6D\x1B\x7E\x9B\x41\x75\x02\x4A\xEA\x27\x3C\x8C\x2C\xE5\xEA\x21\xA6\x06\xAE\xF6\xDD\x50\x34\x21\x0F\x14\x53\xFB\x52\x0A\x18\xFB\xA9\xA8\x42\x76\xBF\x56\x2C\x66\x01\x63\x49\xD2\x8C\x0B\x3D\x90\x5F\xBA\x15\xDD\xDC\x0C\xCE\xE0\xF0\x12\xF0\x79\xE0\x3B\x01\xF7\x37\xF2\x53\x9C\xFF\x37\x86\x24\x02\x16\x9D\x07\x16\xA9\x7D\xC2\x85\x54\x1C\xF7\x81\x98\xEE\xA4\x94\xE2\x7B\x2D\x67\x58\x18\xAE\x51\x94\x72\x05\xAC\xFB\x36\x41\x3B\xE6\x70\x01\xE8\xC7\x53\x46\x00\x34\x30\x81\xB3\x07\xC6\x0C\x04\x83\x92\xAC\xD9\x77\x18\x8A\x50\xA4\x06\xDE\x44\x76\xA0\xD0\x34\x6E\x6B\xEC\x89\x98\xA5\x51\x4E\xDE\xC2\x59\xC5\x47\x71\x11\x15\x21\x2E\xC9\x15\x38\x4B\x52\xD4\xDE\xB9\x22\x02\xB6\x6A\xBE\x6F\xE1\xCC\xFB\x13\xB1\x6F\xB3\x08\xFE\x25\xBD\x28\xE9\x35\x5C\xF0\x53\xD6\x97\x90\x5A\xB1\x86\x32\x04\xF4\x73\xA6\x0D\x75\xA7\xAE\xE0\x4C\xF9\x2F\x9B\xD9\xF9\xBC\x99\x49\x1A\xA0\x98\xFD\xB0\x15\xFD\x92\x56\x7B\xD7\xC2\x59\x49\x7F\xC2\xD9\xEA\x46\x29\x56\x29\xD6\x10\xB9\xC3\x29\x6F\x66\x23\xB8\x11\xFB\x22\xAE\x99\x8E\x07\x36\xD3\x9F\x03\x1F\x0B\xB8\xAF\x91\xFD\xC0\x4E\xE0\xEB\x00\xBE\xE6\x8F\x4B\x3A\x85\x8B\xF3\xC9\x3B\xD8\x45\x0F\x24\x79\x05\x5C\x8D\x0B\x54\x7C\xA3\xCC\x66\x5A\x14\x1F\x69\x7A\x48\xD2\x49\xF2\x2D\xF5\xA2\x43\xF8\x72\x09\x68\x66\x47\x62\x33\x2A\x13\x33\x7B\x53\x52\x9E\xB0\xDD\x55\x92\xFA\x62\x06\xBD\x6E\x5A\x19\x74\x8A\x69\xE0\x5F\xB4\xF6\x08\x46\x35\xE3\x77\x82\x80\x32\xB3\xA3\xB8\x69\x4F\xB3\x5D\x55\x51\xCD\xB8\x6C\x01\x6B\x1F\xE0\x49\x91\x4E\xD3\x0F\x4E\x48\xBA\x45\xD2\x7E\xE0\x81\xFA\xF3\x7E\xC4\x3E\x84\x0B\xB7\x3B\x57\xF7\xA7\x24\x46\x85\xD2\x90\xF4\x19\xC5\xB3\x60\x8F\x9D\xA4\x55\x92\xBE\x27\x69\xB6\xE1\xDA\x27\x9B\x5C\x6B\x92\xB6\x48\x7A\x50\xD2\x07\x63\x9E\x67\x31\xC6\x43\x2F\x40\xD2\xAD\xC0\x6F\x58\xB8\x85\x6C\x8A\x26\x46\x07\x3F\x93\x78\x5D\xD2\x7F\x80\xDB\x62\x96\x74\x4B\x42\x40\x9C\x48\xF5\xDF\x5E\x98\xC4\x05\x9A\xFF\xC4\xCC\xCE\x35\xBF\x05\x7C\x90\x79\x94\x83\x7E\xA9\x08\x58\x5B\xDD\x4C\x00\x3F\x02\x7E\x16\x1B\x3C\x9E\x97\xA5\x22\xE0\x03\xC0\x5E\xE0\xC9\x98\x6D\x5B\x21\x94\x2A\xA0\xDC\xCE\xA7\xDD\x09\x92\xBA\x53\xD2\x1D\x66\x76\x0C\xC0\xFF\x3C\xD6\xE6\x9E\xC5\x8F\xA4\xDF\x26\x18\x81\x6B\xFC\xB0\xEA\xE7\x81\x77\xC6\x44\xBA\xA3\x2C\x0B\x18\xC9\xB2\x80\x91\x2C\x0B\x18\x49\x69\x02\xCA\x39\xA5\x6E\x4F\x98\xE4\xCE\x84\x69\x75\x3F\x92\x1E\x4B\x38\x02\xD7\xF8\x68\xD5\xCF\x55\xCA\x16\x57\x39\x5F\xC8\x51\xF2\xB9\x45\x8B\xF0\x0F\x60\x6F\x09\x5E\xC0\x96\x94\xD5\x84\xBF\x41\x7A\xF1\xC0\xF9\x3F\x62\x3F\x9F\x17\x45\xC7\x6B\xA0\xA4\x11\x5C\xED\x4B\xE1\x8D\x6B\xC6\x79\x60\xB4\xC8\xC7\x72\x52\x52\x46\x0D\x7C\x94\xCE\x89\x07\xCE\x20\xFA\x48\x07\xD3\xCF\xA4\x0C\x01\xCB\xF8\x8F\x85\x95\x19\x45\x96\xE7\x81\x91\x2C\x0B\x18\x49\x19\x02\x76\x2A\x42\xAB\xEC\x3C\xAA\x41\xD2\x56\x49\x63\x92\xE6\x3B\x30\x91\x9E\x97\x74\x48\x05\x76\x98\x2F\xB3\xCC\xD2\xE2\x7F\xCD\x81\x16\x07\xCA\x36\x8E\xBE\x00\x00\x00\x00\x49\x45\x4E\x44\xAE\x42\x60\x82'
-CUSTOM_ICONS.vectors["weapon_flashbang"] = vector(80, 100)
-CUSTOM_ICONS["weapon_flashbang"] = render.load_image(CUSTOM_ICONS.weapon_flashbang, CUSTOM_ICONS.vectors["weapon_flashbang"])
-
-CUSTOM_ICONS.weapon_smokegrenade = '\x89\x50\x4E\x47\x0D\x0A\x1A\x0A\x00\x00\x00\x0D\x49\x48\x44\x52\x00\x00\x00\x27\x00\x00\x00\x64\x08\x06\x00\x00\x00\x05\x6F\x29\xF7\x00\x00\x00\x04\x73\x42\x49\x54\x08\x08\x08\x08\x7C\x08\x64\x88\x00\x00\x00\x09\x70\x48\x59\x73\x00\x00\x2E\x23\x00\x00\x2E\x23\x01\x78\xA5\x3F\x76\x00\x00\x00\x19\x74\x45\x58\x74\x53\x6F\x66\x74\x77\x61\x72\x65\x00\x77\x77\x77\x2E\x69\x6E\x6B\x73\x63\x61\x70\x65\x2E\x6F\x72\x67\x9B\xEE\x3C\x1A\x00\x00\x03\x20\x49\x44\x41\x54\x68\x81\xED\x9A\x3B\x68\x14\x41\x18\xC7\x7F\x5F\x8C\x1A\x0D\x3E\x52\x18\x5F\x84\x44\xC4\x98\xA0\x95\x45\x94\x80\x22\xF8\xC0\x26\x95\x28\x16\x1A\x7C\x14\xC1\x2E\x20\x62\x6B\x65\xAF\xD8\x0A\xD6\x36\x22\x82\x36\x5A\x18\x15\x6C\x15\x2D\x7C\x80\xC6\x58\xC4\x26\xA6\xD1\x18\x83\xFC\x2D\x66\x0F\xD7\xCB\xDE\xDD\xEE\x64\x2F\xBB\xEA\xFC\x60\xB8\x9D\x99\xEF\x66\x7F\xBB\x37\x3B\xB7\x30\x1F\x04\x02\x81\x40\x20\x10\x08\x04\x02\x81\xFF\x09\x49\x2B\x25\x3D\x93\x74\xBB\x68\x97\x79\x48\xBA\x25\xC7\x84\xA4\x3D\x59\xBF\x6F\x0D\x06\x3F\x01\x8C\x02\xAD\x59\xBD\x80\xE7\xC0\xB9\x58\xDB\x23\x33\xDB\x9F\x8B\x9C\xA4\x0E\xE0\x13\xB0\x32\xA3\x58\x3D\x76\x9A\xD9\xAB\xB4\xC1\x2D\x75\xFA\x86\xC8\x57\x0C\xE0\x44\x96\xE0\x7A\x72\x03\x0B\x14\x49\x62\x44\x52\x5B\xDA\xE0\x7A\x72\x1B\x73\x90\xA9\x66\x1D\x70\x34\xB7\xD1\x24\xAD\x90\x74\x57\xF9\xF1\x24\xED\xB9\xEB\xDD\x39\x00\xCC\x6C\x06\xF8\xB1\xA0\x2B\xFC\x93\x41\x49\x7B\xD3\x04\x36\x94\x6B\x02\x06\x1C\x4B\x13\x58\x84\x1C\xC0\xB0\xA4\x55\x8D\x82\x8A\x92\x5B\x03\x1C\x6E\x14\xD4\x50\x2E\x5A\x8C\x77\xE7\x61\x54\xC5\x85\x46\x01\x69\xEE\xDC\x10\xB0\x79\xE1\x2E\xF3\x18\x90\xD4\x55\x2F\xA0\xA6\x9C\xA4\x56\x49\xDB\x80\xED\xB9\x6B\x39\x96\x00\x67\xEA\x05\x98\xA4\x56\x60\x0F\x70\x10\xD8\x8A\x5B\x28\x37\x01\xBD\xC0\xF2\x26\x89\x55\xF8\x08\xF4\x45\xCB\xD5\x7C\x24\x5D\xCF\x71\x81\xF5\xE1\x64\x2D\x73\x93\x34\x09\xAC\x6F\xD2\x9D\x49\xC3\x63\x33\xDB\x97\xD4\xD1\x02\x7C\x58\x5C\x17\x00\x1E\xC4\x8E\xF7\x4A\x4A\x9C\x7B\x2D\xB8\x17\xC3\xC5\xE6\x0A\x30\x16\xAB\x9F\x4D\x0A\x2A\x6A\x11\x16\x70\x1C\x98\x8A\xEA\x9D\x92\x96\x54\x07\x15\x25\x87\x99\x7D\x06\x4E\x45\xD5\x5E\xE0\x74\x75\x4C\x61\x72\x00\x66\x76\x0F\xB8\x13\x55\xAF\x4A\xEA\x8F\xF7\x17\x2A\x17\x31\x02\xCC\x02\xED\xC0\x70\xBC\xA3\x70\xB9\xE8\xE7\xBD\x14\x55\x77\xC5\xFB\x0A\x97\x8B\x78\x9E\xD4\x58\x16\xB9\x44\x82\x9C\x2F\x41\xCE\x97\x20\xE7\x4B\x90\xF3\x25\xC8\xF9\x12\xE4\x7C\x09\x72\xBE\x04\x39\x5F\x82\x9C\x2F\x41\xCE\x97\x20\xE7\x4B\x90\xF3\x25\xC8\xF9\x12\xE4\x7C\x09\x72\xBE\x94\x5A\xAE\x92\x2F\x72\x19\xB8\x09\x74\x03\x3D\xB1\x52\xA9\x77\x01\x4B\x53\x8E\x39\x0B\x8C\x03\xEF\x6B\x94\x17\x59\xE5\x7E\x9A\xD9\x78\x34\xE8\x58\x75\x90\x24\x03\x3A\x80\xB5\xD1\x67\xE5\xD8\x80\x69\xE0\x4B\xBC\x98\x59\xCD\xBD\x0D\x29\xFD\xB6\x47\xAA\x4C\x9B\xE8\x64\x53\xFC\xDE\x37\x58\x14\xFE\x8A\x39\x77\x4E\xD2\x76\xE0\x75\x54\xDE\x00\x6F\x6A\x6E\x35\x66\x40\x6E\xC3\xB7\x2F\x2A\xFD\xB8\x29\x91\x49\xAE\x27\x2A\x55\xE3\xEA\x63\x45\x14\x37\x99\x27\x81\x09\xDC\xDC\xFA\x0A\x7C\xC3\xA5\x14\xAD\x06\x3A\x71\x89\x32\x5D\xB8\x1D\x99\x7E\xDC\x46\x72\xC3\x44\x83\x46\x72\x49\x18\xEE\x69\xED\x06\x0E\xF9\x9E\x60\x21\x94\x7A\xCE\x95\x45\x6E\x43\x52\x63\x59\xE4\xAE\x25\x35\x96\x45\x6E\x19\xEE\x41\x1B\x8D\x37\x66\x4D\x77\x6C\x16\x3D\xC0\x9C\x99\x7D\x8D\x37\x96\x42\xCE\xCC\xA6\x93\xDA\xCB\xF2\xB3\x26\x52\x7A\xB9\x6F\x8B\x7C\xCE\x39\x20\xDD\xDF\xA2\xA4\x36\x49\x17\x25\x7D\x6E\x72\xE6\xCD\xAC\xA4\x1B\x92\xFA\x32\x5F\x8E\xA4\x76\x49\xE7\x25\xBD\xCC\x59\xEA\x9D\xA4\x2B\x92\x32\x67\x92\x25\x26\x31\x4B\x1A\x04\x8E\x00\x07\x70\x29\xB9\x59\x9E\xEA\x19\xE0\x29\xF0\x10\xB8\x6F\x66\x89\x5B\xE4\xDE\x72\x71\xE4\xD2\x17\x77\x00\xDB\x70\x6F\x1B\x5B\xF8\x9D\xFB\xF4\x1D\x97\xC9\x35\x0E\xBC\x03\xDE\x02\xAF\xCD\x2C\xCF\x04\xD4\xC0\xBF\xC5\x2F\x20\x8E\x5A\xE8\x3C\x51\xB3\x6E\x00\x00\x00\x00\x49\x45\x4E\x44\xAE\x42\x60\x82'
-CUSTOM_ICONS.vectors["weapon_smokegrenade"] = vector(39, 100)
-CUSTOM_ICONS["weapon_smokegrenade"] = render.load_image(CUSTOM_ICONS.weapon_smokegrenade, CUSTOM_ICONS.vectors["weapon_smokegrenade"])
-
-CUSTOM_ICONS.weapon_molotov = '\x89\x50\x4E\x47\x0D\x0A\x1A\x0A\x00\x00\x00\x0D\x49\x48\x44\x52\x00\x00\x00\x3B\x00\x00\x00\x64\x08\x06\x00\x00\x00\x38\xFD\x48\x91\x00\x00\x00\x04\x73\x42\x49\x54\x08\x08\x08\x08\x7C\x08\x64\x88\x00\x00\x00\x09\x70\x48\x59\x73\x00\x00\x2E\x23\x00\x00\x2E\x23\x01\x78\xA5\x3F\x76\x00\x00\x00\x19\x74\x45\x58\x74\x53\x6F\x66\x74\x77\x61\x72\x65\x00\x77\x77\x77\x2E\x69\x6E\x6B\x73\x63\x61\x70\x65\x2E\x6F\x72\x67\x9B\xEE\x3C\x1A\x00\x00\x05\xC2\x49\x44\x41\x54\x78\x9C\xED\x9C\x59\xCC\x5C\x53\x1C\xC0\x7F\xA7\xFA\xF5\xEB\xD7\x0A\x5A\x6A\x8D\x10\xAA\x25\x88\xA5\x09\x12\x62\x8F\x20\xB1\x34\xC4\x0B\x21\xB1\x3E\x94\x94\x44\x08\x6F\x9E\x08\x21\x95\x10\x09\x42\xEC\x6B\xC4\x12\xE1\x81\x90\xC6\x5E\xBB\xA4\x96\x07\xDA\xA2\x15\xAA\xB5\xD3\x6A\xBF\x9F\x87\x73\x27\x9D\x8E\xF9\x66\xEE\xCC\x77\xEE\x77\x8F\x98\xDF\xCB\x3D\xF7\xDE\x73\xFF\x73\x7E\x39\x77\xCE\x76\xEF\x0C\x0C\x18\x30\x60\xC0\x80\x01\x03\x06\x0C\x18\x30\x60\x40\x4E\xA8\x47\xA7\x8C\x37\x29\x65\xB0\x94\xA8\x33\x80\xD3\xD4\xA1\x54\x31\xB3\x95\x05\x76\x07\xA6\x01\x87\xA5\x0A\x98\xB3\xEC\xB6\xC5\x76\xBE\xBA\x5D\x8A\x80\x39\xCB\x4E\x2B\xB6\xD3\x81\xCB\xD5\xDD\xC7\x1B\x30\x67\xD9\xE6\xB2\xCD\x02\xAE\x51\xAF\x50\x0F\x57\xA7\xB7\xBB\x40\x9D\x5D\x36\x60\x6E\x6C\x68\x73\x6C\x6F\xE0\x5C\xE0\x26\xF5\x32\x75\x9F\xC6\x09\x75\x1A\xB0\x40\x3D\x68\xAC\x80\x39\xCB\xFE\xDD\xE1\xDC\x16\xC0\x7E\xC0\x42\x75\xBF\xE2\xD8\x5C\xE2\xAD\x7F\xBE\x3A\xA7\xDD\x45\x39\xCB\xFE\x5C\x22\x4F\x00\x8E\x29\xD2\x5B\x16\xDB\x29\xC0\xA5\xEA\x9E\xAD\x99\x73\x96\xFD\x8C\xF6\xB7\x72\x2B\x7B\xAB\x53\x81\xE5\x4D\xC7\x86\x81\xCB\xD4\xDD\x9A\x33\x66\x2B\x1B\x42\xF8\x09\x78\xA2\x44\xD6\xC9\xC0\x51\x21\x84\x15\xC0\xA7\x4D\xC7\x47\x88\xDF\xE1\xAD\x1A\x07\xB2\x95\x05\x08\x21\xBC\x0A\xBC\x55\x22\xEB\x29\xEA\x2E\xC0\x33\x80\x4D\xC7\xB7\x06\xCE\x6E\xEC\x64\x2D\x5B\xF0\x20\xF0\x75\x97\x3C\x43\xC0\xC5\xC0\x6A\x60\x55\xCB\xB9\x03\x1B\x7D\x74\x96\xB2\x45\x5F\x7A\x86\x3A\x2D\x84\xF0\x37\x70\x0F\x30\xDA\xE5\xB2\x1D\x81\xEB\x8A\x6D\x2B\xF3\x20\x53\x59\x60\x2D\x70\x02\x70\x95\x3A\x12\x42\x58\x09\xBC\x56\xE2\xBA\xE9\xB4\x77\xDA\x81\x31\x4E\xE4\xC0\x6F\xC5\x76\x27\xE0\x94\x22\xFD\x22\x9B\x7F\x1F\x7B\x21\x40\xBE\xB2\x5B\x37\xA5\x8F\x54\x87\x42\x08\x3F\x02\xEB\xFA\x8C\xF7\x1D\xC4\x66\x3B\x47\xE6\x35\xA5\x87\x80\x59\xEA\x24\x60\x6A\x9F\xF1\x96\x42\x86\xB2\xEA\xCE\xC0\xA1\x2D\x87\xA7\x00\x07\xF6\x19\x72\x19\x71\x80\x92\xE5\x6D\x3C\x9F\x7F\x97\x6B\x47\xE0\xD8\x22\x3D\x0A\x9C\x04\x1C\x4D\xAC\xE9\x8D\x1D\x62\xAD\x07\xEE\x0D\x21\x08\x99\xD5\x6C\x31\x73\xD9\xBF\xCD\xA9\xD3\x89\x43\x40\x88\x33\x9F\x5D\x8B\xF4\x1C\x62\xBF\xFA\x2C\x45\x23\xD4\xC2\xE2\x10\xC2\x77\x8D\x9D\xDC\x6A\x76\x1B\xDA\x17\x7A\x46\xB1\x1D\x26\xD6\x68\x33\x3B\x01\x97\x00\x33\xF9\x77\x6B\xBD\xD9\xD8\x3A\x37\xD9\xF5\x1D\xCE\x6D\x00\xCE\xEA\x70\xFE\x4C\xA0\x75\xA6\x73\x4C\xCE\x63\xE3\xB5\xB4\x9F\xE9\x48\x1C\x64\x8C\x74\xB9\xFE\x78\x36\xDD\xEE\x14\xE9\xB9\x8D\x9D\xAC\x64\x43\x08\x1B\x89\xAD\x67\x2B\xA3\x40\xC7\x25\x97\x26\x66\xB6\xEC\x7F\xDB\x48\x64\x25\x5B\xF0\x7E\xCB\xFE\x28\x9B\xF7\xBB\x9D\x58\xC5\xE6\x93\x86\xF7\x8B\xA1\x26\x90\xA7\xEC\xEB\xC0\x5F\x45\x5A\x60\x67\xE0\x90\x12\xD7\x8D\x02\x4F\xB3\xA9\x87\x59\x05\x3C\xD0\x9C\x21\x3B\xD9\x10\xC2\x5F\xC0\xCB\xC5\xEE\x54\xE0\xD4\x92\x97\x3E\x4A\x5C\x9B\x02\xF8\x15\xB8\x2D\x84\xF0\x47\x73\x86\xEC\x64\x0B\x5E\x20\x8E\x67\xCF\x29\x99\x7F\x09\x51\x10\x62\x03\x77\x47\x08\x61\x75\x6B\xA6\x76\x7D\x5A\xED\x14\x4B\xA4\x6F\x01\x5B\x75\xCB\x0B\x3C\x4F\x5C\x7F\x9A\x4C\xBC\xED\xEF\x0D\x21\xBC\xDD\x2E\x63\x56\x23\x28\x00\x75\x26\x71\x79\xA5\x8C\xE8\x4A\x60\x05\xD1\x63\x03\xF0\xC8\x58\xA2\x90\x99\xAC\x3A\x19\x78\x1C\xD8\xAB\xE4\x25\x4F\x03\xBF\x00\x9F\x00\x2F\x85\x10\xBE\xAF\xAA\x6C\xC9\x51\x6F\xB3\x3C\x2F\xA8\xC3\xDD\xA3\x66\x88\x7A\x7E\x0F\xA2\x7F\xA8\x7B\xD4\x5D\xE6\xBE\x50\x8F\x50\xD7\xF5\x20\x7B\x6D\xDD\x65\xEE\x0B\x75\x8E\xFA\x43\x0F\xA2\x4B\xD5\x29\x75\x97\xBB\x27\xD4\x49\xEA\x79\xEA\xEA\x1E\x44\x47\x4D\xFC\x9E\x45\xA5\xA8\x93\xD5\x73\xD4\x8F\x7B\x90\x6C\x70\x7F\xDD\xE5\x2F\x85\x3A\x62\x7C\xA6\xFA\x55\x1F\x92\xAA\x6B\xD4\xED\xEB\xF6\xE8\x88\x3A\x5C\x48\x7E\xDB\xA7\x64\x83\x4B\xEA\x76\xE9\x88\xB1\x95\x5D\x3A\x4E\x49\xD5\x77\x8C\x4B\xA9\xF9\xA1\x6E\xA1\xDE\x68\x6C\x50\xC6\xCB\xA8\x7A\x70\xDD\x4E\x6D\x31\x36\x40\xCF\x24\x90\x6C\xF0\x51\xAA\xB2\x55\x71\x6B\x2C\xA2\xFC\x1C\xB4\x0C\x1F\xA4\x0A\x94\x54\x56\x9D\x0F\x2C\x48\x19\x13\xF8\x32\x55\xA0\x64\xB2\xC6\x27\xDF\x77\xA5\x8A\xD7\xC4\xB2\x54\x81\x92\xC8\x1A\x5B\xCA\xFB\xD8\xF4\x0A\x5E\x4A\x96\x77\xCF\x52\x8E\x54\x35\x7B\x25\x70\x5C\xA2\x58\xAD\x24\x93\x1D\xF7\xB2\x4C\xD1\x2D\xBC\x49\x7C\xD2\x96\x9A\x75\xC0\xF4\x62\x3D\x79\xDC\x8C\xAB\x66\x8D\x0F\xA2\x1E\xA2\x1A\x51\x80\x2F\x52\x89\xC2\xF8\x6F\xE3\x5B\x88\x4F\xD5\xAA\xE2\xD3\xEE\x59\xCA\xD3\xB7\xAC\x7A\x1A\xF1\xE9\x59\x95\xBC\x91\x32\x58\x5F\xB2\xC6\xA7\xE3\x77\xA7\x2C\xC8\x18\x2C\x4E\x19\xAC\x67\x59\x35\x10\xFB\xD3\x24\x6F\x77\x77\x60\x19\xF0\x61\xCA\x80\xFD\xD4\xEC\x15\xC0\xC9\x29\x0B\x31\x06\xF7\x35\x5E\x0F\x48\x45\x4F\x5D\x8F\xF1\xDD\xDE\x25\xF4\xFF\xD6\x4A\x59\xD6\x02\xB3\x43\x08\x6B\x52\x06\x2D\x5D\xB3\xEA\x08\xF0\x18\xD5\x8B\x02\x5C\x95\x5A\xB4\x27\xD4\xDB\x13\x4E\xDB\x3A\xF1\x54\x6D\x92\x85\xE8\x89\xA6\x99\x88\x77\xE3\x1B\xB5\x8A\xF1\x75\x69\xD1\xED\xD5\x55\x13\x20\xBA\x51\xAD\x6A\x7C\x5D\x4A\x34\xA8\xCF\x4D\x80\xA8\xEA\x0D\xB5\x89\x16\xB2\x0B\x27\x48\xF4\x3D\xEB\x5C\xE5\x57\xF7\x35\x3E\x40\xAA\x9A\xDF\xD4\xB9\xDD\x4B\x54\x9D\xE8\xB0\xFA\xE1\x04\x88\xAA\x5E\x58\x9B\x68\x21\x7B\xEB\x04\x89\xD6\xDE\xCD\x9C\xE0\xFF\xA4\x9B\x99\xA5\xAE\x9C\x00\xD1\x2C\xBA\x99\x94\x8B\xDB\x9D\xA8\xBD\x9B\x59\x30\x41\xA2\xB5\x75\x33\xA1\x10\xDD\x07\x78\x97\x4D\x3F\xD0\xAD\x8A\xDF\x81\x79\x21\x84\xCF\x2B\xFE\x9C\xB6\x4C\x32\xBE\x71\xF2\x30\xD5\x8B\x02\x2C\xAC\x4B\x14\x00\xF5\xE6\x09\xBA\x7D\xEB\xED\x66\x80\xA0\xFE\x4E\xF5\xB5\xFA\x0D\x70\x40\xAD\x73\x54\xE2\xE4\xFD\x8B\x8A\x3F\x63\x14\x38\xB7\x6E\x51\x88\xB2\x77\x56\xFC\x19\x37\x85\x10\x5E\xA9\xF8\x33\xCA\xA1\x4E\x51\x3F\xAF\xE8\x7B\xBA\xC4\x84\xFF\x20\x92\x04\xF5\x10\x75\x7D\x62\xD1\x7A\x67\x33\x9D\x50\xAF\x4C\x2C\x7B\x41\xDD\x4E\x1D\x51\x17\x25\x12\x7D\xB2\x6E\x97\xAE\x18\xC7\xC7\x37\x8C\x53\xB4\xDE\xD9\x4C\xAF\xA8\x17\xA9\x7F\xF6\x21\xBA\xD1\xFF\xD2\xBB\x85\x0D\xD4\x83\xEC\x7D\xB5\xE2\xFA\xBA\xCB\xDD\x37\xEA\x90\xB1\xE1\x5A\x53\x42\x34\xBF\x6E\xA6\x1F\xD4\x19\xEA\xD5\xEA\xB2\x31\x44\x7F\x55\xCB\xBE\xD7\x5F\x1B\xBD\x3E\xD8\x0A\xC4\x5F\x2D\x9F\x44\xFC\x23\x9B\x1D\x88\x3F\xC6\x5F\x14\x42\x78\x31\x7D\xF1\x06\x0C\x28\xC3\x3F\x31\x7F\xDE\xB2\x9C\x4E\x05\xF8\x00\x00\x00\x00\x49\x45\x4E\x44\xAE\x42\x60\x82'
-CUSTOM_ICONS.vectors["weapon_molotov"] = vector(59, 100)
-CUSTOM_ICONS["weapon_molotov"] = render.load_image(CUSTOM_ICONS.weapon_molotov, CUSTOM_ICONS.vectors["weapon_molotov"])
-
-CUSTOM_ICONS.weapon_hegrenade = '\x89\x50\x4E\x47\x0D\x0A\x1A\x0A\x00\x00\x00\x0D\x49\x48\x44\x52\x00\x00\x00\x3D\x00\x00\x00\x64\x08\x06\x00\x00\x00\x35\xE3\x38\xD6\x00\x00\x00\x04\x73\x42\x49\x54\x08\x08\x08\x08\x7C\x08\x64\x88\x00\x00\x00\x09\x70\x48\x59\x73\x00\x00\x2E\x23\x00\x00\x2E\x23\x01\x78\xA5\x3F\x76\x00\x00\x00\x19\x74\x45\x58\x74\x53\x6F\x66\x74\x77\x61\x72\x65\x00\x77\x77\x77\x2E\x69\x6E\x6B\x73\x63\x61\x70\x65\x2E\x6F\x72\x67\x9B\xEE\x3C\x1A\x00\x00\x05\xAD\x49\x44\x41\x54\x78\x9C\xED\x9C\x5B\x88\x16\x65\x18\xC7\x7F\x8F\x1A\x69\x16\x79\x48\x13\x2F\xC4\x15\x83\x4C\xC9\x53\x12\x81\x56\x28\x15\x76\xB8\xB0\x83\xA8\x24\x19\x45\x51\x5A\x92\x95\x17\x11\x11\x9D\xB4\x08\x89\xA2\x10\x0B\xEB\xAA\x13\xB5\x59\x94\x45\x17\x79\x8A\xCA\x4C\x63\x0B\x83\x0E\x6E\xA2\x59\x2A\x62\x69\xA6\xEB\x61\xF7\xDF\xC5\x3B\xE3\xCE\x8E\xDF\x7E\x87\x39\xED\xCE\xE7\xFC\x60\xC1\xEF\x79\xE7\x7D\xE7\xFF\x77\xBE\x99\xF7\xF4\xCC\x07\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\x05\xA7\x37\xD6\xD5\x02\xC2\x48\xEA\x0D\x3C\x03\xF4\xF5\x42\x4F\x98\xD9\xAE\x2E\x94\x94\x3E\x92\x06\xA9\x23\x37\x26\x7D\x8E\x1E\x49\x37\x98\x02\x97\x25\xDD\x60\xAF\x24\x1B\x93\xD4\x13\x78\x0C\x18\x15\xA3\x99\x33\x43\x9F\x0F\x4B\xEA\x61\x66\x6D\x31\xDA\x4C\x16\x49\x83\x25\x35\x4A\xFA\x4E\xD2\x36\xA5\xC3\x2B\x49\x6A\x8E\xFD\x20\x93\xF4\x19\x70\x4D\x02\x5A\xCA\xD1\x06\xF4\x33\xB3\x7F\x93\x68\x2C\xD6\x3D\x2D\x69\x12\x30\x31\x09\x21\x15\x30\x60\x74\x52\x8D\x45\x36\x2D\xE9\x2C\x60\x0D\x70\x5E\x52\x62\xCA\x60\xC0\xED\x49\x35\x16\xF7\xE9\xDD\x9A\x88\x8A\xEA\xB8\x4B\xD2\xCC\x24\x1A\x8A\x75\x4F\x4B\x9A\x02\x2C\xC6\x5D\xED\xBD\xC0\x21\x60\x02\x70\x61\x7C\x69\x25\x59\x65\x66\x33\x52\x6A\x3B\x3A\x92\x56\xA4\xF4\x04\x97\xA4\x23\x92\x06\xC6\xD5\x98\x87\xC1\x49\x90\xDE\xB8\x71\x40\x2C\xF2\x66\x1A\x60\xBE\xA4\x61\x71\x1A\xC8\xA3\xE9\x9E\xC0\xA2\x38\x0D\xE4\xD1\x34\xC0\x3C\x49\xFD\xA3\x56\xCE\xAB\xE9\x73\x81\xFB\xA3\x56\xCE\xAB\x69\x80\xFB\x24\x85\x27\x27\x55\x91\x67\xD3\x03\x81\x05\x51\x2A\xE6\xD9\x34\xC0\x02\xB9\xE9\x6C\x4D\xE4\xDD\xF4\x70\xA0\xE6\x11\x5A\xDE\x4D\x03\xDC\x5D\x6B\x85\x7A\x30\x3D\x4D\x52\x4D\xF7\x76\x3D\x98\x36\xE0\x25\x49\x55\xCF\xEB\xEB\xC1\xB4\xCF\xAC\x6A\x0F\x4C\x7C\xDD\x5B\xD2\x4D\xC0\xEB\xC0\x39\x11\x9B\x38\xEC\xFD\x1D\x0C\x37\x0D\xFC\xE3\xFD\x7B\x34\x6E\xF2\x11\x64\x0F\xD0\x60\x66\x47\x22\x9E\x37\x1E\x92\xA6\xC6\x98\x3E\x5E\x59\x45\xFB\x77\x76\x52\xF7\x9E\x6A\xF4\xA5\xF5\xF5\x8E\xF3\xBF\x7D\xA2\xD2\x01\x66\xF6\x1A\xD0\x58\xA2\xE8\x61\xB9\x65\xAC\xB2\xA4\x65\x7A\x5F\x4A\xED\x06\xB9\x15\x68\x0A\xC5\x1A\xA8\x62\x2D\x2D\xB7\x0F\x32\xEF\xDE\xBD\x0D\x68\x09\x15\x2D\x96\xD4\xA7\x5C\xDD\xDC\x9A\x06\x30\xB3\x26\x60\x49\x28\x3C\x0C\xB8\xA3\x5C\xBD\x5C\x9B\xF6\x78\x0E\xD8\x12\x8A\xDD\x5B\xAE\x42\x6C\xD3\x92\x2E\x95\xF4\xB2\xA4\xCF\x25\x7D\x25\x69\x2B\xB0\x29\x46\x93\xE3\x6A\x59\x20\x30\xB3\x16\xE0\x11\x3A\x2E\x47\x8F\x92\x74\x7D\xA7\x75\x6A\x51\x23\x69\x08\x70\x39\x70\x15\xAE\xAF\xBC\x98\xF6\x7D\xE4\x24\x69\x05\x7E\xC5\xF5\xBD\xFB\x70\x9B\x0A\x4D\xC0\x26\x33\x3B\xDA\x89\xB6\xD5\xC0\xF4\x40\xE8\x03\x33\x8B\xB6\xCD\x2B\xC9\x24\x4D\x97\xF4\xB6\xA4\xB6\x18\xFD\x6F\x12\x1C\x91\xB4\x59\xD2\x22\x49\x63\x43\x3A\x27\xA8\xA3\xBE\xA3\x92\x06\x47\x31\x3C\x40\xD2\xDA\xCC\xAD\x55\xC7\x09\x49\x2B\xE5\xF6\xD3\x7C\xBD\x4B\x42\xC7\x3C\x5B\xAB\xE1\xC1\x92\x36\x64\xED\x24\x02\xC7\x25\xCD\xF0\x34\xF7\x95\xF4\x66\xA0\x6C\x9F\xAA\x18\xAC\xF8\x86\xCF\x96\xB4\xA9\x0B\x0C\x44\xA5\x4D\xD2\xE3\x9E\xF6\x3E\x92\xF6\x04\xCA\x2A\x6F\x0E\x48\x3A\x53\x52\x53\x57\x28\x4F\x80\xA5\x9E\x87\x47\x03\xB1\xDD\xAA\xB4\x15\x24\x69\x69\xD7\xE8\x4D\x8C\xE9\x72\xB7\xE6\xA1\x40\xEC\xF9\x72\x86\x27\xAA\xEB\x9F\xD0\x71\x59\xEF\x79\x59\x18\x88\x1D\x97\x34\xC0\xF7\x19\x1E\x9C\x2C\xA4\x1B\xE6\x96\xD5\xC8\x64\x49\x17\x01\xAF\xE2\xFA\x79\x70\x09\x45\x4F\xF9\x07\x9C\x34\x2D\x37\x0A\xBA\x2E\x53\x79\xE9\x60\xC0\x6C\x33\x3B\x0C\x7C\x11\x88\xCF\x96\x34\x1C\x3A\x5E\xE9\x79\xC0\x00\xEA\x03\x7F\x64\xF6\x7D\x20\xD6\x0F\x18\x0B\xDE\x57\x59\x52\x0F\x60\x23\x70\x49\xA6\xD2\xD2\xE3\x38\x6E\x6E\xDD\x0B\xD8\x1E\x88\x37\x98\xD9\x76\xFF\x4A\xF7\xA7\x7E\x0C\x03\x9C\x01\x5C\x0B\xFC\x01\xEC\x0E\xC4\xFF\x83\xF6\xAF\xF7\xC8\x8C\x45\x65\xC1\x2C\x33\x6B\x05\x7E\x0E\x17\xF8\xA6\xAF\xCE\x56\x4F\x26\x4C\x95\x34\x1A\xD8\x11\x2E\xF0\x4D\x8F\x0B\xC4\xBA\x4F\x0E\x66\x7C\x6E\x06\x7E\x0C\x07\x7D\xD3\xC1\xA7\xF6\xEF\x99\xC8\xC9\x86\x71\x78\xF7\x71\x10\xDF\xF4\xF8\x40\x6C\x44\x26\x72\xB2\x61\x7C\xA9\x60\xA9\xE5\xA2\xBC\x8F\xC8\x82\xF4\xA6\x44\x56\x63\x3D\x2C\x0C\x56\x22\xBC\x36\x7E\x5A\x98\x3E\x65\x4D\xED\x74\x30\x7D\x0A\xF5\x6E\xFA\x18\xD0\x4C\x68\x9B\xA9\xDE\x4D\x6F\x31\xB3\x03\xC0\xDF\xC1\xA0\x6F\xBA\x39\x7B\x3D\x99\xB0\x3F\xF4\x79\x10\xB4\x9B\x5E\x97\xAD\x96\xCC\xF8\x30\xF4\xF9\x02\x68\x37\xBD\x37\x5B\x2D\x99\xD0\x06\x7C\x5D\xAA\xC0\x37\xFD\x51\x76\x5A\x32\x63\xB5\x99\x95\xBC\x98\xBE\xE9\xDF\x08\xDD\xEC\x75\xC0\x3B\x25\x62\x0D\xE0\x99\xF6\x36\xC5\xDE\xCD\x52\x51\xCA\xEC\xA4\xB4\x9F\x21\xD0\xB1\xCB\x7A\x2B\x13\x39\xD9\xB0\xDC\xCC\x8E\x75\x56\x18\x34\xFD\x25\xF0\x57\xFA\x7A\x52\xA7\x05\x78\xA3\xDC\x01\x27\x4D\x7B\x4B\x2B\x2F\xA4\x2C\x28\x0B\x56\x99\xD9\x9F\xE5\x0E\x08\x8F\xC8\x96\x01\x07\xD2\xD3\x93\x3A\x6D\xC0\x93\x65\xCA\xCF\x87\x90\x69\x33\x3B\x01\xCC\xC6\x65\xE7\xE5\x91\xE5\x66\xF6\x53\x99\xF2\x11\x50\x62\xEC\x6D\x66\x9F\x02\xEF\xA5\xA5\x2A\x45\x76\xE1\x72\x4F\x2A\xD2\xD9\x84\xE3\x21\xDC\x9A\x71\x9E\x98\xEB\x4D\x2E\x2A\x52\xD2\xB4\x99\xED\x00\xE6\x02\x89\xBC\xAF\x9C\x01\x8B\xCC\x6C\x4D\x15\xC7\xB5\x42\x99\xA9\xA5\x99\xAD\x05\x6E\xA0\xFB\x8F\xCB\x1B\xA9\xBE\xD7\xF9\x01\x2A\xCC\xA7\xCD\x6C\x1D\x6E\xBB\xA7\x3B\xF6\xDF\xC2\xF5\x36\x33\xCD\xAC\xDA\x07\x6F\x0B\x54\xB1\x88\x60\x66\x3B\x81\x29\xC0\x86\xC8\xF2\x92\x67\x2B\x70\x8B\x99\x3D\xE8\x8D\x2F\x6A\xA2\xAA\x95\x13\x33\xDB\x06\x4C\x03\x5E\xAC\xF5\x04\x09\x73\x10\xD7\x0F\x4F\x32\xB3\xF7\x33\x3B\xAB\xA4\x2B\x24\x7D\xA2\x6C\xD3\x34\x5A\xE4\x92\xF7\x6A\xDE\x59\x95\x34\x46\xED\xD9\x46\x4F\xC7\x35\x3F\x52\xD2\x03\x92\x36\xA6\x64\xF4\x80\xA4\x65\x92\xE6\x28\x4A\xE6\x9F\xD3\xD8\x5F\x2E\x73\xD0\x67\x32\x24\xB4\x9B\x21\x97\xE3\x31\x07\x97\xBE\x31\x86\x68\x3F\x1A\xB3\x1F\x97\x0F\xBA\x19\xF8\x18\xF8\xC6\xCC\x62\xCD\xF1\xE5\xDE\xC5\x5C\x89\x7B\x45\xB1\xD1\xCC\x56\x40\x3A\x2F\xAE\x0C\x05\xE6\xE3\xD2\x39\x86\x96\x39\xF4\x5B\x5C\xA2\x6B\x33\xB0\x1E\xF8\x25\xAB\x5F\xAD\x49\x6D\xDF\x4A\x92\xE1\x7E\x10\x22\x9C\xA6\xD8\x0A\x34\x9B\x59\xF8\x6D\x9C\x82\x34\xF9\x1F\xC0\x26\xBB\xF6\xF1\xD9\xB5\x01\x00\x00\x00\x00\x49\x45\x4E\x44\xAE\x42\x60\x82'
-CUSTOM_ICONS.vectors["weapon_hegrenade"] = vector(61, 100)
-CUSTOM_ICONS["weapon_hegrenade"] = render.load_image(CUSTOM_ICONS.weapon_hegrenade, CUSTOM_ICONS.vectors["weapon_hegrenade"])
--- bhop icon
-CUSTOM_ICONS.bhop_png = [[
+local bM = {"in_forward", "in_moveright", "in_back", "in_moveleft"}
+local bN =
+    setmetatable(
+    {
+        [n.weapon_smokegrenade] = "Smoke",
+        [n.weapon_flashbang] = "Flashbang",
+        [n.weapon_hegrenade] = "HE",
+        [n.weapon_molotov] = "Molotov",
+        [n.weapon_incgrenade] = "Molotov"
+    },
+    {__index = function(bt, aw)
+            if type(aw) == "table" and aw.name ~= nil then
+                bt[aw] = aw.name
+                return bt[aw]
+            end
+        end}
+)
+local bO =
+    setmetatable(
+    {
+        [n.weapon_smokegrenade] = "Smoke",
+        [n.weapon_flashbang] = "Flashbang",
+        [n.weapon_hegrenade] = "High Explosive",
+        [n.weapon_molotov] = "Molotov",
+        [n.weapon_incgrenade] = "Molotov"
+    },
+    {__index = bN}
+)
+local bP =
+    setmetatable(
+    {},
+    {__index = function(bQ, bR)
+            if bR == nil then
+                return
+            end
+            bQ[bR] = a.get_weapon_icon(bR)
+            return bQ[bR]
+        end}
+)
+local bS =
+    setmetatable(
+    {
+        [bP["weapon_smokegrenade"]] = {0.2, -0.1, 0.35, 0},
+        [bP["weapon_hegrenade"]] = {0.1, -0.12, 0.2, 0},
+        [bP["weapon_molotov"]] = {0, -0.04, 0, 0}
+    },
+    {__index = function(bQ, bR)
+            bQ[bR] = {0, 0, 0, 0}
+            return bQ[bR]
+        end}
+)
+local bT = {}
+bT.vectors = {}
+bT.bhop_png =
+    [[
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 158 200" height="200mm" width="158mm">
     <g style="mix-blend-mode:normal">
@@ -463,53 +1154,36 @@ CUSTOM_ICONS.bhop_png = [[
     </g>
 </svg>
 ]]
-CUSTOM_ICONS.vectors["bhop"] = vector(1866, 2362)
-CUSTOM_ICONS['bhop'] = render.load_image(CUSTOM_ICONS.bhop_png, CUSTOM_ICONS.vectors["bhop"])
---
-
-local WEPAON_ICONS_OFFSETS = setmetatable({
-    [CUSTOM_ICONS["weapon_smokegrenade"]] = {0.2, -0.1, 0.35, 0},
-    [CUSTOM_ICONS["weapon_hegrenade"]] = {0.1, -0.12, 0.2, 0},
-    [CUSTOM_ICONS["weapon_molotov"]] = {0, -0.04, 0, 0},
-}, {
-    __index = function(tbl, key)
-        tbl[key] = {0, 0, 0, 0}
-        return tbl[key]
-    end
-})
-
-local WEAPON_ALIASES = {
-    [weapons["weapon_incgrenade"]] = weapons["weapon_molotov"],
-    [weapons["weapon_firebomb"]] = weapons["weapon_molotov"],
-    [weapons["weapon_frag_grenade"]] = weapons["weapon_hegrenade"],
+bT.vectors["bhop"] = vector(39, 49)
+bT["bhop"] = render.load_image(bT.bhop_png, bT.vectors["bhop"])
+local bU = {
+    [n["weapon_incgrenade"]] = n["weapon_molotov"],
+    [n["weapon_firebomb"]] = n["weapon_molotov"],
+    [n["weapon_frag_grenade"]] = n["weapon_hegrenade"]
 }
-for idx, weapon in pairs(weapons) do
-    if weapon.type == "knife" then
-        WEAPON_ALIASES[weapon] = weapons["weapon_knife"]
+for bV, bW in pairs(n) do
+    if bW.type == "knife" then
+        bU[bW] = n["weapon_knife"]
     end
 end
-
-local vector_index_i, vector_index_lookup = 1, {}
-local VECTOR_INDEX = setmetatable({}, {
-    __index = function(self, key)
-        local id = string.format("%.2f %.2f %.2f", key:unpack())
-        local index = vector_index_lookup[id]
-
-        -- first time we met this location
-        if index == nil then
-            index = vector_index_i
-            vector_index_lookup[id] = index
-            vector_index_i = index + 1
-        end
-
-        self[key] = index
-        return index
-    end,
-    __mode = "k"
-})
-
-local DEFAULTS = {
-    visibility_offset = vectorlib.new(0, 0, 24),
+local bX, bY = 1, {}
+local bZ =
+    setmetatable(
+    {},
+    {__index = function(self, aw)
+            local b_ = string.format("%.2f %.2f %.2f", aw:unpack())
+            local bn = bY[b_]
+            if bn == nil then
+                bn = bX
+                bY[b_] = bn
+                bX = bn + 1
+            end
+            self[aw] = bn
+            return bn
+        end, __mode = "k"}
+)
+local c0 = {
+    visibility_offset = ay.new(0, 0, 24),
     fov = 0.7,
     fov_movement = 25,
     select_fov_legit = 8,
@@ -518,202 +1192,155 @@ local DEFAULTS = {
     destroy_text = "Break the object",
     source_ttl = 5
 }
-
-local MAX_DIST_ICON = 1500
-local MAX_DIST_ICON_SQR = MAX_DIST_ICON*MAX_DIST_ICON
-local MAX_DIST_COMBINE_SQR = 20*20
-local MAX_DIST_TEXT = 650
-local MAX_DIST_CLOSE = 28
-local MAX_DIST_CLOSE_DRAW = 15
-local MAX_DIST_CORRECT = 0.1
-local POSITION_WORLD_OFFSET = vectorlib.new(0, 0, 8)
-local POSITION_WORLD_TOP_SIZE = 6
-local INF = 1/0
-local NULL_VECTOR = vectorlib.new(0, 0, 0)
-local GRENADE_PLAYBACK_PREPARE, GRENADE_PLAYBACK_RUN, GRENADE_PLAYBACK_THROW, GRENADE_PLAYBACK_THROWN, GRENADE_PLAYBACK_FINISHED = 1, 2, 3, 4, 5
-
-local CLR_TEXT_EDIT = {255, 16, 16}
-
-local approach_accurate_Z_OFFSET = 20
-local approach_accurate_PLAYER_RADIUS = 16
-local approach_accurate_OFFSETS_START = {
-    vectorlib.new(approach_accurate_PLAYER_RADIUS*0.7, 0, approach_accurate_Z_OFFSET),
-    vectorlib.new(-approach_accurate_PLAYER_RADIUS*0.7, 0, approach_accurate_Z_OFFSET),
-    vectorlib.new(0, approach_accurate_PLAYER_RADIUS*0.7, approach_accurate_Z_OFFSET),
-    vectorlib.new(0, -approach_accurate_PLAYER_RADIUS*0.7, approach_accurate_Z_OFFSET),
-}
-local approach_accurate_OFFSETS_END = {
-    vectorlib.new(approach_accurate_PLAYER_RADIUS*2, 0, 0),
-    vectorlib.new(0, approach_accurate_PLAYER_RADIUS*2, 0),
-    vectorlib.new(-approach_accurate_PLAYER_RADIUS*2, 0, 0),
-    vectorlib.new(0, -approach_accurate_PLAYER_RADIUS*2, 0),
-}
-
-local benchmark = {
-    start_times = {},
-
-    measure = function(name, callback, ...)
-        if not false then return end
-
-        local start = common.get_unixtime()
-        local values = {callback(...)}
-        print(string.format("%s took %fms", name, common.get_unixtime()-start))
-
-        return unpack(values)
-    end,
-
-    start = function(self, name)
-        if not false then return end
-
-        if self.start_times[name] ~= nil then
-            client.error_log("benchmark: " .. name .. " wasn't finished before starting again")
-        end
-        self.start_times[name] = common.get_unixtime()
-    end,
-
-    finish = function(self, name)
-        if not false then return end
-
-        if self.start_times[name] == nil then
+local c1 = 1500
+local c2 = c1 * c1
+local c3 = 20 * 20
+local c4 = 650
+local c5 = 28
+local c6 = 15
+local c7 = 0.1
+local c8 = ay.new(0, 0, 8)
+local c9 = 6
+local ca = 1 / 0
+local cb = ay.new(0, 0, 0)
+local cc, cd, ce, cf, cg = 1, 2, 3, 4, 5
+local ch = {255, 16, 16}
+local ci = 20
+local cj = 16
+local ck = {ay.new(cj * 0.7, 0, ci), ay.new(-cj * 0.7, 0, ci), ay.new(0, cj * 0.7, ci), ay.new(0, -cj * 0.7, ci)}
+local cl = {ay.new(cj * 2, 0, 0), ay.new(0, cj * 2, 0), ay.new(-cj * 2, 0, 0), ay.new(0, -cj * 2, 0)}
+local cm = {start_times = {}, measure = function(cn, bu, ...)
+        if not false then
             return
         end
-
-        print(string.format("%s took %fms", name, common.get_unixtime()-self.start_times[name]))
-        self.start_times[name] = nil
+        local co = common.get_unixtime()
+        local cp = {bu(...)}
+        print_raw(string.format("%s took %fms", cn, common.get_unixtime() - co))
+        return unpack(cp)
+    end, start = function(self, cn)
+        if not false then
+            return
+        end
+        if self.start_times[cn] ~= nil then
+            bs.error_log("benchmark: " .. cn .. " wasn't finished before starting again")
+        end
+        self.start_times[cn] = common.get_unixtime()
+    end, finish = function(self, cn)
+        if not false then
+            return
+        end
+        if self.start_times[cn] == nil then
+            return
+        end
+        print_raw(string.format("%s took %fms", cn, common.get_unixtime() - self.start_times[cn]))
+        self.start_times[cn] = nil
+    end}
+function a.get_string(cq, ...)
+    local N = ""
+    local cr = {cq, ...}
+    for j = 1, #cr do
+        N = N .. cr[j] .. "\x20"
     end
-}
-
-function test_array.get_string(msg, ...)
-    local str = ""
-    local args = {msg, ...}
-
-    for i = 1, #args do
-        str = str .. args[i] .. "\x20"
-    end
-
-    return str
+    return N
 end
-
-function test_array.hsv_to_rgb(h, s, v)
-    if s == 0 then
-        return v, v, v
+function a.hsv_to_rgb(i, t, w)
+    if t == 0 then
+        return w, w, w
     end
-    h = h / 60
-
-    local hue_sector = math.floor(h)
-    local hue_sector_offset = h - hue_sector
-
-    local p = v * (1 - s)
-    local q = v * (1 - s * hue_sector_offset)
-    local t = v * (1 - s * (1 - hue_sector_offset))
-
-    if hue_sector == 0 then
-        return v, t, p
-    elseif hue_sector == 1 then
-        return q, v, p
-    elseif hue_sector == 2 then
-        return p, v, t
-    elseif hue_sector == 3 then
-        return p, q, v
-    elseif hue_sector == 4 then
-        return t, p, v
-    elseif hue_sector == 5 then
-        return v, p, q
+    i = i / 60
+    local cs = math.floor(i)
+    local ct = i - cs
+    local q = w * (1 - t)
+    local r = w * (1 - t * ct)
+    local u = w * (1 - t * (1 - ct))
+    if cs == 0 then
+        return w, u, q
+    elseif cs == 1 then
+        return r, w, q
+    elseif cs == 2 then
+        return q, w, u
+    elseif cs == 3 then
+        return q, r, w
+    elseif cs == 4 then
+        return u, q, w
+    elseif cs == 5 then
+        return w, q, r
     end
 end
-
-function test_array.rgb_to_hsv(r, g, b)
-    local v = math.max(r, g, b)
-    local d = v - math.min(r, g, b)
-
-    if 1 > d then
-        return 0, 0, v
+function a.rgb_to_hsv(s, h, c)
+    local w = math.max(s, h, c)
+    local e = w - math.min(s, h, c)
+    if 1 > e then
+        return 0, 0, w
     end
-
-    if v == 0 then
-        return -1, 0, v
+    if w == 0 then
+        return -1, 0, w
     end
-
-    local s = d / v
-
-    local h
-    if r == v then
-        h = (g - b) / d
-    elseif g == v then
-        h = 2 + (b - r) / d
+    local t = e / w
+    local i
+    if s == w then
+        i = (h - c) / e
+    elseif h == w then
+        i = 2 + (c - s) / e
     else
-        h = 4 + (r - g) / d
+        i = 4 + (s - h) / e
     end
-
-    h = h * 60
-    if h < 0 then
-        h = h + 360
+    i = i * 60
+    if i < 0 then
+        i = i + 360
     end
-
-    return h, s, v
+    return i, t, w
 end
-
-function test_array.lerp(a, b, percentage)
-    return a + (b - a) * percentage
+function a.lerp(b, c, cu)
+    return b + (c - b) * cu
 end
-
-function test_array.lerp_color(r1, g1, b1, a1, r2, g2, b2, a2, percentage)
-    if percentage == 0 then
-        return r1, g1, b1, a1
-    elseif percentage == 1 then
-        return r2, g2, b2, a2
+function a.lerp_color(cv, cw, cx, b8, cy, cz, cA, b9, cu)
+    if cu == 0 then
+        return cv, cw, cx, b8
+    elseif cu == 1 then
+        return cy, cz, cA, b9
     end
-
-    local h1, s1, v1 = test_array.rgb_to_hsv(r1, g1, b1)
-    local h2, s2, v2 = test_array.rgb_to_hsv(r2, g2, b2)
-
-    local r, g, b = test_array.hsv_to_rgb(test_array.lerp(h1, h2, percentage), test_array.lerp(s1, s2, percentage), test_array.lerp(v1, v2, percentage))
-    local a = test_array.lerp(a1, a2, percentage)
-
-    return r, g, b, math.floor(a)
+    local cB, cC, cD = a.rgb_to_hsv(cv, cw, cx)
+    local cE, cF, cG = a.rgb_to_hsv(cy, cz, cA)
+    local s, h, c = a.hsv_to_rgb(a.lerp(cB, cE, cu), a.lerp(cC, cF, cu), a.lerp(cD, cG, cu))
+    local b = a.lerp(b8, b9, cu)
+    return s, h, c, math.floor(b)
 end
-
-function test_array.normalize_angles(pitch, yaw)
-    if yaw ~= yaw or yaw == INF then
-        yaw = 0
-        yaw = yaw
-    elseif not (yaw > -180 and yaw <= 180) then
-        yaw = math.fmod(math.fmod(yaw + 360, 360), 360)
-        yaw = yaw > 180 and yaw-360 or yaw
+function a.normalize_angles(cH, cI)
+    if cI ~= cI or cI == ca then
+        cI = 0
+        cI = cI
+    elseif not (cI > -180 and cI <= 180) then
+        cI = math.fmod(math.fmod(cI + 360, 360), 360)
+        cI = cI > 180 and cI - 360 or cI
     end
-
-    return math.max(-89, math.min(89, pitch)), yaw
+    return math.max(-89, math.min(89, cH)), cI
 end
-
-function test_array.deep_flatten(tbl, ignore_arr, out, prefix)
-    if out == nil then
-        out = {}
-        prefix = ""
+function a.deep_flatten(bt, cJ, cK, cL)
+    if cK == nil then
+        cK = {}
+        cL = ""
     end
-
-    for key, value in pairs(tbl) do
-        if type(value) == "table" and (not ignore_arr or #value == 0) then
-            test_array.deep_flatten(value, ignore_arr, out, prefix .. key .. ".")
+    for aw, ax in pairs(bt) do
+        if type(ax) == "table" and (not cJ or #ax == 0) then
+            a.deep_flatten(ax, cJ, cK, cL .. aw .. ".")
         else
-            out[prefix .. key] = value
+            cK[cL .. aw] = ax
         end
     end
-
-    return out
+    return cK
 end
-
-function test_array.deep_compare(tbl1, tbl2)
-    if tbl1 == tbl2 then
+function a.deep_compare(cM, cN)
+    if cM == cN then
         return true
-    elseif type(tbl1) == "table" and type(tbl2) == "table" then
-        for key1, value1 in pairs(tbl1) do
-            local value2 = tbl2[key1]
-
-            if value2 == nil then
+    elseif type(cM) == "table" and type(cN) == "table" then
+        for cO, cP in pairs(cM) do
+            local cQ = cN[cO]
+            if cQ == nil then
                 return false
-            elseif value1 ~= value2 then
-                if type(value1) == "table" and type(value2) == "table" then
-                    if not test_array.deep_compare(value1, value2) then
+            elseif cP ~= cQ then
+                if type(cP) == "table" and type(cQ) == "table" then
+                    if not a.deep_compare(cP, cQ) then
                         return false
                     end
                 else
@@ -721,448 +1348,371 @@ function test_array.deep_compare(tbl1, tbl2)
                 end
             end
         end
-
-        for key2, _ in pairs(tbl2) do
-            if tbl1[key2] == nil then
+        for cR, O in pairs(cN) do
+            if cM[cR] == nil then
                 return false
             end
         end
-
         return true
     end
-
     return false
 end
-
-function test_array.vector2_rotate(angle, x, y)
-    local sin = math.sin(angle)
-    local cos = math.cos(angle)
-
-    local x_n = x * cos - y * sin
-    local y_n = x * sin + y * cos
-
-    return x_n, y_n
+function a.vector2_rotate(cS, y, z)
+    local cT = math.sin(cS)
+    local cU = math.cos(cS)
+    local cV = y * cU - z * cT
+    local cW = y * cT + z * cU
+    return cV, cW
+end
+function a.vector2_dist(cX, cY, cZ, c_)
+    local d0 = cZ - cX
+    local d1 = c_ - cY
+    return math.sqrt(d0 * d0 + d1 * d1)
 end
 
-function test_array.vector2_dist(x1, y1, x2, y2)
-    local dx = x2-x1
-    local dy = y2-y1
+function a.triangle_rotated(x, y, width, height, angle, r, g, b, aa)
+    local a_x, a_y = a.vector2_rotate(angle, width/2, 0)
+    local b_x, b_y = a.vector2_rotate(angle, 0, height)
+    local c_x, c_y = a.vector2_rotate(angle, width, height)
 
-    return math.sqrt(dx*dx + dy*dy)
-end
-
-function test_array.triangle_rotated(x, y, width, height, angle, r, g, b, a)
-    local a_x, a_y = test_array.vector2_rotate(angle, width / 2, 0)
-    local b_x, b_y = test_array.vector2_rotate(angle, 0, height)
-    local c_x, c_y = test_array.vector2_rotate(angle, width, height)
-
-    local o_x, o_y = test_array.vector2_rotate(angle, -width / 2, -height / 2)
+    local o_x, o_y = a.vector2_rotate(angle, -width/2, -height/2)
     x, y = x + o_x, y + o_y
 
-    render.poly(color(r, g, b, math.floor(a*255)), vector(x + a_x, y + a_y), vector(x + b_x, y + b_y), vector(x + c_x, y + c_y))
+    render.poly(color(r, g, b, aa), vector(x+a_x,y+a_y), vector(x+b_x,y+b_y), vector(x+c_x,y+c_y))
 end
 
-function test_array.randomid(size)
-    local str = ""
-    for i=1, (size or 32) do
-        str = str .. string.char(utils.random_int(97, 122))
+function a.randomid(db)
+    local N = ""
+    for j = 1, db or 32 do
+        N = N .. string.char(utils.random_int(97, 122))
     end
-    return str
+    return N
 end
-
-local crc32_lt = {}
-function test_array.crc32(s, lt)
-    lt = lt or crc32_lt
-    local b, crc, mask
-    if not lt[1] then -- setup table
-        for i = 1, 256 do
-            crc = i - 1
-            for _ = 1, 8 do --eight times
-                mask = -bit.band(crc, 1)
-                crc = bit.bxor(bit.rshift(crc, 1), bit.band(0xedb88320, mask))
+local dc = {}
+function a.crc32(t, dd)
+    dd = dd or dc
+    local c, de, df
+    if not dd[1] then
+        for j = 1, 256 do
+            de = j - 1
+            for O = 1, 8 do
+                df = -bit.band(de, 1)
+                de = bit.bxor(bit.rshift(de, 1), bit.band(0xedb88320, df))
             end
-            lt[i] = crc
+            dd[j] = de
         end
     end
-
-    -- compute the crc
-    crc = 0xffffffff
-    for i = 1, #s do
-        b = string.byte(s, i)
-        crc = bit.bxor(bit.rshift(crc, 8), lt[bit.band(bit.bxor(crc, b), 0xFF) + 1])
+    de = 0xffffffff
+    for j = 1, #t do
+        c = string.byte(t, j)
+        de = bit.bxor(bit.rshift(de, 8), dd[bit.band(bit.bxor(de, c), 0xFF) + 1])
     end
-    return bit.band(bit.bnot(crc), 0xffffffff)
+    return bit.band(bit.bnot(de), 0xffffffff)
 end
-
-function test_array.is_grenade_being_thrown(weapon, cmd)
-    local pin_pulled = weapon["m_bPinPulled"]
-
-    if pin_pulled ~= nil then
-        if not pin_pulled or bit.band(cmd.buttons, 1) == 1 or bit.band(cmd.buttons, 2048) == 2048 then
-            local throw_time = weapon["m_fThrowTime"]
-            if throw_time ~= nil and throw_time > 0 and throw_time < globals.curtime+1 then
+function a.is_grenade_being_thrown(bW, dg)
+    local dh = bW["m_bPinPulled"]
+    if dh ~= nil then
+        if not dh or bit.band(dg.buttons, 1) == 1 or bit.band(dg.buttons, 2048) == 2048 then
+            local di = bW["m_fThrowTime"]
+            if di ~= nil and di > 0 and di < globals.curtime + 1 then
                 return true
             end
         end
     end
     return false
 end
-
-function test_array.trace_line_debug(entindex_skip, sx, sy, sz, tx, ty, tz)
-    entindex_skip = type(entindex_skip) == "number" and entity.get(entindex_skip) or entindex_skip
-
-    return utils.trace_line(vector(sx, sy, sz), vector(tx, ty, tz), entindex_skip, 0xFFFFFFFF)
+function a.trace_line_debug(dj, dk, dl, dm, dn, dp, dq)
+    dj = type(dj) == "number" and entity.get(dj) or dj
+    return utils.trace_line(vector(dk, dl, dm), vector(dn, dp, dq), dj, 0xFFFFFFFF)
 end
-
-function test_array.trace_line_skip_entities(start, target, max_traces)
-    max_traces = max_traces or 10
-    local fraction, entindex_hit = 0, -1
-    local hit = start
-
-    local i = 0
-    while max_traces >= i and fraction < 1 and (entindex_hit > -1 or i == 0) do
-        local hx, hy, hz = hit:unpack()
-        local traced_line = utils.trace_line(vector(hx, hy, hz), vector(target:unpack()), entity.get(entindex_hit), 0xFFFFFFFF)
-
-        fraction, entindex_hit = traced_line.fraction, traced_line.hit_entity == nil and -1 or traced_line.hit_entity:EntIndex()
-
-        hit = hit:lerp(target, fraction)
-        i = i + 1
+function a.trace_line_skip_entities(co, dr, ds)
+    ds = ds or 10
+    local dt, du = 0, -1
+    local dv = co
+    local j = 0
+    while ds >= j and dt < 1 and (du > -1 or j == 0) do
+        local dw, dx, dy = dv:unpack()
+        local dz = utils.trace_line(vector(dw, dx, dy), vector(dr:unpack()), entity.get(du), 0xFFFFFFFF)
+        dt, du = dz.fraction, dz.hit_entity == nil and -1 or dz.hit_entity:EntIndex()
+        dv = dv:lerp(dr, dt)
+        j = j + 1
     end
-
-    fraction = start:dist_to(hit) / start:dist_to(target)
-
-    return fraction, entindex_hit, hit
+    dt = co:dist_to(dv) / co:dist_to(dr)
+    return dt, du, dv
 end
-
-local native_GetWorldToScreenMatrix = test_array.vtable_bind("engine.dll", "VEngineClient014", 37, "struct {float m[4][4];}&(__thiscall*)(void*)")
-
-function test_array.render_world_to_screen(w_x, w_y, w_z)
-    local w2sMatrix = native_GetWorldToScreenMatrix()
-
-    local x = w2sMatrix.m[0][0] * w_x + w2sMatrix.m[0][1] * w_y + w2sMatrix.m[0][2] * w_z + w2sMatrix.m[0][3]
-    local y = w2sMatrix.m[1][0] * w_x + w2sMatrix.m[1][1] * w_y + w2sMatrix.m[1][2] * w_z + w2sMatrix.m[1][3]
-    local z = 0.0
-
-    local w = w2sMatrix.m[3][0] * w_x + w2sMatrix.m[3][1] * w_y + w2sMatrix.m[3][2] * w_z + w2sMatrix.m[3][3]
-
-    if (w < 0.001) then
-        x = x * 100000
+local dA = a.vtable_bind("engine.dll", "VEngineClient014", 37, "struct {float m[4][4];}&(__thiscall*)(void*)")
+function a.render_world_to_screen(dB, dC, dD)
+    local dE = dA()
+    local y = dE.m[0][0] * dB + dE.m[0][1] * dC + dE.m[0][2] * dD + dE.m[0][3]
+    local z = dE.m[1][0] * dB + dE.m[1][1] * dC + dE.m[1][2] * dD + dE.m[1][3]
+    local aH = 0.0
+    local x = dE.m[3][0] * dB + dE.m[3][1] * dC + dE.m[3][2] * dD + dE.m[3][3]
+    if x < 0.001 then
         y = y * 100000
-
+        z = z * 100000
         return 0, 0
     end
-
-    x = x / w
-    y = y / w
-
-    local screen = render.screen_size()
-
-    x = (screen.x / 2.0) + (x * screen.x) / 2.0
-    y = (screen.y / 2.0) - (y * screen.y) / 2.0
-
-    return x, y
+    y = y / x
+    z = z / x
+    local dF = render.screen_size()
+    y = dF.x / 2.0 + y * dF.x / 2.0
+    z = dF.y / 2.0 - z * dF.y / 2.0
+    return y, z
 end
-
-function test_array.world_to_screen_offscreen(x, y, z, matrix, screen_width, screen_height)
-    matrix = matrix or native_GetWorldToScreenMatrix()
-
-    local wx = matrix.m[0][0] * x + matrix.m[0][1] * y + matrix.m[0][2] * z + matrix.m[0][3]
-    local wy = matrix.m[1][0] * x + matrix.m[1][1] * y + matrix.m[1][2] * z + matrix.m[1][3]
-    local ww = matrix.m[3][0] * x + matrix.m[3][1] * y + matrix.m[3][2] * z + matrix.m[3][3]
-
-    local in_front
-    if ww < 0.001 then
-        local invw = -1.0 / ww
-        in_front = false
-        wx = wx * invw
-        wy = wy * invw
+function a.world_to_screen_offscreen(y, z, aH, dG, dH, dI)
+    dG = dG or dA()
+    local dJ = dG.m[0][0] * y + dG.m[0][1] * z + dG.m[0][2] * aH + dG.m[0][3]
+    local dK = dG.m[1][0] * y + dG.m[1][1] * z + dG.m[1][2] * aH + dG.m[1][3]
+    local dL = dG.m[3][0] * y + dG.m[3][1] * z + dG.m[3][2] * aH + dG.m[3][3]
+    local dM
+    if dL < 0.001 then
+        local dN = -1.0 / dL
+        dM = false
+        dJ = dJ * dN
+        dK = dK * dN
     else
-        local invw = 1.0 / ww
-        in_front = true
-        wx = wx * invw
-        wy = wy * invw
+        local dN = 1.0 / dL
+        dM = true
+        dJ = dJ * dN
+        dK = dK * dN
     end
-
-    if type(wx) ~= "number" or type(wy) ~= "number" then
-      return
-    end
-
-    if screen_width == nil then
-        screen_width, screen_height = render.screen_size().x, render.screen_size().y
-    end
-
-    wx = screen_width / 2 + (0.5 * wx * screen_width + 0.5)
-    wy = screen_height / 2 - (0.5 * wy * screen_height + 0.5)
-
-    return wx, wy, in_front, ww
-end
-
-function test_array.line_intersection(a_s_x, a_s_y, a_e_x, a_e_y, b_s_x, b_s_y, b_e_x, b_e_y)
-    local d = (a_s_x - a_e_x) * (b_s_y - b_e_y) - (a_s_y - a_e_y) * (b_s_x - b_e_x)
-    local a = a_s_x * a_e_y - a_s_y * a_e_x
-    local b = b_s_x * b_e_y - b_s_y * b_e_x
-    local x = (a * (b_s_x - b_e_x) - (a_s_x - a_e_x) * b) / d
-    local y = (a * (b_s_y - b_e_y) - (a_s_y - a_e_y) * b) / d
-    return x, y
-end
-
-function test_array.world_to_screen_offscreen_rect(x, y, z, matrix, screen_width, screen_height, cd)
-    local wx, wy, in_front = test_array.world_to_screen_offscreen(x, y, z, matrix, screen_width, screen_height)
-
-    if wx == nil then
+    if type(dJ) ~= "number" or type(dK) ~= "number" then
         return
     end
-
-    if not in_front or cd > wx or wx > screen_width-cd or cd > wy or wy > screen_height-cd then
-        local cx, cy = screen_width/2, screen_height/2
-        if not in_front then
-            local angle = math.atan2(wy-cy, wx-cx)
-            local radius = math.max(screen_width, screen_height)
-            wx = cx + radius * math.cos(angle)
-            wy = cy + radius * math.sin(angle)
+    if dH == nil then
+        dH, dI = render.screen_size().x, render.screen_size().y
+    end
+    dJ = dH / 2 + 0.5 * dJ * dH + 0.5
+    dK = dI / 2 - (0.5 * dK * dI + 0.5)
+    return dJ, dK, dM, dL
+end
+function a.line_intersection(dO, dP, dQ, dR, dS, dT, dU, dV)
+    local e = (dO - dQ) * (dT - dV) - (dP - dR) * (dS - dU)
+    local b = dO * dR - dP * dQ
+    local c = dS * dV - dT * dU
+    local y = (b * (dS - dU) - (dO - dQ) * c) / e
+    local z = (b * (dT - dV) - (dP - dR) * c) / e
+    return y, z
+end
+function a.world_to_screen_offscreen_rect(y, z, aH, dG, dH, dI, dW)
+    local dJ, dK, dM = a.world_to_screen_offscreen(y, z, aH, dG, dH, dI)
+    if dJ == nil then
+        return
+    end
+    if not dM or dW > dJ or dJ > dH - dW or dW > dK or dK > dI - dW then
+        local dX, dY = dH / 2, dI / 2
+        if not dM then
+            local cS = math.atan2(dK - dY, dJ - dX)
+            local dZ = math.max(dH, dI)
+            dJ = dX + dZ * math.cos(cS)
+            dK = dY + dZ * math.sin(cS)
         end
-
-        local border_vectors = {
-            cd, cd, screen_width-cd, cd,
-            screen_width-cd, cd, screen_width-cd, screen_height-cd,
-            cd, cd, cd, screen_height-cd,
-            cd, screen_height-cd, screen_width-cd, screen_height-cd
+        local d_ = {
+            dW,
+            dW,
+            dH - dW,
+            dW,
+            dH - dW,
+            dW,
+            dH - dW,
+            dI - dW,
+            dW,
+            dW,
+            dW,
+            dI - dW,
+            dW,
+            dI - dW,
+            dH - dW,
+            dI - dW
         }
-
-        for i=1, #border_vectors, 4 do
-            local s_x, s_y, e_x, e_y = border_vectors[i], border_vectors[i+1], border_vectors[i+2], border_vectors[i+3]
-            local i_x, i_y = test_array.line_intersection(s_x, s_y, e_x, e_y, cx, cy, wx, wy)
-
-            if (i == 1 and wy < cd and i_x >= cd and i_x <= screen_width-cd) or
-                 (i == 5 and wx > screen_width-cd and i_y >= cd and i_y <= screen_height-cd) or
-                 (i == 9 and wx < cd and i_y >= cd and i_y <= screen_height-cd) or
-                 (i == 13 and wy > screen_height-cd and i_x >= cd and i_x <= screen_width-cd) then
-                return i_x, i_y, false
+        for j = 1, #d_, 4 do
+            local e0, e1, e2, e3 = d_[j], d_[j + 1], d_[j + 2], d_[j + 3]
+            local e4, e5 = a.line_intersection(e0, e1, e2, e3, dX, dY, dJ, dK)
+            if
+                j == 1 and dK < dW and e4 >= dW and e4 <= dH - dW or
+                    j == 5 and dJ > dH - dW and e5 >= dW and e5 <= dI - dW or
+                    j == 9 and dJ < dW and e5 >= dW and e5 <= dI - dW or
+                    j == 13 and dK > dI - dW and e4 >= dW and e4 <= dH - dW
+             then
+                return e4, e5, false
             end
         end
-
-        return wx, wy, false
+        return dJ, dK, false
     end
-
-    return wx, wy, true
+    return dJ, dK, true
 end
-
-local MOVEMENT_BUTTONS_CHARS_INV = test_array.table_map_assoc(MOVEMENT_BUTTONS_CHARS, function(k, v) return v, k end)
-
-function test_array.parse_buttons_str(str)
-    local buttons_down, buttons_up = {}, {}
-
-    for c in str:gmatch(".") do
-        if c:lower() == c then
-            table.insert(buttons_up, MOVEMENT_BUTTONS_CHARS_INV[c:upper()] or false)
+local e6 =
+    a.table_map_assoc(
+    bL,
+    function(l, w)
+        return w, l
+    end
+)
+function a.parse_buttons_str(N)
+    local e7, e8 = {}, {}
+    for d in N:gmatch(".") do
+        if d:lower() == d then
+            table.insert(e8, e6[d:upper()] or false)
         else
-            table.insert(buttons_down, MOVEMENT_BUTTONS_CHARS_INV[c] or false)
+            table.insert(e7, e6[d] or false)
         end
     end
-
-    return buttons_down, buttons_up
+    return e7, e8
 end
-
-function test_array.sanitize_string(str)
-    str = tostring(str)
-    str = str:gsub('[%c]', '')
-
-    return str
+function a.sanitize_string(N)
+    N = tostring(N)
+    N = N:gsub("[%c]", "")
+    return N
 end
-
-local js_api = {
-    get_timestamp = function()
+local e9 = {get_timestamp = function()
         return common.get_unixtime()
-    end,
-
-    format_timestamp = function(timestamp)
-        local day_count, year, days, month = function(yr) return (yr % 4 == 0 and (yr % 100 ~= 0 or yr % 400 == 0)) and 366 or 365 end, 1970, math.ceil(timestamp/86400)
-
-        while days >= day_count(year) do
-            days = days - day_count(year) year = year + 1
+    end, format_timestamp = function(ea)
+        local eb, ec, ed, ee = function(ef)
+                return ef % 4 == 0 and (ef % 100 ~= 0 or ef % 400 == 0) and 366 or 365
+            end, 1970, math.ceil(ea / 86400)
+        while ed >= eb(ec) do
+            ed = ed - eb(ec)
+            ec = ec + 1
         end
-
-        local tab_overflow = function(seed, table)
-            for i = 1, #table do
-                if seed - table[i] <= 0 then
-                    return i, seed
+        local eg = function(eh, table)
+            for j = 1, #table do
+                if eh - table[j] <= 0 then
+                    return j, eh
                 end
-
-                seed = seed - table[i]
+                eh = eh - table[j]
             end
         end
-
-        month, days = tab_overflow(days, {31, (day_count(year) == 366 and 29 or 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31})
-
-        local hours, minutes, seconds = math.floor(timestamp / 3600 % 24), math.floor(timestamp / 60 % 60), math.floor(timestamp % 60)
-        local period = hours > 12 and "pm" or "am"
-
-        return string.format("%d/%d/%04d %02d:%02d", days, month, year, hours, minutes)
-    end
-}
-
-local format_timestamp = setmetatable({}, {
-    __index = function(tbl, ts)
-        tbl[ts] = js_api.format_timestamp(ts)
-        return tbl[ts]
-    end
-})
-
-local realtime_offset = js_api.get_timestamp() - globals.realtime
-
-function test_array.format_duration(secs, ignore_seconds, max_parts)
-    local units, dur, part = {"day", "hour", "minute"}, "", 1
-    max_parts = max_parts or 4
-
-    for i, v in ipairs({86400, 3600, 60}) do
-        if part > max_parts then
+        ee, ed = eg(ed, {31, eb(ec) == 366 and 29 or 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31})
+        local ei, ej, ek = math.floor(ea / 3600 % 24), math.floor(ea / 60 % 60), math.floor(ea % 60)
+        local el = ei > 12 and "pm" or "am"
+        return string.format("%d/%d/%04d %02d:%02d", ed, ee, ec, ei, ej)
+    end}
+local em =
+    setmetatable(
+    {},
+    {__index = function(bt, en)
+            bt[en] = e9.format_timestamp(en)
+            return bt[en]
+        end}
+)
+local eo = e9.get_timestamp() - globals.realtime
+function a.format_duration(ep, eq, er)
+    local es, et, eu = {"day", "hour", "minute"}, "", 1
+    er = er or 4
+    for j, w in ipairs({86400, 3600, 60}) do
+        if eu > er then
             break
         end
-
-        if secs >= v then
-            dur = dur .. math.floor(secs / v) .. " " .. units[i] .. (math.floor(secs / v) > 1 and "s" or "") .. ", "
-            secs = secs % v
-            part = part + 1
+        if ep >= w then
+            et = et .. math.floor(ep / w) .. " " .. es[j] .. (math.floor(ep / w) > 1 and "s" or "") .. ", "
+            ep = ep % w
+            eu = eu + 1
         end
     end
-
-    if secs == 0 or ignore_seconds or part > max_parts then
-        return dur:sub(1, -3)
+    if ep == 0 or eq or eu > er then
+        return et:sub(1, -3)
     else
-        secs = math.floor(secs)
-        return dur .. secs .. (secs > 1 and " seconds" or " second")
+        ep = math.floor(ep)
+        return et .. ep .. (ep > 1 and " seconds" or " second")
     end
 end
-
-function test_array.get_unix_timestamp()
-    return globals.realtime + realtime_offset
+function a.get_unix_timestamp()
+    return globals.realtime + eo
 end
-
-function test_array.format_unix_timestamp(timestamp, allow_future, ignore_seconds, max_parts)
-    local secs = timestamp - test_array.get_unix_timestamp()
-
-    if secs < 0 or allow_future then
-        local duration = test_array.format_duration(math.abs(secs), ignore_seconds, max_parts)
-        return secs > 0 and ("In " .. duration) or (duration .. " ago")
+function a.format_unix_timestamp(ea, ev, eq, er)
+    local ep = ea - a.get_unix_timestamp()
+    if ep < 0 or ev then
+        local ew = a.format_duration(math.abs(ep), eq, er)
+        return ep > 0 and "In " .. ew or ew .. " ago"
     else
-        return format_timestamp[timestamp]
+        return em[ea]
     end
 end
-
-local native_GetClipboardTextCount = test_array.vtable_bind("vgui2.dll", "VGUI_System010", 7, "int(__thiscall*)(void*)")
-local native_SetClipboardText = test_array.vtable_bind("vgui2.dll", "VGUI_System010", 9, "void(__thiscall*)(void*, const char*, int)")
-local native_GetClipboardText = test_array.vtable_bind("vgui2.dll", "VGUI_System010", 11, "int(__thiscall*)(void*, int, const char*, int)")
-
-local new_char_arr = ffi.typeof("char[?]")
-
-function test_array.get_clipboard_text()
-    local len = native_GetClipboardTextCount()
-    if len > 0 then
-        local char_arr = new_char_arr(len)
-        native_GetClipboardText(0, char_arr, len)
-        return ffi.string(char_arr, len-1)
+local ex = a.vtable_bind("vgui2.dll", "VGUI_System010", 7, "int(__thiscall*)(void*)")
+local ey = a.vtable_bind("vgui2.dll", "VGUI_System010", 9, "void(__thiscall*)(void*, const char*, int)")
+local ez = a.vtable_bind("vgui2.dll", "VGUI_System010", 11, "int(__thiscall*)(void*, int, const char*, int)")
+local eA = ffi.typeof("char[?]")
+function a.get_clipboard_text()
+    local M = ex()
+    if M > 0 then
+        local eB = eA(M)
+        ez(0, eB, M)
+        return ffi.string(eB, M - 1)
     end
 end
-
-function test_array.set_clipboard_text(text)
-    native_SetClipboardText(text, text:len())
+function a.set_clipboard_text(T)
+    ey(T, T:len())
 end
-
-function test_array.calculate_move(btn1, btn2)
-    return btn1 and 450 or (btn2 and -450 or 0)
+function a.calculate_move(eC, eD)
+    return eC and 450 or (eD and -450 or 0)
 end
-
-function test_array.compress_usercmds(usercmds)
-    local frames = {}
-
-    local current = {
-        viewangles = {pitch=usercmds[1].pitch, yaw=usercmds[1].yaw},
-        buttons = {}
-    }
-
-    -- initialize all buttons as false
-    for key, char in pairs(MOVEMENT_BUTTONS_CHARS) do
-        current.buttons[key] = false
+function a.compress_usercmds(eE)
+    local eF = {}
+    local eG = {viewangles = {pitch = eE[1].pitch, yaw = eE[1].yaw}, buttons = {}}
+    for aw, eH in pairs(bL) do
+        eG.buttons[aw] = false
     end
-
-    local empty_count = 0
-    for i, cmd in ipairs(usercmds) do
-        local buttons = ""
-
-        for btn, value_prev in pairs(current.buttons) do
-            if cmd[btn] and not value_prev then
-                buttons = buttons .. MOVEMENT_BUTTONS_CHARS[btn]
-            elseif not cmd[btn] and value_prev then
-                buttons = buttons .. MOVEMENT_BUTTONS_CHARS[btn]:lower()
+    local eI = 0
+    for j, dg in ipairs(eE) do
+        local eJ = ""
+        for eK, eL in pairs(eG.buttons) do
+            if dg[eK] and not eL then
+                eJ = eJ .. bL[eK]
+            elseif not dg[eK] and eL then
+                eJ = eJ .. bL[eK]:lower()
             end
-            current.buttons[btn] = cmd[btn]
+            eG.buttons[eK] = dg[eK]
         end
-
-        local frame = {cmd.pitch-current.viewangles.pitch, cmd.yaw-current.viewangles.yaw, buttons, cmd.forwardmove, cmd.sidemove}
-        current.viewangles = {pitch=cmd.pitch, yaw=cmd.yaw}
-
-        if frame[#frame] == test_array.calculate_move(cmd.in_moveright, cmd.in_moveleft) then
-            frame[#frame] = nil
-
-            if frame[#frame] == test_array.calculate_move(cmd.in_forward, cmd.in_back) then
-                frame[#frame] = nil
-
-                if frame[#frame] == "" then
-                    frame[#frame] = nil
-
-                    if frame[#frame] == 0 then
-                        frame[#frame] = nil
-
-                        if frame[#frame] == 0 then
-                            frame[#frame] = nil
+        local eM = {dg.pitch - eG.viewangles.pitch, dg.yaw - eG.viewangles.yaw, eJ, dg.forwardmove, dg.sidemove}
+        eG.viewangles = {pitch = dg.pitch, yaw = dg.yaw}
+        if eM[#eM] == a.calculate_move(dg.in_moveright, dg.in_moveleft) then
+            eM[#eM] = nil
+            if eM[#eM] == a.calculate_move(dg.in_forward, dg.in_back) then
+                eM[#eM] = nil
+                if eM[#eM] == "" then
+                    eM[#eM] = nil
+                    if eM[#eM] == 0 then
+                        eM[#eM] = nil
+                        if eM[#eM] == 0 then
+                            eM[#eM] = nil
                         end
                     end
                 end
             end
         end
-
-        if #frame > 0 then
-            -- first frame after a bunch of empty frames
-            if empty_count > 0 then
-                table.insert(frames, empty_count)
-                empty_count = 0
+        if #eM > 0 then
+            if eI > 0 then
+                table.insert(eF, eI)
+                eI = 0
             end
-
-            -- insert frame normally
-            table.insert(frames, frame)
+            table.insert(eF, eM)
         else
-            empty_count = empty_count + 1
+            eI = eI + 1
         end
     end
-
-    if empty_count > 0 then
-        table.insert(frames, empty_count)
-        empty_count = 0
+    if eI > 0 then
+        table.insert(eF, eI)
+        eI = 0
     end
-
-    return frames
+    return eF
 end
-
-function test_array.get_map_pattern()
-    local world = entity.get(0)
-    if world == nil then return end
-    local mins = world["m_WorldMins"]
-    local maxs = world["m_WorldMaxs"]
-
-    local str
-    if mins ~= NULL_VECTOR or maxs ~= NULL_VECTOR then
-        str = string.format("bomb_%.2f_%.2f_%.2f %.2f_%.2f_%.2f", mins.x, mins.y, mins.z, maxs.x, maxs.y, maxs.z)
+function a.get_map_pattern()
+    local eN = entity.get(0)
+    if eN == nil then
+        return
     end
-
-    if str ~= nil then
-        return test_array.crc32(str)
+    local eO = eN["m_WorldMins"]
+    local eP = eN["m_WorldMaxs"]
+    local N
+    if eO ~= cb or eP ~= cb then
+        N = string.format("bomb_%.2f_%.2f_%.2f %.2f_%.2f_%.2f", eO.x, eO.y, eO.z, eP.x, eP.y, eP.z)
     end
-
+    if N ~= nil then
+        return a.crc32(N)
+    end
     return nil
 end
-
-local MAP_PATTERNS = {
+local eQ = {
     [-2011174878] = "de_train",
     [-1890957714] = "ar_shoots",
     [-1768287648] = "dz_blacksite",
@@ -1174,91 +1724,77 @@ local MAP_PATTERNS = {
     [-1411074561] = "de_tulip",
     [-1348292803] = "cs_apollo",
     [-1218081885] = "de_guard",
-    [-923663825]  = "dz_frostbite",
-    [-768791216]  = "de_dust2",
-    [-692592072]  = "cs_italy",
-    [-542128589]  = "ar_monastery",
-    [-222265935]  = "ar_baggage",
-    [-182586077]  = "de_aztec",
-    [371013699]   = "de_stmarc",
-    [405708653]   = "de_overpass",
-    [549370830]   = "de_lake",
-    [790893427]   = "dz_sirocco",
-    [792319475]   = "de_ancient",
-    [878725495]   = "de_bank",
-    [899765791]   = "de_safehouse",
-    [1014664118]  = "cs_office",
-    [1238495690]  = "ar_dizzy",
-    [1364328969]  = "cs_militia",
-    [1445192006]  = "de_engage",
-    [1463756432]  = "cs_assault",
-    [1476824995]  = "de_vertigo",
-    [1507960924]  = "cs_agency",
-    [1563115098]  = "de_nuke",
-    [1722587796]  = "de_dust2_old",
-    [1850283081]  = "de_anubis",
-    [1900771637]  = "de_cache",
-    [1964982021]  = "de_elysion",
-    [2041417734]  = "de_cbble",
-    [2056138930]  = "gd_rialto",
+    [-923663825] = "dz_frostbite",
+    [-768791216] = "de_dust2",
+    [-692592072] = "cs_italy",
+    [-542128589] = "ar_monastery",
+    [-222265935] = "ar_baggage",
+    [-182586077] = "de_aztec",
+    [371013699] = "de_stmarc",
+    [405708653] = "de_overpass",
+    [549370830] = "de_lake",
+    [790893427] = "dz_sirocco",
+    [792319475] = "de_ancient",
+    [878725495] = "de_bank",
+    [899765791] = "de_safehouse",
+    [1014664118] = "cs_office",
+    [1238495690] = "ar_dizzy",
+    [1364328969] = "cs_militia",
+    [1445192006] = "de_engage",
+    [1463756432] = "cs_assault",
+    [1476824995] = "de_vertigo",
+    [1507960924] = "cs_agency",
+    [1563115098] = "de_nuke",
+    [1722587796] = "de_dust2_old",
+    [1850283081] = "de_anubis",
+    [1900771637] = "de_cache",
+    [1964982021] = "de_elysion",
+    [2041417734] = "de_cbble",
+    [2056138930] = "gd_rialto"
 }
-
-local MAP_LOOKUP = {
+local eR = {
     de_shortnuke = "de_nuke",
     de_shortdust = "de_shortnuke",
     ["workshop/533515529/bot_aimtrain_textured_v1"] = "bot_aimtrain_textured_v1 "
 }
-
-local mapname_cache = {}
-function test_array.get_mapname()
+local eS = {}
+function a.get_mapname()
     if common.get_map_data() == nil then
-        client.error_log('Only available on the map')
+        bs.error_log("Only available on the map")
         return
     end
-    local mapname_raw = common.get_map_data()['shortname']
-
-    if mapname_raw == nil then
+    local eT = common.get_map_data()["shortname"]
+    if eT == nil then
         return
     end
-
-    if mapname_cache[mapname_raw] == nil then
-        -- clean up mapname
-        local mapname = mapname_raw:gsub("_scrimmagemap$", "")
-
-        if MAP_LOOKUP[mapname] ~= nil then
-            -- we have a hardcoded alias for this map
-            mapname = MAP_LOOKUP[mapname]
+    if eS[eT] == nil then
+        local eU = eT:gsub("_scrimmagemap$", "")
+        if eR[eU] ~= nil then
+            eU = eR[eU]
         else
-            local is_first_party_map = false
-            for key, value in pairs(MAP_PATTERNS) do
-                if value == mapname then
-                    is_first_party_map = true
+            local eV = false
+            for aw, ax in pairs(eQ) do
+                if ax == eU then
+                    eV = true
                     break
                 end
             end
-
-            -- try and find mapname based on patterns if its not a first-party map
-            if not is_first_party_map then
-                local pattern = test_array.get_map_pattern()
-
-                if MAP_PATTERNS[pattern] ~= nil then
-                    mapname = MAP_PATTERNS[pattern]
+            if not eV then
+                local eW = a.get_map_pattern()
+                if eQ[eW] ~= nil then
+                    eU = eQ[eW]
                 end
             end
         end
-
-        mapname_cache[mapname_raw] = mapname
+        eS[eT] = eU
     end
-
-    return mapname_cache[mapname_raw]
+    return eS[eT]
 end
-
-benchmark:start("db_read")
-local db = database.read("helper_db") or {}
-db.sources = db.sources or {}
-benchmark:finish("db_read")
-
-local default_sources = {
+cm:start("db_read")
+local av = au.read("helper_db") or {}
+av.sources = av.sources or {}
+cm:finish("db_read")
+local eX = {
     {
         name = "HvH locations",
         id = "hvh_locations",
@@ -1268,956 +1804,858 @@ local default_sources = {
         builtin = false
     }
 }
-
-local removed_sources = {
-    builtin_local_file = true,
-    builtin_hvh = true
-}
-
-for i=1, #default_sources do
-    removed_sources[default_sources[i].id] = true
+local eY = {builtin_local_file = true, builtin_hvh = true}
+for j = 1, #eX do
+    eY[eX[j].id] = true
 end
-
-for i=#db.sources, 1, -1 do
-    local source = db.sources[i]
-
-    if source ~= nil and removed_sources[source.id] then
-        table.remove(db.sources, i)
+for j = #av.sources, 1, -1 do
+    local eZ = av.sources[j]
+    if eZ ~= nil and eY[eZ.id] then
+        table.remove(av.sources, j)
     end
 end
-
-for i=1, #default_sources do
-    if db.sources[i] == nil or db.sources[i].id ~= default_sources[i].id then
-        table.insert(db.sources, i, default_sources[i])
+for j = 1, #eX do
+    if av.sources[j] == nil or av.sources[j].id ~= eX[j].id then
+        table.insert(av.sources, j, eX[j])
     end
 end
-
-if files.read(game_dir.."/helper_data.json") ~= '' and files.read(game_dir.."/helper_data.json") then
-    table.insert(db.sources, {
-        name = "helper_data.json",
-        id = "builtin_local_file",
-        type = "local_file",
-        filename = "helper_data.json",
-        description = "Local file",
-        builtin = true
-    })
-
-    local store_db = (database.read("helper_store") or {})
-    store_db.locations = store_db.locations or {}
-    store_db.locations["builtin_local_file"] = {}
+if files.read(ah .. "/helper_data.json") ~= "" and files.read(ah .. "/helper_data.json") then
+    table.insert(
+        av.sources,
+        {
+            name = "helper_data.json",
+            id = "builtin_local_file",
+            type = "local_file",
+            filename = "helper_data.json",
+            description = "Local file",
+            builtin = true
+        }
+    )
+    local e_ = au.read("helper_store") or {}
+    e_.locations = e_.locations or {}
+    e_.locations["builtin_local_file"] = {}
 end
-
-local sources_locations = {}
-local update_sources_ui, edit_set_ui_values
-local map_locations, active_locations = {}
-
-function test_array.flush_active_locations(reason)
-    active_locations = nil
-    test_array.table_clear(map_locations)
+local f0 = {}
+local f1, f2
+local f3, f4 = {}
+local http_lib = require("neverlose/http_lib")
+function a.flush_active_locations(f5)
+    f4 = nil
+    a.table_clear(f3)
 end
-
-local tickrates_mt = {
-    __index = function(tbl, key)
-        if tbl.tickrate ~= nil then
-            return key / tbl.tickrate
+local f6 = {__index = function(bt, aw)
+        if bt.tickrate ~= nil then
+            return aw / bt.tickrate
         end
-    end
-}
-
-local location_mt = {
+    end}
+local f7 = {
     __index = {
         get_type_string = function(self)
             if self.type == "grenade" then
-                local names = test_array.table_map(self.weapons, function(weapon) return GRENADE_WEAPON_NAMES[weapon] end)
-                return table.concat(names, "/")
+                local f8 =
+                    a.table_map(
+                    self.weapons,
+                    function(bW)
+                        return bN[bW]
+                    end
+                )
+                return table.concat(f8, "/")
             else
-                return LOCATION_TYPE_NAMES[self.type] or self.type
+                return bI[self.type] or self.type
             end
         end,
         get_export_tbl = function(self)
-            local tbl = {
-                name = (self.name == self.full_name) and self.name or {self.full_name:match("^(.*) to (.*)$")},
+            local bt = {
+                name = self.name == self.full_name and self.name or {self.full_name:match("^(.*) to (.*)$")},
                 description = self.description,
-                weapon = #self.weapons == 1 and self.weapons[1].console_name or test_array.table_map(self.weapons, function(weapon) return weapon.console_name end),
+                weapon = #self.weapons == 1 and self.weapons[1].console_name or
+                    a.table_map(
+                        self.weapons,
+                        function(bW)
+                            return bW.console_name
+                        end
+                    ),
                 position = {self.position.x, self.position.y, self.position.z},
-                viewangles = {self.viewangles.pitch, self.viewangles.yaw},
+                viewangles = {self.viewangles.pitch, self.viewangles.yaw}
             }
-
-            if getmetatable(self.tickrates) == tickrates_mt then
+            if getmetatable(self.tickrates) == f6 then
                 if self.tickrates.tickrate_set then
-                    tbl.tickrate = self.tickrates.tickrate
+                    bt.tickrate = self.tickrates.tickrate
                 end
             elseif self.tickrates.orig ~= nil then
-                tbl.tickrate = self.tickrates.orig
+                bt.tickrate = self.tickrates.orig
             end
-
             if self.approach_accurate ~= nil then
-                tbl.approach_accurate = self.approach_accurate
+                bt.approach_accurate = self.approach_accurate
             end
-
             if self.duckamount ~= 0 then
-                tbl.duck = self.duckamount == 1 and true or self.duckamount
+                bt.duck = self.duckamount == 1 and true or self.duckamount
             end
-
             if self.position_visibility_different then
-                tbl.position_visibility = {
-                    self.position_visibility.x-self.position.x,
-                    self.position_visibility.y-self.position.y,
-                    self.position_visibility.z-self.position.z
+                bt.position_visibility = {
+                    self.position_visibility.x - self.position.x,
+                    self.position_visibility.y - self.position.y,
+                    self.position_visibility.z - self.position.z
                 }
             end
-
             if self.type == "grenade" then
-                tbl.grenade = {
-                    fov = self.fov ~= DEFAULTS.fov and self.fov or nil,
+                bt.grenade = {
+                    fov = self.fov ~= c0.fov and self.fov or nil,
                     jump = self.jump and true or nil,
                     strength = self.throw_strength ~= 1 and self.throw_strength or nil,
                     run = self.run_duration ~= nil and self.run_duration or nil,
-                    run_yaw = self.run_yaw ~= self.viewangles.yaw and self.run_yaw-self.viewangles.yaw or nil,
+                    run_yaw = self.run_yaw ~= self.viewangles.yaw and self.run_yaw - self.viewangles.yaw or nil,
                     run_speed = self.run_speed ~= nil and self.run_speed or nil,
-                    recovery_yaw = self.recovery_yaw ~= nil and self.recovery_yaw-self.run_yaw or nil,
+                    recovery_yaw = self.recovery_yaw ~= nil and self.recovery_yaw - self.run_yaw or nil,
                     recovery_jump = self.recovery_jump and true or nil,
                     delay = self.delay > 0 and self.delay or nil
                 }
-
-                if next(tbl.grenade) == nil then
-                    tbl.grenade = nil
+                if next(bt.grenade) == nil then
+                    bt.grenade = nil
                 end
             elseif self.type == "movement" then
-                local frames = {}
-                tbl.movement = {
-                    frames = test_array.compress_usercmds(self.movement_commands)
-                }
+                local eF = {}
+                bt.movement = {frames = a.compress_usercmds(self.movement_commands)}
             end
-
             if self.destroy_text ~= nil then
-                tbl.destroy = {
+                bt.destroy = {
                     ["start"] = self.destroy_start and {self.destroy_start:unpack()} or nil,
                     ["end"] = {self.destroy_end:unpack()},
-                    ["text"] = self.destroy_text ~= DEFAULTS.destroy_text and self.destroy_text or nil,
+                    ["text"] = self.destroy_text ~= c0.destroy_text and self.destroy_text or nil
                 }
             end
-
-            return tbl
+            return bt
         end,
-        get_export = function(self, fancy)
-            local tbl = self:get_export_tbl()
-            local indent = "  "
-
-            local json_str
-            if fancy then
-                local default_keys, default_fancy = {"name", "description", "weapon", "position", "viewangles", "position_visibility", "grenade"}, {["grenade"] = 1}
-                local result = {}
-
-                for i=1, #default_keys do
-                    local key = default_keys[i]
-                    local value = tbl[key]
-                    if value ~= nil then
-                        local str = default_fancy[key] == 1 and pretty_json.stringify(value, "\n", indent) or json.encode(value)
-
-                        if type(value[1]) == "number" and type(value[2]) == "number" and (value[3] == nil or type(value[3]) == "number") then
-                            str = str:gsub(",", ", ")
+        get_export = function(self, f9)
+            local bt = self:get_export_tbl()
+            local fa = "  "
+            local fb
+            if f9 then
+                local fc, fd = {
+                        "name",
+                        "description",
+                        "weapon",
+                        "position",
+                        "viewangles",
+                        "position_visibility",
+                        "grenade"
+                    },
+                    {["grenade"] = 1}
+                local fe = {}
+                for j = 1, #fc do
+                    local aw = fc[j]
+                    local ax = bt[aw]
+                    if ax ~= nil then
+                        local N = fd[aw] == 1 and aA.stringify(ax, "\n", fa) or json.encode(ax)
+                        if
+                            type(ax[1]) == "number" and type(ax[2]) == "number" and
+                                (ax[3] == nil or type(ax[3]) == "number")
+                         then
+                            N = N:gsub(",", ", ")
                         else
-                            str = str:gsub("\",\"", "\", \"")
+                            N = N:gsub('","', '", "')
                         end
-
-                        table.insert(result, string.format("\"%s\": %s", key, str))
-                        tbl[key] = nil
+                        table.insert(fe, string.format('"%s": %s', aw, N))
+                        bt[aw] = nil
                     end
                 end
-
-                for key, value in pairs(tbl) do
-                    table.insert(result, string.format("\"%s\": %s", key, pretty_json.stringify(tbl[key], "\n", indent)))
+                for aw, ax in pairs(bt) do
+                    table.insert(fe, string.format('"%s": %s', aw, aA.stringify(bt[aw], "\n", fa)))
                 end
-
-                json_str = "{\n" .. indent .. table.concat(result, ",\n"):gsub("\n", "\n" .. indent) .. "\n}"
+                fb = "{\n" .. fa .. table.concat(fe, ",\n"):gsub("\n", "\n" .. fa) .. "\n}"
             else
-                json_str = json.encode(tbl)
+                fb = json.encode(bt)
             end
-
-            return json_str
+            return fb
         end
     }
 }
-
-function test_array.create_location(location_parsed)
-    if type(location_parsed) ~= "table" then
+function a.create_location(ff)
+    if type(ff) ~= "table" then
         return "wrong type, expected table"
     end
-
-    if getmetatable(location_parsed) == location_mt then
+    if getmetatable(ff) == f7 then
         return "trying to create an already created location"
     end
-
-    local location = {}
-
-    if type(location_parsed.name) == "string" and location_parsed.name:len() > 0 then
-        location.name = test_array.sanitize_string(location_parsed.name)
-        location.full_name = location.name
-    elseif type(location_parsed.name) == "table" and #location_parsed.name == 2 then
-        location.name = test_array.sanitize_string(location_parsed.name[2])
-        location.full_name = test_array.sanitize_string(string.format("%s to %s", location_parsed.name[1], location_parsed.name[2]))
+    local fg = {}
+    if type(ff.name) == "string" and ff.name:len() > 0 then
+        fg.name = a.sanitize_string(ff.name)
+        fg.full_name = fg.name
+    elseif type(ff.name) == "table" and #ff.name == 2 then
+        fg.name = a.sanitize_string(ff.name[2])
+        fg.full_name = a.sanitize_string(string.format("%s to %s", ff.name[1], ff.name[2]))
     else
         return "invalid name, expected string or table of length 2"
     end
-
-    if type(location_parsed.description) == "string" and location_parsed.description:len() > 0 then
-        location.description = location_parsed.description
-    elseif location_parsed.description ~= nil then
+    if type(ff.description) == "string" and ff.description:len() > 0 then
+        fg.description = ff.description
+    elseif ff.description ~= nil then
         return "invalid description, expected nil or non-empty string"
     end
-
-    if type(location_parsed.weapon) == "string" and weapons[location_parsed.weapon] ~= nil then
-        location.weapons = {weapons[location_parsed.weapon]}
-        location.weapons_assoc = {[location_parsed.weapon] = true}
-    elseif type(location_parsed.weapon) == "table" and #location_parsed.weapon > 0 then
-        location.weapons = {}
-        location.weapons_assoc = {}
-
-        for i=1, #location_parsed.weapon do
-            local weapon = weapons[location_parsed.weapon[i]]
-
-            if weapon ~= nil then
-                if location.weapons_assoc[weapon] then
-                    return "duplicate weapon: " .. location_parsed.weapon[i]
+    if type(ff.weapon) == "string" and n[ff.weapon] ~= nil then
+        fg.weapons = {n[ff.weapon]}
+        fg.weapons_assoc = {[ff.weapon] = true}
+    elseif type(ff.weapon) == "table" and #ff.weapon > 0 then
+        fg.weapons = {}
+        fg.weapons_assoc = {}
+        for j = 1, #ff.weapon do
+            local bW = n[ff.weapon[j]]
+            if bW ~= nil then
+                if fg.weapons_assoc[bW] then
+                    return "duplicate weapon: " .. ff.weapon[j]
                 else
-                    location.weapons[i] = weapon
-                    location.weapons_assoc[weapon] = true
+                    fg.weapons[j] = bW
+                    fg.weapons_assoc[bW] = true
                 end
             else
-                return "invalid weapon: " .. location_parsed.weapon[i]
+                return "invalid weapon: " .. ff.weapon[j]
             end
         end
     else
-        return string.format("invalid weapon (%s)", tostring(location_parsed.weapon))
+        return string.format("invalid weapon (%s)", tostring(ff.weapon))
     end
-
-    if type(location_parsed.position) == "table" and #location_parsed.position == 3 then
-        local x, y, z = unpack(location_parsed.position)
-
-        if type(x) == "number" and type(y) == "number" and type(z) == "number" then
-            location.position = vectorlib.new(x, y, z)
-            location.position_visibility = location.position + DEFAULTS.visibility_offset
-            location.position_id = VECTOR_INDEX[location.position]
+    if type(ff.position) == "table" and #ff.position == 3 then
+        local y, z, aH = unpack(ff.position)
+        if type(y) == "number" and type(z) == "number" and type(aH) == "number" then
+            fg.position = ay.new(y, z, aH)
+            fg.position_visibility = fg.position + c0.visibility_offset
+            fg.position_id = bZ[fg.position]
         else
             return "invalid type in position"
         end
     else
         return "invalid position"
     end
-
-    if type(location_parsed.position_visibility) == "table" and #location_parsed.position_visibility == 3 then
-        local x, y, z = unpack(location_parsed.position_visibility)
-
-        if type(x) == "number" and type(y) == "number" and type(z) == "number" then
-            local origin = location.position
-            location.position_visibility = vectorlib.new(origin.x+x, origin.y+y, origin.z+z)
-            location.position_visibility_different = true
+    if type(ff.position_visibility) == "table" and #ff.position_visibility == 3 then
+        local y, z, aH = unpack(ff.position_visibility)
+        if type(y) == "number" and type(z) == "number" and type(aH) == "number" then
+            local fh = fg.position
+            fg.position_visibility = ay.new(fh.x + y, fh.y + z, fh.z + aH)
+            fg.position_visibility_different = true
         else
             return "invalid type in position_visibility"
         end
-    elseif location_parsed.position_visibility ~= nil then
+    elseif ff.position_visibility ~= nil then
         return "invalid position_visibility"
     end
-
-    if type(location_parsed.viewangles) == "table" and #location_parsed.viewangles == 2 then
-        local pitch, yaw = unpack(location_parsed.viewangles)
-
-        if type(pitch) == "number" and type(yaw) == "number" then
-            location.viewangles = {
-                pitch = pitch,
-                yaw = yaw
-            }
-            location.viewangles_forward = vectorlib.new():init_from_angles(pitch, yaw)
+    if type(ff.viewangles) == "table" and #ff.viewangles == 2 then
+        local cH, cI = unpack(ff.viewangles)
+        if type(cH) == "number" and type(cI) == "number" then
+            fg.viewangles = {pitch = cH, yaw = cI}
+            fg.viewangles_forward = ay.new():init_from_angles(cH, cI)
         else
             return "invalid type in viewangles"
         end
     else
         return "invalid viewangles"
     end
-
-    if type(location_parsed.approach_accurate) == "boolean" then
-        location.approach_accurate = location_parsed.approach_accurate
-    elseif location_parsed.approach_accurate ~= nil then
+    if type(ff.approach_accurate) == "boolean" then
+        fg.approach_accurate = ff.approach_accurate
+    elseif ff.approach_accurate ~= nil then
         return "invalid approach_accurate"
     end
-
-    if location_parsed.duck == nil or type(location_parsed.duck) == "boolean" then
-        location.duckamount = location_parsed.duck and 1 or 0
+    if ff.duck == nil or type(ff.duck) == "boolean" then
+        fg.duckamount = ff.duck and 1 or 0
     else
-        return string.format("invalid duck value (%s)", tostring(location_parsed.duck))
+        return string.format("invalid duck value (%s)", tostring(ff.duck))
     end
-    location.eye_pos = location.position + vectorlib.new(0, 0, 64-location.duckamount*18)
-
-    if (type(location_parsed.tickrate) == "number" and location_parsed.tickrate > 0) or location_parsed.tickrate == nil then
-        location.tickrates = setmetatable({
-            tickrate = location_parsed.tickrate or 64,
-            tickrate_set = location_parsed.tickrate ~= nil
-        }, tickrates_mt)
-    elseif type(location_parsed.tickrate) == "table" and #location_parsed.tickrate > 0 then
-        location.tickrates = {
-            orig = location_parsed.tickrate
-        }
-
-        local orig_tickrate
-
-        for i=1, #location_parsed.tickrate do
-            local tickrate = location_parsed.tickrate[i]
-            if type(tickrate) == "number" and tickrate > 0 then
-                if orig_tickrate == nil then
-                    orig_tickrate = tickrate
-                    location.tickrates[tickrate] = 1
+    fg.eye_pos = fg.position + ay.new(0, 0, 64 - fg.duckamount * 18)
+    if type(ff.tickrate) == "number" and ff.tickrate > 0 or ff.tickrate == nil then
+        fg.tickrates = setmetatable({tickrate = ff.tickrate or 64, tickrate_set = ff.tickrate ~= nil}, f6)
+    elseif type(ff.tickrate) == "table" and #ff.tickrate > 0 then
+        fg.tickrates = {orig = ff.tickrate}
+        local fi
+        for j = 1, #ff.tickrate do
+            local fj = ff.tickrate[j]
+            if type(fj) == "number" and fj > 0 then
+                if fi == nil then
+                    fi = fj
+                    fg.tickrates[fj] = 1
                 else
-                    location.tickrates[tickrate] = orig_tickrate/tickrate
+                    fg.tickrates[fj] = fi / fj
                 end
             else
-                return "invalid tickrate: " .. tostring(location_parsed.tickrate[i])
+                return "invalid tickrate: " .. tostring(ff.tickrate[j])
             end
         end
     else
-        return string.format("invalid tickrate (%s)", tostring(location_parsed.tickrate))
+        return string.format("invalid tickrate (%s)", tostring(ff.tickrate))
     end
-
-    if type(location_parsed.target) == "table" then
-        local x, y, z = unpack(location_parsed.target)
-
-        if type(x) == "number" and type(y) == "number" and type(z) == "number" then
-            location.target = vectorlib.new(x, y, z)
+    if type(ff.target) == "table" then
+        local y, z, aH = unpack(ff.target)
+        if type(y) == "number" and type(z) == "number" and type(aH) == "number" then
+            fg.target = ay.new(y, z, aH)
         else
             return "invalid type in target"
         end
-    elseif location_parsed.target ~= nil then
+    elseif ff.target ~= nil then
         return "invalid target"
     end
-
-    -- ensure they're all a grenade or none a grenade, then determine type
-    local has_grenade, has_non_grenade
-    for i=1, #location.weapons do
-        if location.weapons[i].type == "grenade" then
-            has_grenade = true
+    local fk, fl
+    for j = 1, #fg.weapons do
+        if fg.weapons[j].type == "grenade" then
+            fk = true
         else
-            has_non_grenade = true
+            fl = true
         end
     end
-
-    if has_grenade and has_non_grenade then
+    if fk and fl then
         return "can't have grenade and non-grenade in one location"
     end
-
-    if location_parsed.movement ~= nil then
-        location.type = "movement"
-        location.fov = DEFAULTS.fov_movement
-    elseif has_grenade then
-        location.type = "grenade"
-        location.throw_strength = 1
-        location.fov = DEFAULTS.fov
-        location.delay = 0
-        location.jump = false
-        location.run_yaw = location.viewangles.yaw
-    elseif has_non_grenade then
-        location.type = "wallbang"
+    if ff.movement ~= nil then
+        fg.type = "movement"
+        fg.fov = c0.fov_movement
+    elseif fk then
+        fg.type = "grenade"
+        fg.throw_strength = 1
+        fg.fov = c0.fov
+        fg.delay = 0
+        fg.jump = false
+        fg.run_yaw = fg.viewangles.yaw
+    elseif fl then
+        fg.type = "wallbang"
     else
         return "invalid type"
     end
-
-    if location.viewangles_forward ~= nil and location.eye_pos ~= nil then
-        local viewangles_target = location.eye_pos + location.viewangles_forward * 700
-        local fraction, entindex_hit, vec_hit = test_array.trace_line_skip_entities(location.eye_pos, viewangles_target, 2)
-        location.viewangles_target = fraction > 0.05 and vec_hit or viewangles_target
+    if fg.viewangles_forward ~= nil and fg.eye_pos ~= nil then
+        local fm = fg.eye_pos + fg.viewangles_forward * 700
+        local dt, du, fn = a.trace_line_skip_entities(fg.eye_pos, fm, 2)
+        fg.viewangles_target = dt > 0.05 and fn or fm
     end
-
-    if location.type == "grenade" and type(location_parsed.grenade) == "table" then
-        local grenade = location_parsed.grenade
-        if type(grenade.strength) == "number" and grenade.strength >= 0 and grenade.strength <= 1 then
-            location.throw_strength = grenade.strength
-        elseif grenade.strength ~= nil then
-            return string.format("invalid grenade.strength (%s)", tostring(grenade.strength))
+    if fg.type == "grenade" and type(ff.grenade) == "table" then
+        local fo = ff.grenade
+        if type(fo.strength) == "number" and fo.strength >= 0 and fo.strength <= 1 then
+            fg.throw_strength = fo.strength
+        elseif fo.strength ~= nil then
+            return string.format("invalid grenade.strength (%s)", tostring(fo.strength))
         end
-
-        if type(grenade.delay) == "number" and grenade.delay > 0 then
-            location.delay = grenade.delay
-        elseif grenade.delay ~= nil then
-            return string.format("invalid grenade.delay (%s)", tostring(grenade.delay))
+        if type(fo.delay) == "number" and fo.delay > 0 then
+            fg.delay = fo.delay
+        elseif fo.delay ~= nil then
+            return string.format("invalid grenade.delay (%s)", tostring(fo.delay))
         end
-
-        if type(grenade.fov) == "number" and grenade.fov >= 0 and grenade.fov <= 180 then
-            location.fov = grenade.fov
-        elseif grenade.fov ~= nil then
-            return string.format("invalid grenade.fov (%s)", tostring(grenade.fov))
+        if type(fo.fov) == "number" and fo.fov >= 0 and fo.fov <= 180 then
+            fg.fov = fo.fov
+        elseif fo.fov ~= nil then
+            return string.format("invalid grenade.fov (%s)", tostring(fo.fov))
         end
-
-        if type(grenade.jump) == "boolean" then
-            location.jump = grenade.jump
-        elseif grenade.jump ~= nil then
-            return string.format("invalid grenade.jump (%s)", tostring(grenade.jump))
+        if type(fo.jump) == "boolean" then
+            fg.jump = fo.jump
+        elseif fo.jump ~= nil then
+            return string.format("invalid grenade.jump (%s)", tostring(fo.jump))
         end
-
-        if type(grenade.run) == "number" and grenade.run > 0 and grenade.run < 512 then
-            location.run_duration = grenade.run
-        elseif grenade.run ~= nil then
-            return string.format("invalid grenade.run (%s)", tostring(grenade.run))
+        if type(fo.run) == "number" and fo.run > 0 and fo.run < 512 then
+            fg.run_duration = fo.run
+        elseif fo.run ~= nil then
+            return string.format("invalid grenade.run (%s)", tostring(fo.run))
         end
-
-        if type(grenade.run_yaw) == "number" and grenade.run_yaw >= -180 and grenade.run_yaw <= 180 then
-            location.run_yaw = location.viewangles.yaw + grenade.run_yaw
-        elseif grenade.run_yaw ~= nil then
-            return string.format("invalid grenade.run_yaw (%s)", tostring(grenade.run_yaw))
+        if type(fo.run_yaw) == "number" and fo.run_yaw >= -180 and fo.run_yaw <= 180 then
+            fg.run_yaw = fg.viewangles.yaw + fo.run_yaw
+        elseif fo.run_yaw ~= nil then
+            return string.format("invalid grenade.run_yaw (%s)", tostring(fo.run_yaw))
         end
-
-        if type(grenade.run_speed) == "boolean" then
-            location.run_speed = grenade.run_speed
-        elseif grenade.run_speed ~= nil then
+        if type(fo.run_speed) == "boolean" then
+            fg.run_speed = fo.run_speed
+        elseif fo.run_speed ~= nil then
             return "invalid grenade.run_speed"
         end
-
-        if type(grenade.recovery_yaw) == "number" then
-            location.recovery_yaw = location.run_yaw + grenade.recovery_yaw
-        elseif grenade.recovery_yaw ~= nil then
+        if type(fo.recovery_yaw) == "number" then
+            fg.recovery_yaw = fg.run_yaw + fo.recovery_yaw
+        elseif fo.recovery_yaw ~= nil then
             return "invalid grenade.recovery_yaw"
         end
-
-        if type(grenade.recovery_jump) == "boolean" then
-            location.recovery_jump = grenade.recovery_jump
-        elseif grenade.recovery_jump ~= nil then
+        if type(fo.recovery_jump) == "boolean" then
+            fg.recovery_jump = fo.recovery_jump
+        elseif fo.recovery_jump ~= nil then
             return "invalid grenade.recovery_jump"
         end
-    elseif location_parsed.grenade ~= nil then
+    elseif ff.grenade ~= nil then
         return "invalid grenade"
     end
-
-    if location.type == "movement" and type(location_parsed.movement) == "table" then
-        local movement = location_parsed.movement
-
-        if type(movement.fov) == "number" and movement.fov > 0 and movement.fov < 360 then
-            location.fov = movement.fov
+    if fg.type == "movement" and type(ff.movement) == "table" then
+        local fp = ff.movement
+        if type(fp.fov) == "number" and fp.fov > 0 and fp.fov < 360 then
+            fg.fov = fp.fov
         end
-
-        if type(movement.frames) == "table" then
-            local frames = {}
-
-            for i, frame in ipairs(movement.frames) do
-                if type(frame) == "number" then
-                    if movement.frames[i] > 0 then
-                        for j=1, frame do
-                            table.insert(frames, {})
+        if type(fp.frames) == "table" then
+            local eF = {}
+            for j, eM in ipairs(fp.frames) do
+                if type(eM) == "number" then
+                    if fp.frames[j] > 0 then
+                        for k = 1, eM do
+                            table.insert(eF, {})
                         end
                     else
-                        return "invalid frame " .. tostring(i)
+                        return "invalid frame " .. tostring(j)
                     end
-                elseif type(frame) == "table" then
-                    table.insert(frames, frame)
+                elseif type(eM) == "table" then
+                    table.insert(eF, eM)
                 end
             end
-
-            local current = {
-                viewangles = {pitch=location.viewangles.pitch, yaw=location.viewangles.yaw},
-                buttons = {}
-            }
-
-            for key, char in pairs(MOVEMENT_BUTTONS_CHARS) do
-                current.buttons[key] = false
+            local eG = {viewangles = {pitch = fg.viewangles.pitch, yaw = fg.viewangles.yaw}, buttons = {}}
+            for aw, eH in pairs(bL) do
+                eG.buttons[aw] = false
             end
-
-            for i, value in ipairs(frames) do
-                local pitch, yaw, buttons, forwardmove, sidemove = unpack(value)
-
-                if pitch ~= nil and type(pitch) ~= "number" then
-                    return string.format("invalid pitch in frame #%d", i)
-                elseif yaw ~= nil and type(yaw) ~= "number" then
-                    return string.format("invalid yaw in frame #%d", i)
+            for j, ax in ipairs(eF) do
+                local cH, cI, eJ, fq, fr = unpack(ax)
+                if cH ~= nil and type(cH) ~= "number" then
+                    return string.format("invalid pitch in frame #%d", j)
+                elseif cI ~= nil and type(cI) ~= "number" then
+                    return string.format("invalid yaw in frame #%d", j)
                 end
-
-                current.viewangles.pitch = current.viewangles.pitch + (pitch or 0)
-                current.viewangles.yaw = current.viewangles.yaw + (yaw or 0)
-
-                -- update buttons
-                if type(buttons) == "string" then
-                    local buttons_down, buttons_up = test_array.parse_buttons_str(buttons)
-
-                    local buttons_seen = {}
-                    for _, btn in ipairs(buttons_down) do
-                        if btn == false then
-                            return string.format("invalid button in frame #%d", i)
-                        elseif buttons_seen[btn] then
-                            return string.format("invalid frame #%d: duplicate button %s", i, btn)
+                eG.viewangles.pitch = eG.viewangles.pitch + (cH or 0)
+                eG.viewangles.yaw = eG.viewangles.yaw + (cI or 0)
+                if type(eJ) == "string" then
+                    local e7, e8 = a.parse_buttons_str(eJ)
+                    local fs = {}
+                    for O, eK in ipairs(e7) do
+                        if eK == false then
+                            return string.format("invalid button in frame #%d", j)
+                        elseif fs[eK] then
+                            return string.format("invalid frame #%d: duplicate button %s", j, eK)
                         end
-                        buttons_seen[btn] = true
-                        current.buttons[btn] = true
+                        fs[eK] = true
+                        eG.buttons[eK] = true
                     end
-
-                    for _, btn in ipairs(buttons_up) do
-                        if btn == false then
-                            return string.format("invalid button in frame #%d", i)
-                        elseif buttons_seen[btn] then
-                            return string.format("invalid frame #%d: duplicate button %s", i, btn)
+                    for O, eK in ipairs(e8) do
+                        if eK == false then
+                            return string.format("invalid button in frame #%d", j)
+                        elseif fs[eK] then
+                            return string.format("invalid frame #%d: duplicate button %s", j, eK)
                         end
-                        buttons_seen[btn] = true
-                        current.buttons[btn] = false
+                        fs[eK] = true
+                        eG.buttons[eK] = false
                     end
-                elseif buttons ~= nil then
-                    return string.format("invalid buttons in frame #%d", i)
+                elseif eJ ~= nil then
+                    return string.format("invalid buttons in frame #%d", j)
                 end
-
-                if type(forwardmove) == "number" and forwardmove >= -450 and forwardmove <= 450 then
-                    current.forwardmove = forwardmove
-                elseif forwardmove ~= nil then
-                    return string.format("invalid forwardmove in frame #%d: %s", i, tostring(forwardmove))
+                if type(fq) == "number" and fq >= -450 and fq <= 450 then
+                    eG.forwardmove = fq
+                elseif fq ~= nil then
+                    return string.format("invalid forwardmove in frame #%d: %s", j, tostring(fq))
                 else
-                    current.forwardmove = test_array.calculate_move(current.buttons.in_forward, current.buttons.in_back)
+                    eG.forwardmove = a.calculate_move(eG.buttons.in_forward, eG.buttons.in_back)
                 end
-
-                if type(sidemove) == "number" and sidemove >= -450 and sidemove <= 450 then
-                    current.sidemove = sidemove
-                elseif sidemove ~= nil then
-                    return string.format("invalid sidemove in frame #%d: %s", i, tostring(sidemove))
+                if type(fr) == "number" and fr >= -450 and fr <= 450 then
+                    eG.sidemove = fr
+                elseif fr ~= nil then
+                    return string.format("invalid sidemove in frame #%d: %s", j, tostring(fr))
                 else
-                    current.sidemove = test_array.calculate_move(current.buttons.in_moveright, current.buttons.in_moveleft)
+                    eG.sidemove = a.calculate_move(eG.buttons.in_moveright, eG.buttons.in_moveleft)
                 end
-
-                frames[i] = {
-                    pitch = current.viewangles.pitch,
-                    yaw = current.viewangles.yaw,
-                    move_yaw = current.viewangles.yaw,
-                    forwardmove = current.forwardmove,
-                    sidemove = current.sidemove
+                eF[j] = {
+                    pitch = eG.viewangles.pitch,
+                    yaw = eG.viewangles.yaw,
+                    move_yaw = eG.viewangles.yaw,
+                    forwardmove = eG.forwardmove,
+                    sidemove = eG.sidemove
                 }
-
-                for btn, value in pairs(current.buttons) do
-                    frames[i][btn] = value
+                for eK, ax in pairs(eG.buttons) do
+                    eF[j][eK] = ax
                 end
             end
-
-            location.movement_commands = frames
+            fg.movement_commands = eF
         else
             return "invalid movement.frames"
         end
-    elseif location_parsed.movement ~= nil then
+    elseif ff.movement ~= nil then
         return "invalid movement"
     end
-
-    if type(location_parsed.destroy) == "table" then
-        local destroy = location_parsed.destroy
-        location.destroy_text = "Break the object"
-
-        if type(destroy.start) == "table" then
-            local x, y, z = unpack(destroy.start)
-
-            if type(x) == "number" and type(y) == "number" and type(z) == "number" then
-                location.destroy_start = vectorlib.new(x, y, z)
+    if type(ff.destroy) == "table" then
+        local ft = ff.destroy
+        fg.destroy_text = "Break the object"
+        if type(ft.start) == "table" then
+            local y, z, aH = unpack(ft.start)
+            if type(y) == "number" and type(z) == "number" and type(aH) == "number" then
+                fg.destroy_start = ay.new(y, z, aH)
             else
                 return "invalid type in destroy.start"
             end
-        elseif destroy.start ~= nil then
+        elseif ft.start ~= nil then
             return "invalid destroy.start"
         end
-
-        if type(destroy["end"]) == "table" then
-            local x, y, z = unpack(destroy["end"])
-
-            if type(x) == "number" and type(y) == "number" and type(z) == "number" then
-                location.destroy_end = vectorlib.new(x, y, z)
+        if type(ft["end"]) == "table" then
+            local y, z, aH = unpack(ft["end"])
+            if type(y) == "number" and type(z) == "number" and type(aH) == "number" then
+                fg.destroy_end = ay.new(y, z, aH)
             else
                 return "invalid type in destroy.end"
             end
         else
             return "invalid destroy.end"
         end
-
-        if type(destroy.text) == "string" and destroy.text:len() > 0 then
-            location.destroy_text = destroy.text
-        elseif destroy.text ~= nil then
+        if type(ft.text) == "string" and ft.text:len() > 0 then
+            fg.destroy_text = ft.text
+        elseif ft.text ~= nil then
             return "invalid destroy.text"
         end
-    elseif location_parsed.destroy ~= nil then
+    elseif ff.destroy ~= nil then
         return "invalid destroy"
     end
-
-    return setmetatable(location, location_mt)
+    return setmetatable(fg, f7)
 end
-
-function test_array.parse_and_create_locations(table_or_json, mapname)
-    local locations_parsed
-    if type(table_or_json) == "string" then
-        local success
-        success, locations_parsed = pcall(json.parse, table_or_json)
-
-        if not success then
-            error(locations_parsed)
+function a.parse_and_create_locations(fu, eU)
+    local fv
+    if type(fu) == "string" then
+        local fw
+        fw, fv = pcall(json.parse, fu)
+        if not fw then
+            error(fv)
             return
         end
-    elseif type(table_or_json) == "table" then
-        locations_parsed = table_or_json
+    elseif type(fu) == "table" then
+        fv = fu
     else
         assert(false)
     end
-
-    if type(locations_parsed) ~= "table" then
-        error(string.format("invalid type %s, expected table", type(locations_parsed)))
+    if type(fv) ~= "table" then
+        error(string.format("invalid type %s, expected table", type(fv)))
         return
     end
-
-    local locations = {}
-    for i=1, #locations_parsed do
-        local location = test_array.create_location(locations_parsed[i])
-
-        if type(location) == "table" then
-            table.insert(locations, location)
+    local fx = {}
+    for j = 1, #fv do
+        local fg = a.create_location(fv[j])
+        if type(fg) == "table" then
+            table.insert(fx, fg)
         else
-            error(location or "failed to parse")
+            error(fg or "failed to parse")
             return
         end
     end
-
-    return locations
+    return fx
 end
-
-function test_array.export_locations(tbl, fancy)
-    local indent = "  "
-    local result = {}
-
-    for i=1, #tbl do
-        local str = tbl[i]:get_export(fancy)
-        if fancy then
-            str = indent .. str:gsub("\n", "\n" .. indent)
+function a.export_locations(bt, f9)
+    local fa = "  "
+    local fe = {}
+    for j = 1, #bt do
+        local N = bt[j]:get_export(f9)
+        if f9 then
+            N = fa .. N:gsub("\n", "\n" .. fa)
         end
-        table.insert(result, str)
+        table.insert(fe, N)
     end
-
-    return (fancy and "[\n" or "[") .. table.concat(result, fancy and ",\n" or ",") .. (fancy and "\n]" or "]")
+    return (f9 and "[\n" or "[") .. table.concat(fe, f9 and ",\n" or ",") .. (f9 and "\n]" or "]")
 end
-
-function test_array.sort_by_distsqr(a, b)
-    return a.distsqr > b.distsqr
+function a.sort_by_distsqr(b, c)
+    return b.distsqr > c.distsqr
 end
-
-function test_array.source_get_index_data(url, callback)
-    http:get(url:gsub("^https://raw.githubusercontent.com/", "https://combinatronics.com/"), function(response)
-        local data = {}
-    
-        if not response:success() or response.status ~= 200 or response.body == "404: Not Found" then
-            if response.body == "404: Not Found" then
-                callback("404 - Not Found")
-                print("404 - Not Found")
+function a.source_get_index_data(fy, bu)
+    http.get(fy:gsub("^https://raw.githubusercontent.com/", "https://combinatronics.com/"), function(success, fz)
+            local fA = {}
+            if not success or fz.status ~= 200 or fz.body == "404: Not Found" then
+                if fz.body == "404: Not Found" then
+                    bu("404 - Not Found")
+                    print_raw("404 - Not Found")
+                else
+                    bu(string.format("%s - %s", fz.status, fz.status_message))
+                    print_raw(string.format("%s - %s", fz.status, fz.status_message))
+                end
+                return
+            end
+            local fB, fC = pcall(json.parse, fz.body)
+            if not fB then
+                bu("Invalid JSON: " .. fC)
+                print_raw("Invalid JSON: " .. fC)
+                return
+            end
+            if type(fC.name) == "string" then
+                fA.name = fC.name
             else
-                callback(string.format("%s - %s", response.status, response.status_message))
-                print(string.format("%s - %s", response.status, response.status_message))
-            end
-
-            return
-        end
-
-        local valid_json, jso = pcall(json.parse, response.body)
-    
-        if not valid_json then
-            callback("Invalid JSON: " .. jso)
-            print("Invalid JSON: " .. jso)
-            return
-        end
-
-        -- name is always required
-        if type(jso.name) == "string" then
-            data.name = jso.name
-        else
-            callback("Invalid name")
-            print("Invalid name")
-            return
-        end
-
-        -- description can be nil or string
-        if jso.description == nil or type(jso.description) == "string" then
-            data.description = jso.description
-        else
-            callback("Invalid description")
-            print("Invalid description")
-            return
-        end
-
-        -- update_timestamp can be nil or number
-        if jso.update_timestamp == nil or type(jso.update_timestamp) == "number" then
-            data.update_timestamp = jso.update_timestamp
-        else
-            callback("Invalid update_timestamp")
-            print("Invalid update_timestamp")
-            return
-        end
-
-        if jso.url_format ~= nil then
-            if type(jso.url_format) ~= "string" or not jso.url_format:match("^https?://.+$") then
-                callback("Invalid url_format")
-                print("Invalid url_format")
+                bu("Invalid name")
+                print_raw("Invalid name")
                 return
             end
-
-            if not jso.url_format:find("%%map%%") then
-                callback("Invalid url_format - %map% is required")
-                print("Invalid url_format - %map% is required")
+            if fC.description == nil or type(fC.description) == "string" then
+                fA.description = fC.description
+            else
+                bu("Invalid description")
+                print_raw("Invalid description")
                 return
             end
-
-            data.url_format = jso.url_format
-        else
-            data.url_format = nil
-        end
-        data.location_aliases = {}
-        data.locations = {}
-        if type(jso.locations) == "table" then
-            for map, map_data in pairs(jso.locations) do
-                if type(map) ~= "string" then
-                    callback("Invalid key in locations")
-                    print("Invalid key in locations")
-                    return
-                end
-
-                if type(map_data) == "string" then
-                    -- this is an alias
-                    data.location_aliases[map] = map_data
-                elseif type(map_data) == "table" then
-                    data.locations[map] = map_data
-                elseif jso.url_format ~= nil then
-                    callback("Location data is forbidden for split locations")
-                    return
-                end
+            if fC.update_timestamp == nil or type(fC.update_timestamp) == "number" then
+                fA.update_timestamp = fC.update_timestamp
+            else
+                bu("Invalid update_timestamp")
+                print_raw("Invalid update_timestamp")
+                return
             end
-        elseif jso.locations ~= nil then
-            callback("Invalid locations")
-            print("Invalid locations")
-            return
+            if fC.url_format ~= nil then
+                if type(fC.url_format) ~= "string" or not fC.url_format:match("^https?://.+$") then
+                    bu("Invalid url_format")
+                    print_raw("Invalid url_format")
+                    return
+                end
+                if not fC.url_format:find("%%map%%") then
+                    bu("Invalid url_format - %map% is required")
+                    print_raw("Invalid url_format - %map% is required")
+                    return
+                end
+                fA.url_format = fC.url_format
+            else
+                fA.url_format = nil
+            end
+            fA.location_aliases = {}
+            fA.locations = {}
+            if type(fC.locations) == "table" then
+                for fD, fE in pairs(fC.locations) do
+                    if type(fD) ~= "string" then
+                        bu("Invalid key in locations")
+                        print_raw("Invalid key in locations")
+                        return
+                    end
+                    if type(fE) == "string" then
+                        fA.location_aliases[fD] = fE
+                    elseif type(fE) == "table" then
+                        fA.locations[fD] = fE
+                    elseif fC.url_format ~= nil then
+                        bu("Location data is forbidden for split locations")
+                        return
+                    end
+                end
+            elseif fC.locations ~= nil then
+                bu("Invalid locations")
+                print_raw("Invalid locations")
+                return
+            end
+            if next(fA.location_aliases) == nil then
+                fA.location_aliases = nil
+            end
+            if next(fA.locations) == nil then
+                fA.locations = nil
+            end
+            fA.last_updated = a.get_unix_timestamp()
+            bu(nil, fA)
         end
-
-        if next(data.location_aliases) == nil then
-            data.location_aliases = nil
-        end
-
-        if next(data.locations) == nil then
-            data.locations = nil
-        end
-
-        data.last_updated = test_array.get_unix_timestamp()
-
-        callback(nil, data)
-    end)
+    )
 end
-ui.sidebar('\aEAD1FFFF.gg/chernobylnl', 'bomb')
-
-local group = ui.create('Main', "\a7878FFFFHelper")
-local group1 = ui.create('Manager', "\a7878FFFFA")
-local group2 = ui.create('Manager', "\a7878FFFFB")
-
-local source_mt = {
+local fF = math.floor(math.sin(globals.realtime * 2) * 127 + 128)
+local fG = math.floor(math.sin(globals.realtime * 2 + 2) * 127 + 128)
+local fH = math.floor(math.sin(globals.realtime * 2 + 4) * 127 + 128)
+function render.gradient_text(fI, fJ, bf, a1, fK, fL, bg, a2, fM)
+    local fN = ""
+    local fO = #fM - 1
+    local fP = (fK - fI) / fO
+    local fQ = (fL - fJ) / fO
+    local fR = (bg - bf) / fO
+    local fS = (a2 - a1) / fO
+    for i = 1, fO + 1 do
+        fN = fN .. ("\a%02x%02x%02x%02x%s"):format(fI, fJ, bf, a1, fM:sub(i, i))
+        fI = fI + fP
+        fJ = fJ + fQ
+        bf = bf + fR
+        a1 = a1 + fS
+    end
+    return fN
+end
+ui.sidebar(render.gradient_text(249, 44, 75, 255, 75, 44, 249, 255, "Helper V3"), "bomb")
+local fT = ui.create("Main", render.gradient_text(249, 44, 75, 255, 75, 44, 249, 255, "Helper"))
+local fU = ui.create("Manager", "A")
+local fV = ui.create("Manager", "B")
+local fW = {
     __index = {
         update_remote_data = function(self)
             if not self.type == "remote" or self.url == nil then
                 return
             end
-        
             self.remote_status = "Loading index data..."
-            test_array.source_get_index_data(self.url, function(err, data)
-                if err ~= nil then
-                    self.remote_status = string.format("Error: %s", err)
-                    update_sources_ui()
-                    return
-                end
-                self.last_updated = data.last_updated
-
-                if self.last_updated == nil then
-                    self.remote_status = "Index data refreshed"
-                    update_sources_ui()
-                    self.remote_status = nil
-                else
-                    self.remote_status = nil
-                    update_sources_ui()
-                end
-
-                local keys = {"name", "description", "update_timestamp", "url_format"}
-                for i=1, #keys do
-                    self[keys[i]] = data[keys[i]]
-                end
-
-                -- new url
-                if data.url ~= nil and data.url ~= self.url then
-                    self.url = data.url
-                    self:update_remote_data()
-                    return
-                end
-
-                local current_map_name = test_array.get_mapname()
-                sources_locations[self] = nil
-                local success1, message1 = pcall(database.read("helper_store"))
-
-                local store_db_locations = (database.read("helper_store") or {})["locations"]
-                if store_db_locations ~= nil and type(store_db_locations[self.id]) == "table" then
-                    store_db_locations[self.id] = {}
-                end
-                test_array.flush_active_locations("update_remote_data")
-
-                if data.locations ~= nil then
-                    sources_locations[self] = {}
-                    for map, locations_unparsed in pairs(data.locations) do
-                        local success, locations = pcall(test_array.parse_and_create_locations, locations_unparsed, map)
-                        if not success then
-                            self.remote_status = string.format("Invalid map data: %s", locations)
-                            client.error_log(string.format("Failed to load map data for %s (%s): %s", self.name, map, locations))
-                            update_sources_ui()
-                            return
-                        end
-
-                        sources_locations[self][map] = locations
-                        self:store_write(map)
-
-                        if map == current_map_name then
-                            test_array.flush_active_locations("B")
-                        else
-                            sources_locations[self][map] = nil
-                        end
+            a.source_get_index_data(
+                self.url,
+                function(fX, fA)
+                    if fX ~= nil then
+                        self.remote_status = string.format("Error: %s", fX)
+                        f1()
+                        return
                     end
-                end
-            end)
-        end,
-        store_read = function(self, mapname)
-            if mapname == nil then
-                local store_db_locations = (database.read("helper_store") or {})["locations"]
-                if store_db_locations ~= nil and type(store_db_locations[self.id]) == "table" then
-                    for mapname, _ in pairs(store_db_locations[self.id]) do
-                        self:store_read(mapname)
+                    self.last_updated = fA.last_updated
+                    if self.last_updated == nil then
+                        self.remote_status = "Index data refreshed"
+                        f1()
+                        self.remote_status = nil
+                    else
+                        self.remote_status = nil
+                        f1()
                     end
-                end
-                return
-            end
-
-            local store_db_locations = (database.read("helper_store") or {})["locations"]
-            if store_db_locations ~= nil and type(store_db_locations[self.id]) == "table" and type(store_db_locations[self.id][mapname]) == "string" then
-                local success, locations = pcall(test_array.parse_and_create_locations, store_db_locations[self.id][mapname], mapname)
-
-                if not success then
-                    self.remote_status = string.format("Invalid map data for %s in database: %s", mapname, locations)
-                    client.error_log(string.format("Invalid map data for %s (%s) in database: %s", self.name, mapname, locations))
-                    update_sources_ui()
-                else
-                    sources_locations[self][mapname] = locations
-                end
-            end
-        end,
-        store_write = function(self, mapname)
-            if mapname == nil then
-                if sources_locations[self] ~= nil then
-                    for mapname, _ in pairs(sources_locations[self]) do
-                        self:store_write(mapname)
+                    local fY = {"name", "description", "update_timestamp", "url_format"}
+                    for j = 1, #fY do
+                        self[fY[j]] = fA[fY[j]]
                     end
-                end
-                return
-            end
-            local store_db = (database.read("helper_store") or {})
-            store_db.locations = store_db.locations or {}
-            store_db.locations[self.id] = store_db.locations[self.id] or {}
-            store_db.locations[self.id][mapname] = test_array.export_locations(sources_locations[self][mapname])
-
-            database.write("helper_store", store_db)
-        end,
-        get_locations = function(self, mapname, allow_fetch)
-            if sources_locations[self] == nil then
-                sources_locations[self] = {}
-            end
-
-            if sources_locations[self][mapname] == nil then
-                self:store_read(mapname)
-                local locations = sources_locations[self][mapname]
-                if self.type == "remote" and allow_fetch and (self.last_updated == nil or test_array.get_unix_timestamp()-self.last_updated > (self.ttl or DEFAULTS.source_ttl)) then
-                    self:update_remote_data()
-                end
-
-                if self.type == "local_file" and mapname ~= nil then
-                    utils.execute_after(0.5, function()
-                        benchmark:start("readfile")
-                        local contents_raw = files.read(game_dir..self.filename)
-                        local to_parse = "{}"
-                        local pretty_parsed_status, pretty_parsed_data = pcall(pretty_json.parse, contents_raw)
-                        local default_parsed_status, default_parsed_data = pcall(json.parse, contents_raw)
-
-                        if pretty_parsed_status then
-                            to_parse = pretty_parsed_data
-                        elseif default_parsed_status then
-                            to_parse = default_parsed_data
-                        end
-                        contents_raw = json.encode(to_parse)
-                        local contents = json.parse(contents_raw)
-
-                        if type(contents) ~= "table" then
-                            return
-                        end
-                        local current_map_name = test_array.get_mapname()
-                        for mapname, map_locations in pairs(contents) do
-                            local success, locations = pcall(test_array.parse_and_create_locations, map_locations, mapname)
-                            if not success then
-                                self.remote_status = string.format("Invalid map data: %s", locations)
-                                client.error_log(string.format("Failed to load map data for %s (%s): %s", self.name, mapname, locations))
-                                update_sources_ui()
+                    if fA.url ~= nil and fA.url ~= self.url then
+                        self.url = fA.url
+                        self:update_remote_data()
+                        return
+                    end
+                    local fZ = a.get_mapname()
+                    f0[self] = nil
+                    local f_, g0 = pcall(au.read("helper_store"))
+                    local g1 = (au.read("helper_store") or {})["locations"]
+                    if g1 ~= nil and type(g1[self.id]) == "table" then
+                        g1[self.id] = {}
+                    end
+                    a.flush_active_locations("update_remote_data")
+                    if fA.locations ~= nil then
+                        f0[self] = {}
+                        for fD, g2 in pairs(fA.locations) do
+                            local fw, fx = pcall(a.parse_and_create_locations, g2, fD)
+                            if not fw then
+                                self.remote_status = string.format("Invalid map data: %s", fx)
+                                bs.error_log(
+                                    string.format("Failed to load map data for %s (%s): %s", self.name, fD, fx)
+                                )
+                                f1()
                                 return
                             end
-
-                            sources_locations[self][mapname] = locations
-                            test_array.flush_active_locations()
-                            self:store_write(mapname)
-
-                            if mapname ~= current_map_name then
-                                sources_locations[self][mapname] = nil
-                            end
-                        end
-
-                        benchmark:finish("readfile")
-                    end)
-                elseif locations == nil and allow_fetch and self.type == "remote" and self.url_format ~= nil then
-                    local url = self.url_format:gsub("%%map%%", mapname):gsub("^https://raw.githubusercontent.com/", "https://combinatronics.com/")
-
-                    self.remote_status = string.format("Loading map data for %s...", mapname)
-                    update_sources_ui()
-
-                    http:get(url, function(response)
-                        if not response:success() or response.status ~= 200 or response.body == "404: Not Found" then
-                            if response.status == 404 or response.body == "404: Not Found" then
-                                self.remote_status = string.format("No locations found for %s.", mapname)
+                            f0[self][fD] = fx
+                            self:store_write(fD)
+                            if fD == fZ then
+                                a.flush_active_locations("B")
                             else
-                                self.remote_status = string.format("Failed to fetch %s: %s %s", mapname, response.status, response.status_message)
+                                f0[self][fD] = nil
                             end
-                            update_sources_ui()
-                            return
                         end
-
-                        local success, locations = pcall(parse_and_create_locations, response.body, mapname)
-                        if not success then
-                            self.remote_status = string.format("Invalid map data: %s", locations)
-                            update_sources_ui()
-                            client.error_log(string.format("Failed to load map data for %s (%s): %s", self.name, mapname, locations))
-                            return
-                        end
-
-                        -- set in runtime cache
-                        sources_locations[self][mapname] = locations
-
-                        -- save runtime cache to db
-                        self:store_write(mapname)
-
-                        self.remote_status = nil
-                        update_sources_ui()
-                        flush_active_locations("C")
-                    end)
+                    end
                 end
-
-                sources_locations[self][mapname] = locations or {}
+            )
+        end,
+        store_read = function(self, eU)
+            if eU == nil then
+                local g1 = (au.read("helper_store") or {})["locations"]
+                if g1 ~= nil and type(g1[self.id]) == "table" then
+                    for eU, O in pairs(g1[self.id]) do
+                        self:store_read(eU)
+                    end
+                end
+                return
             end
-
-            return sources_locations[self][mapname]
+            local g1 = (au.read("helper_store") or {})["locations"]
+            if g1 ~= nil and type(g1[self.id]) == "table" and type(g1[self.id][eU]) == "string" then
+                local fw, fx = pcall(a.parse_and_create_locations, g1[self.id][eU], eU)
+                if not fw then
+                    self.remote_status = string.format("Invalid map data for %s in database: %s", eU, fx)
+                    bs.error_log(string.format("Invalid map data for %s (%s) in database: %s", self.name, eU, fx))
+                    f1()
+                else
+                    f0[self][eU] = fx
+                end
+            end
+        end,
+        store_write = function(self, eU)
+            if eU == nil then
+                if f0[self] ~= nil then
+                    for eU, O in pairs(f0[self]) do
+                        self:store_write(eU)
+                    end
+                end
+                return
+            end
+            local e_ = au.read("helper_store") or {}
+            e_.locations = e_.locations or {}
+            e_.locations[self.id] = e_.locations[self.id] or {}
+            e_.locations[self.id][eU] = a.export_locations(f0[self][eU])
+            au.write("helper_store", e_)
+        end,
+        get_locations = function(self, eU, g3)
+            if f0[self] == nil then
+                f0[self] = {}
+            end
+            if f0[self][eU] == nil then
+                self:store_read(eU)
+                local fx = f0[self][eU]
+                if
+                    self.type == "remote" and g3 and
+                        (self.last_updated == nil or
+                            a.get_unix_timestamp() - self.last_updated > (self.ttl or c0.source_ttl))
+                 then
+                    self:update_remote_data()
+                end
+                if self.type == "local_file" and eU ~= nil then
+                    utils.execute_after(
+                        0.5,
+                        function()
+                            cm:start("readfile")
+                            local g4 = files.read(ah .. self.filename)
+                            local g5 = "{}"
+                            local g6, g7 = pcall(aA.parse, g4)
+                            local g8, g9 = pcall(json.parse, g4)
+                            if g6 then
+                                g5 = g7
+                            elseif g8 then
+                                g5 = g9
+                            end
+                            g4 = json.encode(g5)
+                            local ga = json.parse(g4)
+                            if type(ga) ~= "table" then
+                                return
+                            end
+                            local fZ = a.get_mapname()
+                            for eU, f3 in pairs(ga) do
+                                local fw, fx = pcall(a.parse_and_create_locations, f3, eU)
+                                if not fw then
+                                    self.remote_status = string.format("Invalid map data: %s", fx)
+                                    bs.error_log(
+                                        string.format("Failed to load map data for %s (%s): %s", self.name, eU, fx)
+                                    )
+                                    f1()
+                                    return
+                                end
+                                f0[self][eU] = fx
+                                a.flush_active_locations()
+                                self:store_write(eU)
+                                if eU ~= fZ then
+                                    f0[self][eU] = nil
+                                end
+                            end
+                            cm:finish("readfile")
+                        end
+                    )
+                elseif fx == nil and g3 and self.type == "remote" and self.url_format ~= nil then
+                    local fy =
+                        self.url_format:gsub("%%map%%", eU):gsub(
+                        "^https://raw.githubusercontent.com/",
+                        "https://combinatronics.com/"
+                    )
+                    self.remote_status = string.format("Loading map data for %s...", eU)
+                    f1()
+                    http.get(fy, function(success, fz)
+                            if not success or fz.status ~= 200 or fz.body == "404: Not Found" then
+                                if fz.status == 404 or fz.body == "404: Not Found" then
+                                    self.remote_status = string.format("No locations found for %s.", eU)
+                                else
+                                    self.remote_status =
+                                        string.format("Failed to fetch %s: %s %s", eU, fz.status, fz.status_message)
+                                end
+                                f1()
+                                return
+                            end
+                            local fw, fx = pcall(parse_and_create_locations, fz.body, eU)
+                            if not fw then
+                                self.remote_status = string.format("Invalid map data: %s", fx)
+                                f1()
+                                bs.error_log(
+                                    string.format("Failed to load map data for %s (%s): %s", self.name, eU, fx)
+                                )
+                                return
+                            end
+                            f0[self][eU] = fx
+                            self:store_write(eU)
+                            self.remote_status = nil
+                            f1()
+                            flush_active_locations("C")
+                        end
+                    )
+                end
+                f0[self][eU] = fx or {}
+            end
+            return f0[self][eU]
         end,
         get_all_locations = function(self)
-            local locations = {}
-
-            local store_db_locations = (database.read("helper_store") or {})["locations"]
-            if store_db_locations ~= nil and type(store_db_locations[self.id]) == "table" then
-                for mapname, _ in pairs(store_db_locations[self.id]) do
-
-                    locations[mapname] = self:get_locations(mapname)
+            local fx = {}
+            local g1 = (au.read("helper_store") or {})["locations"]
+            if g1 ~= nil and type(g1[self.id]) == "table" then
+                for eU, O in pairs(g1[self.id]) do
+                    fx[eU] = self:get_locations(eU)
                 end
             end
-            return locations
+            return fx
         end,
         cleanup = function(self)
             self.remote_status = nil
@@ -2225,2946 +2663,2638 @@ local source_mt = {
         end
     }
 }
-
-for i=1, #db.sources do
-    setmetatable(db.sources[i], source_mt)
+for j = 1, #av.sources do
+    setmetatable(av.sources[j], fW)
 end
-
-function test_array.get_sources_config()
-    local sources_config = database.read("sources_config") or json.parse("{}")
-
-    local source_ids_assoc = {}
-    sources_config.enabled = sources_config.enabled or {}
-    for i=1, #db.sources do
-        local source = db.sources[i]
-        source_ids_assoc[source.id] = true
-        if sources_config.enabled[source.id] == nil then
-            sources_config.enabled[source.id] = true
+function a.get_sources_config()
+    local gb = au.read("sources_config") or json.parse("{}")
+    local gc = {}
+    gb.enabled = gb.enabled or {}
+    for j = 1, #av.sources do
+        local eZ = av.sources[j]
+        gc[eZ.id] = true
+        if gb.enabled[eZ.id] == nil then
+            gb.enabled[eZ.id] = true
         end
     end
-
-    for id, enabled in pairs(sources_config.enabled) do
-        if source_ids_assoc[id] == nil then
-            sources_config.enabled[id] = nil
+    for b_, gd in pairs(gb.enabled) do
+        if gc[b_] == nil then
+            gb.enabled[b_] = nil
         end
     end
-
-    return sources_config
+    return gb
 end
-
-function test_array.set_sources_config(sources_config)
-    database.write("sources_config", sources_config)
+function a.set_sources_config(gb)
+    au.write("sources_config", gb)
 end
-
-function test_array.button_with_confirmation(gruppa, name, callback, callback_visibility)
-    local button_open, button_cancel, button_confirm
-    local ts_open
-
-    button_open = gruppa:button(name, function()
-        button_open:set_visible(false)
-        button_cancel:set_visible(true)
-        button_confirm:set_visible(true)
-
-        local realtime = globals.realtime
-        ts_open = realtime
-
-        utils.execute_after(5, function()
-            if ts_open == realtime then
-                button_open:set_visible(true)
-                button_cancel:set_visible(false)
-                button_confirm:set_visible(false)
-
-                if callback_visibility ~= nil then
-                    callback_visibility()
+function a.button_with_confirmation(ge, cn, bu, gf)
+    local gg, gh, gi
+    local gj
+    gg =
+        ge:button(
+        cn,
+        function()
+            gg:set_visible(false)
+            gh:set_visible(true)
+            gi:set_visible(true)
+            local gk = globals.realtime
+            gj = gk
+            utils.execute_after(
+                5,
+                function()
+                    if gj == gk then
+                        gg:set_visible(true)
+                        gh:set_visible(false)
+                        gi:set_visible(false)
+                        if gf ~= nil then
+                            gf()
+                        end
+                    end
                 end
+            )
+        end
+    )
+    gh =
+        ge:button(
+        cn .. " (CANCEL)",
+        function()
+            gg:set_visible(true)
+            gh:set_visible(false)
+            gi:set_visible(false)
+            if gf ~= nil then
+                gf()
             end
-        end)
-    end)
-
-    button_cancel = gruppa:button(name .. " (CANCEL)", function()
-        button_open:set_visible(true)
-        button_cancel:set_visible(false)
-        button_confirm:set_visible(false)
-
-        if callback_visibility ~= nil then
-            callback_visibility()
+            gj = nil
         end
-
-        ts_open = nil
-    end)
-
-    button_confirm = gruppa:button(name .. " (CONFIRM)", function()
-        button_open:set_visible(true)
-        button_cancel:set_visible(false)
-        button_confirm:set_visible(false)
-
-        ts_open = nil
-        callback()
-
-        if callback_visibility ~= nil then
-            callback_visibility()
+    )
+    gi =
+        ge:button(
+        cn .. " (CONFIRM)",
+        function()
+            gg:set_visible(true)
+            gh:set_visible(false)
+            gi:set_visible(false)
+            gj = nil
+            bu()
+            if gf ~= nil then
+                gf()
+            end
         end
-    end)
-
-    button_cancel:set_visible(false)
-    button_confirm:set_visible(false)
-
-    return button_open, button_cancel, button_confirm
+    )
+    gh:set_visible(false)
+    gi:set_visible(false)
+    return gg, gh, gi
 end
-
-local airstrafe_reference = ui.find("Miscellaneous", "Main", "Movement", "Air Strafe")
-local infinite_duck_reference = ui.find("Miscellaneous", "Main", "Movement", "Infinite Duck")
-local slow_walk_reference = ui.find("Aimbot", "Anti Aim", "Misc", "Slow Walk")
-local fast_stop_reference = ui.find("Miscellaneous", "Main", "Movement", "Quick Stop")
-local air_duck_reference = ui.find("Miscellaneous", "Main", "Movement", "Air Duck")
-local strafe_assist_reference = ui.find("Miscellaneous", "Main", "Movement", "Strafe Assist")
-
-group:label("\aFFFFFFFFOwned by discord.gg/\aFFC819FFchernobylnl")
-group:label("\aFFFFFFFFCredits: \aCD60FFFFDarkLuny#1337 \aFFFFFFFF| \aCD60FFFFHellfish#9343")
-local enabled_reference = group:switch("\aEAD1FFFFHelper", false)
-local hotkey_reference = group:switch("Helper hotkey", false)
-local color_reference = group:color_picker("Helper color", color(120, 120, 255, 255))
-local types_reference = group:selectable("Helper types", {
-    "Smoke",
-    "Flashbang",
-    "High Explosive",
-    "Molotov",
-    "Movement"
-}, 0)
-local aimbot_reference = group:combo("Aim at locations", {"Off", "Legit", "Legit (Silent)", "Rage"}, 0)
-local aimbot_fov_reference = group:slider("Helper Aimbot FOV", 0, 200, 80)
-local aimbot_speed_reference = group:slider("Helper Aimbot Speed", 0, 100, 75)
-local aimbot_auto_dt_reference = group:switch("Automatic disable dt", false)
-local behind_walls_reference = group:switch("Show locations behind walls", false)
-
-local sources_list_ui = {
-    title = group1:switch("\a7878FFFFHelper: Manage sources", false),
-    list = group1:list("Helper sources", {''}, 0),
-    source_label1 = group1:label("Source label 1"),
-    enabled = group1:switch("Enabled", false),
-    source_label2 = group1:label("Source label 2"),
-    source_label3 = group1:label("Source label 3"),
-    name = group1:input("New source name"),
+local gl = ui.find("Miscellaneous", "Main", "Movement", "Air Strafe")
+local gm = ui.find("Miscellaneous", "Main", "Movement", "Infinite Duck")
+local gn = ui.find("Aimbot", "Anti Aim", "Misc", "Slow Walk")
+local go = ui.find("Miscellaneous", "Main", "Movement", "Quick Stop")
+local gp = ui.find("Miscellaneous", "Main", "Movement", "Air Duck")
+local gq = ui.find("Miscellaneous", "Main", "Movement", "Strafe Assist")
+local gr = ui.find("Aimbot", "Anti Aim", "Angles", "Body Yaw")
+local gs = ui.find("Aimbot", "Anti Aim", "Angles", "Pitch")
+local gt = fT:switch("\aEAD1FFFFHelper", false)
+local gu = gt:create():hotkey("Helper hotkey")
+local gv = gt:create():color_picker("Helper Color", color(120, 120, 255, 255))
+local fJ = gt:create():selectable("\nHelper types", {"Smoke", "Flashbang", "High Explosive", "Molotov", "Movement"}, 0)
+local fL = fT:combo("Aim at locations", {"Off", "Legit", "Legit (Silent)", "Rage"}, 0)
+local gw = fT:slider("Helper Aimbot FOV", 0, 200, 80, nil, "°")
+local gx = fT:slider("Helper Aimbot Speed", 0, 100, 75, nil, "t")
+local gy = fT:switch("Automatic disable dt", false)
+local gz = fT:switch("Show locations behind walls", false)
+local gA = {
+    title = fU:switch("\aEAD1FFFFHelper: Manage sources", false),
+    list = fU:list("Helper sources", {""}, 0),
+    source_label1 = fU:label("Source label 1"),
+    enabled = fU:switch("Enabled", false),
+    source_label2 = fU:label("Source label 2"),
+    source_label3 = fU:label("Source label 3"),
+    name = fU:input("New source name")
 }
-
-local on_edit_save, on_edit_delete, on_edit_teleport, on_edit_set, on_edit_export
-local edit_ui = {
-    list = group1:list("Selected source", {''}, 0),
-    show_all = group1:switch("Show all maps", false),
-    sort_by = group1:combo("Sort by", {"Creation date", "Type", "Alphabetically"}, 0),
-
-    type_label = group2:label("Creating new location"),
-    type = group2:combo("Location Type", {"Grenade"}, 0),
-    from = group2:input("From"),
-    to = group2:input("To"),
-    description_label = group2:label("Description (Optional)"),
-    description = group2:input("Description"),
-    grenade_properties = group2:selectable("Grenade Properties", {
-        "Jump",
-        "Run",
-        "Walk (Shift)",
-        "Throw strength",
-        "Force-enable recovery",
-        "Tickrate dependent",
-        "Destroy breakable object",
-        "Delayed throw"
-    }, 0),
-    throw_strength = group2:combo("Throw strength", {"Left Click", "Left / Right Click", "Right Click"}, 0),
-    run_direction = group2:combo("Run direction", {"Forward", "Left", "Right", "Back", "Custom"}, 0),
-    run_direction_custom = group2:slider("Custom run direction", -180, 180, 0),
-    run_duration = group2:slider("Run duration", 1, 256, 20),
-    delay = group2:slider("Throw delay", 1, 40, 1),
-    recovery_direction = group2:combo("Recovery direction", {"Back", "Forward", "Left", "Right", "Custom"}, 0),
-    recovery_direction_custom = group2:slider("Recovery direction", -180, 180, 0),
-    recovery_jump = group2:switch("Recovery bunny-hop", false),
-    set = group2:button("Set location", function() on_edit_set() end),
-    set_hotkey = group2:switch("Helper set location hotkey", false),
-    teleport = group2:button("Teleport", function() on_edit_teleport() end),
-    teleport_hotkey = group2:switch("Helper teleport hotkey", false),
-    export = group2:button("Export to clipboard", function() on_edit_export() end),
-    save = group2:button("Save", function() on_edit_save() end),
+local gB, gC, gD, gE, gF
+local gG = {
+    list = fU:list("Selected source", {""}, 0),
+    show_all = fU:switch("Show all maps", false),
+    sort_by = fU:combo("Sort by", {"Creation date", "Type", "Alphabetically"}, 0),
+    type_label = fV:label("Creating new location"),
+    type = fV:combo("Location Type", {"Grenade"}, 0),
+    from = fV:input("From"),
+    to = fV:input("To"),
+    description_label = fV:label("Description (Optional)"),
+    description = fV:input("Description"),
+    grenade_properties = fV:selectable(
+        "Grenade Properties",
+        {
+            "Jump",
+            "Run",
+            "Walk (Shift)",
+            "Throw strength",
+            "Force-enable recovery",
+            "Tickrate dependent",
+            "Destroy breakable object",
+            "Delayed throw"
+        },
+        0
+    ),
+    throw_strength = fV:combo("Throw strength", {"Left Click", "Left / Right Click", "Right Click"}, 0),
+    run_direction = fV:combo("Run direction", {"Forward", "Left", "Right", "Back", "Custom"}, 0),
+    run_direction_custom = fV:slider("Custom run direction", -180, 180, 0),
+    run_duration = fV:slider("Run duration", 1, 256, 20),
+    delay = fV:slider("Throw delay", 1, 40, 1),
+    recovery_direction = fV:combo("Recovery direction", {"Back", "Forward", "Left", "Right", "Custom"}, 0),
+    recovery_direction_custom = fV:slider("Recovery direction", -180, 180, 0),
+    recovery_jump = fV:switch("Recovery bunny-hop", false),
+    set = fV:button(
+        "Set location",
+        function()
+            gE()
+        end
+    ),
+    set_hotkey = fV:switch("Helper set location hotkey", false),
+    teleport = fV:button(
+        "Teleport",
+        function()
+            gD()
+        end
+    ),
+    teleport_hotkey = fV:switch("Helper teleport hotkey", false),
+    export = fV:button(
+        "Export to clipboard",
+        function()
+            gF()
+        end
+    ),
+    save = fV:button(
+        "Save",
+        function()
+            gB()
+        end
+    )
 }
-
-edit_ui.delete, edit_ui.delete_cancel, edit_ui.delete_confirm = test_array.button_with_confirmation(group2, "Delete", function() on_edit_delete() end, update_sources_ui)
-edit_ui.delete_hotkey = group2:switch("Helper delete hotkey", false)
-local edit_list, edit_ignore_callbacks, edit_different_map_selected = {}, false, false
-local edit_location_selected
-
-local on_source_edit, on_source_edit_back, on_source_update, on_source_delete, on_source_create, on_source_import, on_source_export
-sources_list_ui.edit = group1:button("Edit", function() on_source_edit() end)
-sources_list_ui.update = group1:button("Update", function() on_source_update() end)
-sources_list_ui.delete, sources_list_ui.delete_cancel, sources_list_ui.delete_confirm = test_array.button_with_confirmation(group1, "Delete", function() on_source_delete() end, update_sources_ui)
-sources_list_ui.create = group1:button("Create", function() on_source_create() end)
-sources_list_ui.import = group1:button("Import from clipboard", function() on_source_import() end)
-sources_list_ui.export = group1:button("Export all to clipboard", function() on_source_export() end)
-sources_list_ui.back = group1:button("Back", function() on_source_edit_back() end)
-
-sources_list_ui.source_label4 = group1:label("Ready.")
-
-local sources_list, sources_ignore_callback = {}, false
-local source_editing, source_selected, source_remote_add_status = false
-local source_editing_modified, source_editing_has_changed = setmetatable({}, {__mode = "k"}), setmetatable({}, {__mode = "k"})
-
-local source_editing_hotkeys_prev = {
-    [edit_ui.set_hotkey] = false,
-    [edit_ui.teleport_hotkey] = false,
-    [edit_ui.delete_hotkey] = false
-}
-
-function test_array.set_source_selected(source_selected_new)
-    source_selected_new = source_selected_new or "add_local"
-
-    if source_selected_new == source_selected then
+gG.delete, gG.delete_cancel, gG.delete_confirm =
+    a.button_with_confirmation(
+    fV,
+    "Delete",
+    function()
+        gC()
+    end,
+    f1
+)
+gG.delete_hotkey = fV:switch("Helper delete hotkey", false)
+local gH, gI, gJ = {}, false, false
+local gK
+local gL, gM, gN, gO, gP, gQ, gR
+gA.edit =
+    fU:button(
+    "Edit",
+    function()
+        gL()
+    end
+)
+gA.update =
+    fU:button(
+    "Update",
+    function()
+        gN()
+    end
+)
+gA.delete, gA.delete_cancel, gA.delete_confirm =
+    a.button_with_confirmation(
+    fU,
+    "Delete",
+    function()
+        gO()
+    end,
+    f1
+)
+gA.create =
+    fU:button(
+    "Create",
+    function()
+        gP()
+    end
+)
+gA.import =
+    fU:button(
+    "Import from clipboard",
+    function()
+        gQ()
+    end
+)
+gA.export =
+    fU:button(
+    "Export all to clipboard",
+    function()
+        gR()
+    end
+)
+gA.back =
+    fU:button(
+    "Back",
+    function()
+        gM()
+    end
+)
+gA.source_label4 = fU:label("Ready.")
+local gS, gT = {}, false
+local gU, gV, gW = false
+local gX, gY = setmetatable({}, {__mode = "k"}), setmetatable({}, {__mode = "k"})
+local gZ = {[gG.set_hotkey] = false, [gG.teleport_hotkey] = false, [gG.delete_hotkey] = false}
+function a.set_source_selected(g_)
+    g_ = g_ or "add_local"
+    if g_ == gV then
         return false
     end
-
-    for i=1, #sources_list do
-        if sources_list[i] == source_selected_new then
-            sources_list_ui.list:set(i)
-            source_editing = false
+    for j = 1, #gS do
+        if gS[j] == g_ then
+            gA.list:set(j)
+            gU = false
             return true
         end
     end
-
     return false
 end
-
-function test_array.add_source(name_or_source, typ)
-    local source
-    if type(name_or_source) == "string" then
-        source = {
-            name = name_or_source,
-            type = typ,
-            id = test_array.randomid(8)
-        }
-    elseif type(name_or_source) == "table" then
-        source = name_or_source
-        source.type = typ
+function a.add_source(h0, h1)
+    local eZ
+    if type(h0) == "string" then
+        eZ = {name = h0, type = h1, id = a.randomid(8)}
+    elseif type(h0) == "table" then
+        eZ = h0
+        eZ.type = h1
     else
         assert(false)
     end
-    setmetatable(source, source_mt)
-
-    local existing_ids = test_array.table_map_assoc(db.sources, function(key, source) return source.id, true end)
-    while existing_ids[source.id] do
-        source.id = test_array.randomid(8)
-    end
-
-    table.insert(db.sources, source)
-
-    test_array.set_sources_config(test_array.get_sources_config())
-
-    return source
-end
-
-function test_array.get_sorted_locations(locations, sorting)
-    if sorting == 1 then
-        return locations
-    elseif sorting == 2 or sorting == 3 then
-        local new_tbl = {}
-
-        for i=1, #locations do
-            table.insert(new_tbl, locations[i])
+    setmetatable(eZ, fW)
+    local h2 =
+        a.table_map_assoc(
+        av.sources,
+        function(aw, eZ)
+            return eZ.id, true
         end
-
-        table.sort(new_tbl, function(a, b)
-            if sorting == 2 then
-                return a:get_type_string() < b:get_type_string()
-            elseif sorting == 3 then
-                return a.name < b.name
-            else
-                return true
+    )
+    while h2[eZ.id] do
+        eZ.id = a.randomid(8)
+    end
+    table.insert(av.sources, eZ)
+    a.set_sources_config(a.get_sources_config())
+    return eZ
+end
+function a.get_sorted_locations(fx, h3)
+    if h3 == "Creation date" then
+        return fx
+    elseif h3 == "Type" or h3 == "Alphabetically" then
+        local h4 = {}
+        for j = 1, #fx do
+            table.insert(h4, fx[j])
+        end
+        table.sort(
+            h4,
+            function(b, c)
+                if h3 == "Type" then
+                    return b:get_type_string() < c:get_type_string()
+                elseif h3 == "Alphabetically" then
+                    return b.name < c.name
+                else
+                    return true
+                end
             end
-        end)
-
-        return new_tbl
+        )
+        return h4
     else
-        return locations
+        return fx
     end
 end
-
-function update_sources_ui()
-    local ui_visibility = {}
-
-    for name, reference in pairs(sources_list_ui) do
-        if name ~= "title" then
-            ui_visibility[reference] = false
+function f1()
+    local h5 = {}
+    for cn, h6 in pairs(gA) do
+        if cn ~= "title" then
+            h5[h6] = false
         end
     end
-
-    edit_different_map_selected = true
-
-    for name, reference in pairs(edit_ui) do
-        ui_visibility[reference] = false
+    gJ = true
+    for cn, h6 in pairs(gG) do
+        h5[h6] = false
     end
-
-    if enabled_reference:get() and sources_list_ui.title:get() then
-        if source_editing and source_selected ~= nil then
-            local mapname = test_array.get_mapname()
-            local show_all = edit_ui.show_all:get()
-
-            if mapname == nil then
-                show_all = true
+    if gt:get() and gA.title:get() then
+        if gU and gV ~= nil then
+            local eU = a.get_mapname()
+            local h7 = gG.show_all:get()
+            if eU == nil then
+                h7 = true
             end
-
-            ui_visibility[sources_list_ui.source_label1] = true
-            ui_visibility[sources_list_ui.source_label2] = true
-            sources_list_ui.source_label1:set(string.format("Editing %s source: %s", (SOURCE_TYPE_NAMES[source_selected.type] or source_selected.type):lower(), source_selected.name))
-            sources_list_ui.source_label2:set(show_all and "Locations on all maps: " or string.format("Locations on %s:", mapname))
-            ui_visibility[sources_list_ui.import] = true
-            ui_visibility[sources_list_ui.export] = true
-            ui_visibility[sources_list_ui.back] = true
-            ui_visibility[edit_ui.list] = true
-            ui_visibility[edit_ui.show_all] = true
-            ui_visibility[edit_ui.sort_by] = true
-
-            local edit_listbox, edit_maps, edit_listbox_i = {}, {}
-            test_array.table_clear(edit_list)
-            local sorting = edit_ui.sort_by:get()
-
-            if show_all then
-                local all_locations = source_selected:get_all_locations()
-                local j = 1
-
-                for map, locations in pairs(all_locations) do
-                    locations = test_array.get_sorted_locations(locations, sorting)
-                    for i=1, #locations do
-                        local location = locations[i]
-                        edit_list[j] = location
-
-                        local type_str = location:get_type_string()
-                        edit_listbox[j] = string.format("[%s] %s: %s", map, type_str, location.name)
-
-                        edit_maps[j] = map
-
-                        j = j + 1
+            h5[gA.source_label1] = true
+            h5[gA.source_label2] = true
+            gA.source_label1:set(string.format("Editing %s source: %s", (bH[gV.type] or gV.type):lower(), gV.name))
+            gA.source_label2:set(h7 and "Locations on all maps: " or string.format("Locations on %s:", eU))
+            h5[gA.import] = true
+            h5[gA.export] = true
+            h5[gA.back] = true
+            h5[gG.list] = true
+            h5[gG.show_all] = true
+            h5[gG.sort_by] = true
+            local h8, h9, ha = {}, {}
+            a.table_clear(gH)
+            local h3 = gG.sort_by:get()
+            if h7 then
+                local hb = gV:get_all_locations()
+                local k = 1
+                for fD, fx in pairs(hb) do
+                    fx = a.get_sorted_locations(fx, h3)
+                    for j = 1, #fx do
+                        local fg = fx[j]
+                        gH[k] = fg
+                        local hc = fg:get_type_string()
+                        h8[k] = string.format("[%s] %s: %s", fD, hc, fg.name)
+                        h9[k] = fD
+                        k = k + 1
                     end
                 end
             else
-                local locations = source_selected:get_locations(mapname)
-
-                locations = test_array.get_sorted_locations(locations, sorting)
-
-                for i=1, #locations do
-                    local location = locations[i]
-                    edit_list[i] = location
-
-                    local type_str = location:get_type_string()
-                    edit_listbox[i] = string.format("%s: %s", type_str, location.full_name)
-
-                    edit_maps[i] = mapname
+                local fx = gV:get_locations(eU)
+                fx = a.get_sorted_locations(fx, h3)
+                for j = 1, #fx do
+                    local fg = fx[j]
+                    gH[j] = fg
+                    local hc = fg:get_type_string()
+                    h8[j] = string.format("%s: %s", hc, fg.full_name)
+                    h9[j] = eU
                 end
             end
-
-            table.insert(edit_listbox, "+  Create new")
-            table.insert(edit_list, "create_new")
-
-            edit_ui.list:update(edit_listbox)
-
-            if edit_location_selected == nil then
-                edit_location_selected = "create_new"
-                edit_set_ui_values(true)
+            table.insert(h8, "+  Create new")
+            table.insert(gH, "create_new")
+            gG.list:update(h8)
+            if gK == nil then
+                gK = "create_new"
+                f2(true)
             end
-
-            if edit_location_selected == "create_new" then
-                edit_different_map_selected = false
+            if gK == "create_new" then
+                gJ = false
             end
-
-            for i=1, #edit_list do
-                if edit_list[i] == edit_location_selected then
-                    edit_ui.list:set(i-1)
-
-                    if edit_maps[i] == mapname and mapname ~= nil then
-                        edit_different_map_selected = false
+            for j = 1, #gH do
+                if gH[j] == gK then
+                    if h9[j] == eU and eU ~= nil then
+                        gJ = false
                     end
                 end
             end
-
-            ui_visibility[edit_ui.type] = true
-            ui_visibility[edit_ui.from] = true
-            ui_visibility[edit_ui.to] = true
-            ui_visibility[edit_ui.description] = true
-            ui_visibility[edit_ui.grenade_properties] = true
-            ui_visibility[edit_ui.set] = true
-            ui_visibility[edit_ui.set_hotkey] = true
-            ui_visibility[edit_ui.teleport] = true
-            ui_visibility[edit_ui.teleport_hotkey] = true
-            ui_visibility[edit_ui.export] = true
-            ui_visibility[edit_ui.save] = true
-
-            local properties = edit_ui.grenade_properties
-            if properties:get("Run") then
-                ui_visibility[edit_ui.run_direction] = true
-                ui_visibility[edit_ui.run_duration] = true
-
-                if edit_ui.run_direction:get() == "Custom" then
-                    ui_visibility[edit_ui.run_direction_custom] = true
+            h5[gG.type] = true
+            h5[gG.from] = true
+            h5[gG.to] = true
+            h5[gG.description] = true
+            h5[gG.grenade_properties] = true
+            h5[gG.set] = true
+            h5[gG.set_hotkey] = true
+            h5[gG.teleport] = true
+            h5[gG.teleport_hotkey] = true
+            h5[gG.export] = true
+            h5[gG.save] = true
+            local hd = gG.grenade_properties
+            if hd:get("Run") then
+                h5[gG.run_direction] = true
+                h5[gG.run_duration] = true
+                if gG.run_direction:get() == "Custom" then
+                    h5[gG.run_direction_custom] = true
                 end
             end
-
-            if properties:get("Jump") or properties:get("Force-enable recovery") then
-                ui_visibility[edit_ui.recovery_direction] = true
-                ui_visibility[edit_ui.recovery_jump] = true
-
-                if edit_ui.recovery_direction:get() == "Custom" then
-                    ui_visibility[edit_ui.recovery_direction_custom] = true
+            if hd:get("Jump") or hd:get("Force-enable recovery") then
+                h5[gG.recovery_direction] = true
+                h5[gG.recovery_jump] = true
+                if gG.recovery_direction:get() == "Custom" then
+                    h5[gG.recovery_direction_custom] = true
                 end
             end
-
-            if properties:get("Delayed throw") then
-                ui_visibility[edit_ui.delay] = true
+            if hd:get("Delayed throw") then
+                h5[gG.delay] = true
             end
-
-            if properties:get("Throw strength") then
-                ui_visibility[edit_ui.throw_strength] = true
+            if hd:get("Throw strength") then
+                h5[gG.throw_strength] = true
             end
-
-            if edit_location_selected ~= nil and edit_location_selected ~= "create_new" then
-                ui_visibility[edit_ui.delete] = true
-                ui_visibility[edit_ui.delete_hotkey] = true
+            if gK ~= nil and gK ~= "create_new" then
+                h5[gG.delete] = true
+                h5[gG.delete_hotkey] = true
             end
-            -- end
         else
-            local sources_config = test_array.get_sources_config()
-
-            local sources_listbox, sources_listbox_i = {}
-            test_array.table_clear(sources_list)
-
-            for i=1, #db.sources do
-                local source = db.sources[i]
-                sources_list[i] = source
-                table.insert(sources_listbox, string.format("%s  %s: %s", sources_config.enabled[source.id] and "+" or "-", SOURCE_TYPE_NAMES[source.type] or source.type, source.name))
-
-                if source == source_selected then
-                    sources_listbox_i = i
+            local gb = a.get_sources_config()
+            local he, hf = {}
+            a.table_clear(gS)
+            for j = 1, #av.sources do
+                local eZ = av.sources[j]
+                gS[j] = eZ
+                table.insert(
+                    he,
+                    string.format("%s  %s: %s", gb.enabled[eZ.id] and "+" or "-", bH[eZ.type] or eZ.type, eZ.name)
+                )
+                if eZ == gV then
+                    hf = j
                 end
             end
-
-            table.insert(sources_listbox, "+  Add remote source")
-            table.insert(sources_list, "add_remote")
-            if source_selected == "add_remote" then
-                sources_listbox_i = #sources_list
+            table.insert(he, "+  Add remote source")
+            table.insert(gS, "add_remote")
+            if gV == "add_remote" then
+                hf = #gS
             end
-
-            table.insert(sources_listbox, "+  Create local")
-            table.insert(sources_list, "add_local")
-            if source_selected == "add_local" then
-                sources_listbox_i = #sources_list
+            table.insert(he, "+  Create local")
+            table.insert(gS, "add_local")
+            if gV == "add_local" then
+                hf = #gS
             end
-
-            if sources_listbox_i == nil then
-                source_selected = sources_list[1]
-                sources_listbox_i = 1
+            if hf == nil then
+                gV = gS[1]
+                hf = 1
             end
-
-            sources_list_ui.list:update(sources_listbox)
-            if sources_listbox_i ~= nil then
-                --sources_list_ui.list:set(sources_listbox_i-1)
-            end
-
-            ui_visibility[sources_list_ui.list] = true
-            if source_selected ~= nil then
-                ui_visibility[sources_list_ui.source_label1] = true
-                if source_selected == "add_remote" then
-                    sources_list_ui.source_label1:set("Add new remote source")
-                    ui_visibility[sources_list_ui.import] = true
-
-                    if source_remote_add_status ~= nil then
-                        sources_list_ui.source_label4:set(source_remote_add_status)
-                        ui_visibility[sources_list_ui.source_label4] = true
+            gA.list:update(he)
+            h5[gA.list] = true
+            if gV ~= nil then
+                h5[gA.source_label1] = true
+                if gV == "add_remote" then
+                    gA.source_label1:set("Add new remote source")
+                    h5[gA.import] = true
+                    if gW ~= nil then
+                        gA.source_label4:set(gW)
+                        h5[gA.source_label4] = true
                     end
-                elseif source_selected == "add_local" then
-                    sources_list_ui.source_label1:set("New source name:")
-                    ui_visibility[sources_list_ui.name] = true
-                    ui_visibility[sources_list_ui.create] = true
-                elseif source_selected ~= nil then
-                    ui_visibility[sources_list_ui.enabled] = true
-                    ui_visibility[sources_list_ui.edit] = source_selected.type == "local" and not source_selected.builtin
-                    ui_visibility[sources_list_ui.update] = source_selected.type == "remote"
-                    ui_visibility[sources_list_ui.delete] = not source_selected.builtin
-
-                    sources_ignore_callback = true
-
-                    sources_list_ui.source_label1:set(string.format("%s source: %s", SOURCE_TYPE_NAMES[source_selected.type] or source_selected.type, source_selected.name))
-
-                    if source_selected.description ~= nil then
-                        ui_visibility[sources_list_ui.source_label2] = true
-                        sources_list_ui.source_label2:set(string.format("%s", source_selected.description))
+                elseif gV == "add_local" then
+                    gA.source_label1:set("New source name:")
+                    h5[gA.name] = true
+                    h5[gA.create] = true
+                elseif gV ~= nil then
+                    h5[gA.enabled] = true
+                    h5[gA.edit] = gV.type == "local" and not gV.builtin
+                    h5[gA.update] = gV.type == "remote"
+                    h5[gA.delete] = not gV.builtin
+                    gT = true
+                    gA.source_label1:set(string.format("%s source: %s", bH[gV.type] or gV.type, gV.name))
+                    if gV.description ~= nil then
+                        h5[gA.source_label2] = true
+                        gA.source_label2:set(string.format("%s", gV.description))
                     end
-
-                    if source_selected.remote_status ~= nil then
-                        ui_visibility[sources_list_ui.source_label3] = true
-                        sources_list_ui.source_label3:set(source_selected.remote_status)
-                    elseif source_selected.update_timestamp ~= nil then
-                        ui_visibility[sources_list_ui.source_label3] = true
-                        -- format_unix_timestamp(timestamp, allow_future, ignore_seconds, max_parts)
-                        sources_list_ui.source_label3:set(string.format("Last updated: %s", test_array.format_unix_timestamp(source_selected.update_timestamp, false, false, 1)))
+                    if gV.remote_status ~= nil then
+                        h5[gA.source_label3] = true
+                        gA.source_label3:set(gV.remote_status)
+                    elseif gV.update_timestamp ~= nil then
+                        h5[gA.source_label3] = true
+                        gA.source_label3:set(
+                            string.format(
+                                "Last updated: %s",
+                                a.format_unix_timestamp(gV.update_timestamp, false, false, 1)
+                            )
+                        )
                     end
-
-                    sources_list_ui.enabled:set(sources_config.enabled[source_selected.id] == true)
-
-                    sources_ignore_callback = false
+                    gA.enabled:set(gb.enabled[gV.id] == true)
+                    gT = false
                 end
             end
         end
     end
-
-    for reference, visible in pairs(ui_visibility) do
-        reference:set_visible(visible)
+    for h6, hg in pairs(h5) do
+        h6:set_visible(hg)
     end
 end
-
-sources_list_ui.title:set_callback(function()
-    if not sources_list_ui.title:get() then
-        source_editing = false
+gA.title:set_callback(
+    function()
+        if not gA.title:get() then
+            gU = false
+        end
+        f1()
     end
-
-    update_sources_ui()
-end)
-
-test_array.update_list = function()
-    local source_selected_prev = source_selected
-    local i = sources_list_ui.list:get()
-
-    if i ~= nil then
-        source_selected = sources_list[i]
-
-        if source_selected ~= source_selected_prev then
-            source_editing = false
-            source_remote_add_status = nil
-            update_sources_ui()
+)
+a.update_list = function()
+    local hh = gV
+    local j = gA.list:get()
+    if j ~= nil then
+        gV = gS[j]
+        if gV ~= hh then
+            gU = false
+            gW = nil
+            f1()
         end
     end
 end
-
-sources_list_ui.list:set_callback(function()
-    test_array.update_list()
-end)
-
-sources_list_ui.enabled:set_callback(function()
-    if type(source_selected) == "table" and not sources_ignore_callback then
-        local sources_config = test_array.get_sources_config()
-        sources_config.enabled[source_selected.id] = sources_list_ui.enabled:get()
-        test_array.set_sources_config(sources_config)
-        update_sources_ui()
-
-        test_array.flush_active_locations("D")
+gA.list:set_callback(
+    function()
+        a.update_list()
     end
-end)
-
-types_reference:set_callback(test_array.flush_active_locations)
-
-edit_ui.show_all:set_callback(update_sources_ui)
-edit_ui.sort_by:set_callback(update_sources_ui)
-
-local url_fixers = {
-    function(url)
-        local match = url:match("^https://pastebin.com/(%w+)/?$")
-
-        if match ~= nil then
-            return string.format("https://pastebin.com/raw/%s", match)
+)
+gA.enabled:set_callback(
+    function()
+        if type(gV) == "table" and not gT then
+            local gb = a.get_sources_config()
+            gb.enabled[gV.id] = gA.enabled:get()
+            a.set_sources_config(gb)
+            f1()
+            a.flush_active_locations("D")
         end
-    end,
-    function(url)
-        local user, repo, branch, path = url:match("^https://github.com/(%w+)/(%w+)/blob/(%w+)/(.+)$")
-
-        if user ~= nil then
-            return string.format("https://github.com/%s/%s/raw/%s/%s", user, repo, branch, path)
+    end
+)
+fJ:set_callback(a.flush_active_locations)
+gG.show_all:set_callback(f1)
+gG.sort_by:set_callback(f1)
+local hi = {function(fy)
+        local hj = fy:match("^https://pastebin.com/(%w+)/?$")
+        if hj ~= nil then
+            return string.format("https://pastebin.com/raw/%s", hj)
         end
-    end,
-}
-
-function on_source_delete()
-    if type(source_selected) == "table" and not source_selected.builtin then
-        for i=1, #db.sources do
-            if db.sources[i] == source_selected then
-                table.remove(db.sources, i)
+    end, function(fy)
+        local hk, hl, hm, hn = fy:match("^https://github.com/(%w+)/(%w+)/blob/(%w+)/(.+)$")
+        if hk ~= nil then
+            return string.format("https://github.com/%s/%s/raw/%s/%s", hk, hl, hm, hn)
+        end
+    end}
+function gO()
+    if type(gV) == "table" and not gV.builtin then
+        for j = 1, #av.sources do
+            if av.sources[j] == gV then
+                table.remove(av.sources, j)
                 break
             end
         end
-        test_array.set_sources_config(test_array.get_sources_config())
-        test_array.flush_active_locations("source deleted")
-        test_array.set_source_selected()
-        test_array.update_list()
+        a.set_sources_config(a.get_sources_config())
+        a.flush_active_locations("source deleted")
+        a.set_source_selected()
+        a.update_list()
     end
 end
-
-function on_source_update()
-    if type(source_selected) == "table" and source_selected.type == "remote"
-     then
-        source_selected:update_remote_data()
-        update_sources_ui()
+function gN()
+    if type(gV) == "table" and gV.type == "remote" then
+        gV:update_remote_data()
+        f1()
     end
 end
-
-function on_source_create()
-    if source_selected == "add_local" then
-        local name = sources_list_ui.name:get()
-        if name:gsub(" ", "") == "" then
+function gP()
+    if gV == "add_local" then
+        local cn = gA.name:get()
+        if cn:gsub(" ", "") == "" then
             return
         end
-
-        local existing_names = test_array.table_map_assoc(db.sources, function(i, source) return source.name, source.type == "local" end)
-        local name_new, i = name, 2
-
-        while existing_names[name_new] do
-            name_new = string.format("%s (%d)", name, i)
-            i = i + 1
+        local ho =
+            a.table_map_assoc(
+            av.sources,
+            function(j, eZ)
+                return eZ.name, eZ.type == "local"
+            end
+        )
+        local hp, j = cn, 2
+        while ho[hp] do
+            hp = string.format("%s (%d)", cn, j)
+            j = j + 1
         end
-        name = name_new
-
-        local source = test_array.add_source(name, "local")
-
-        update_sources_ui()
-        test_array.set_source_selected(source)
-        test_array.update_list()
+        cn = hp
+        local eZ = a.add_source(cn, "local")
+        f1()
+        a.set_source_selected(eZ)
+        a.update_list()
     end
 end
-
-function test_array.source_import_arr(tbl, mapname)
-    local locations = {}
-    for i=1, #tbl do
-        local location = test_array.create_location(tbl[i])
-        if type(location) ~= "table" then
-            local err = string.format("invalid location #%d: %s", i, location)
-            client.error_log("Failed to import " .. tostring(mapname) .. ", " .. err)
-            source_remote_add_status = err
-            update_sources_ui()
+function a.source_import_arr(bt, eU)
+    local fx = {}
+    for j = 1, #bt do
+        local fg = a.create_location(bt[j])
+        if type(fg) ~= "table" then
+            local fX = string.format("invalid location #%d: %s", j, fg)
+            bs.error_log("Failed to import " .. tostring(eU) .. ", " .. fX)
+            gW = fX
+            f1()
             return
         end
-        locations[i] = location
+        fx[j] = fg
     end
-
-    if #locations == 0 then
-        client.error_log("Failed to import: No locations to import")
-        source_remote_add_status = "No locations to import"
-        update_sources_ui()
+    if #fx == 0 then
+        bs.error_log("Failed to import: No locations to import")
+        gW = "No locations to import"
+        f1()
         return
     end
-
-    local source_locations = source_selected:get_locations(mapname)
-    if source_locations == nil then
-        source_locations = {}
-        sources_locations[source_selected][mapname] = source_locations
+    local hq = gV:get_locations(eU)
+    if hq == nil then
+        hq = {}
+        f0[gV][eU] = hq
     end
-
-    for i=1, #locations do
-        table.insert(source_locations, locations[i])
+    for j = 1, #fx do
+        table.insert(hq, fx[j])
     end
-
-    update_sources_ui()
-    source_selected:store_write()
-    test_array.flush_active_locations()
+    f1()
+    gV:store_write()
+    a.flush_active_locations()
 end
-
-function on_source_import()
-    if source_editing and type(source_selected) == "table" and source_selected.type == "local" and test_array.get_clipboard_text then
-        -- import data into source
-        local text = test_array.get_clipboard_text()
-
-        if text == nil then
-            local err = "No text copied to clipboard"
-            client.error_log("Failed to import: " .. err)
-            source_remote_add_status = err
-            update_sources_ui()
+function gQ()
+    if gU and type(gV) == "table" and gV.type == "local" and a.get_clipboard_text then
+        local T = a.get_clipboard_text()
+        if T == nil then
+            local fX = "No text copied to clipboard"
+            bs.error_log("Failed to import: " .. fX)
+            gW = fX
+            f1()
             return
         end
-
-        local success, tbl = pcall(json.parse, text)
-
-        if success and text:sub(1, 1) ~= "[" and text:sub(1, 1) ~= "{" then
-            success, tbl = false, "Expected object or array"
+        local fw, bt = pcall(json.parse, T)
+        if fw and T:sub(1, 1) ~= "[" and T:sub(1, 1) ~= "{" then
+            fw, bt = false, "Expected object or array"
         end
-
-        if not success then
-            local err = string.format("Invalid JSON: %s", tbl)
-            client.error_log("Failed to import: " .. err)
-            source_remote_add_status = err
-            update_sources_ui()
+        if not fw then
+            local fX = string.format("Invalid JSON: %s", bt)
+            bs.error_log("Failed to import: " .. fX)
+            gW = fX
+            f1()
             return
         end
-
-        -- heuristics to determine if its a location or an array of locations
-        local is_arr = text:sub(1, 1) == "["
-
-        if not is_arr then
-            -- heuristics to determine if its a table of mapname -> locations or a single location
-            if tbl["name"] ~= nil or tbl["grenade"] ~= nil or tbl["location"] ~= nil then
-                tbl = {tbl}
-                is_arr = true
+        local hr = T:sub(1, 1) == "["
+        if not hr then
+            if bt["name"] ~= nil or bt["grenade"] ~= nil or bt["location"] ~= nil then
+                bt = {bt}
+                hr = true
             end
         end
-
-        if is_arr then
-            local mapname = test_array.get_mapname()
-
-            if mapname == nil then
-                client.error_log("Failed to import: You need to be in-game")
-                source_remote_add_status = "You need to be in-game"
-                update_sources_ui()
+        if hr then
+            local eU = a.get_mapname()
+            if eU == nil then
+                bs.error_log("Failed to import: You need to be in-game")
+                gW = "You need to be in-game"
+                f1()
                 return
             end
-
-            test_array.source_import_arr(tbl, mapname)
+            a.source_import_arr(bt, eU)
         else
-            for mapname, locations in pairs(tbl) do
-                if type(mapname) ~= "string" or mapname:find(" ") then
-                    client.error_log("Failed to import: Invalid map name")
-                    source_remote_add_status = "Invalid map name"
-                    update_sources_ui()
+            for eU, fx in pairs(bt) do
+                if type(eU) ~= "string" or eU:find(" ") then
+                    bs.error_log("Failed to import: Invalid map name")
+                    gW = "Invalid map name"
+                    f1()
                     return
                 end
             end
-
-            for mapname, locations in pairs(tbl) do
-                test_array.source_import_arr(locations, mapname)
+            for eU, fx in pairs(bt) do
+                a.source_import_arr(fx, eU)
             end
         end
-    elseif source_selected == "add_remote" and test_array.get_clipboard_text then
-        -- add new remote source
-        local text = test_array.get_clipboard_text()
-        if text == nil then
-            client.error_log("Failed to import: Clipboard is empty")
-            source_remote_add_status = "Clipboard is empty"
-            update_sources_ui()
+    elseif gV == "add_remote" and a.get_clipboard_text then
+        local T = a.get_clipboard_text()
+        if T == nil then
+            bs.error_log("Failed to import: Clipboard is empty")
+            gW = "Clipboard is empty"
+            f1()
             return
         end
-
-        local url = test_array.sanitize_string(text):gsub(" ", "")
-
-        if not url:match("^https?://.+$") then
-            client.error_log("Failed to import: Invalid URL")
-            source_remote_add_status = "Invalid URL"
-            update_sources_ui()
+        local fy = a.sanitize_string(T):gsub(" ", "")
+        if not fy:match("^https?://.+$") then
+            bs.error_log("Failed to import: Invalid URL")
+            gW = "Invalid URL"
+            f1()
             return
         end
-
-        for i=1, #url_fixers do
-            url = url_fixers[i](url) or url
+        for j = 1, #hi do
+            fy = hi[j](fy) or fy
         end
-
-        for i=1, #db.sources do
-            local source = db.sources[i]
-            if source.type == "remote" and source.url == url then
-                client.error_log("Failed to import: A source with that URL already exists")
-                source_remote_add_status = "A source with that URL already exists"
-                update_sources_ui()
+        for j = 1, #av.sources do
+            local eZ = av.sources[j]
+            if eZ.type == "remote" and eZ.url == fy then
+                bs.error_log("Failed to import: A source with that URL already exists")
+                gW = "A source with that URL already exists"
+                f1()
                 return
             end
         end
-
-        update_sources_ui()
-        test_array.source_get_index_data(url, function(err, data)
-            if source_selected ~= "add_remote" then
-                return
-            end
-
-            if err ~= nil then
-                client.error_log(string.format("Failed to import: %s", err))
-                source_remote_add_status = err
-                update_sources_ui()
-                return
-            end
-            local source = test_array.add_source(data.name, "remote")
-
-            source.url = data.url or url
-            source.url_format = data.url_format
-            source.description = data.description
-            source.update_timestamp = data.update_timestamp
-            source.last_updated = data.last_updated
-
-            update_sources_ui()
-
-            source_selected = nil
-            test_array.set_source_selected("add_remote")
-            update_sources_ui()
-        end)
-    end
-end
-
-function on_source_export()
-    if source_editing and type(source_selected) == "table" and source_selected.type == "local" then
-        local indent = "  "
-        local mapname = test_array.get_mapname()
-        local show_all = edit_ui.show_all:get()
-
-        -- if we're not ingame show all locations
-        if mapname == nil then
-            show_all = true
-        end
-
-        local export_str
-        if show_all then
-            local all_locations = source_selected:get_all_locations()
-
-            local maps = {}
-            for map, _ in pairs(all_locations) do
-                table.insert(maps, map)
-            end
-            table.sort(maps)
-
-            local tbl = {}
-            for i=1, #maps do
-                local map = maps[i]
-                local locations = all_locations[map]
-                local tbl_map = {}
-                for i=1, #locations do
-                    local str = locations[i]:get_export(true)
-                    table.insert(tbl_map, indent .. (str:gsub("\n", "\n" .. indent .. indent)))
+        f1()
+        a.source_get_index_data(
+            fy,
+            function(fX, fA)
+                if gV ~= "add_remote" then
+                    return
                 end
-
-                table.insert(tbl, json.encode(map) .. ": [\n" .. indent .. table.concat(tbl_map, ",\n" .. indent) .. "\n" .. indent .. "]")
+                if fX ~= nil then
+                    bs.error_log(string.format("Failed to import: %s", fX))
+                    gW = fX
+                    f1()
+                    return
+                end
+                local eZ = a.add_source(fA.name, "remote")
+                eZ.url = fA.url or fy
+                eZ.url_format = fA.url_format
+                eZ.description = fA.description
+                eZ.update_timestamp = fA.update_timestamp
+                eZ.last_updated = fA.last_updated
+                f1()
+                gV = nil
+                a.set_source_selected("add_remote")
+                f1()
             end
-
-            export_str = "{\n" .. indent .. table.concat(tbl, ",\n" .. indent) .. "\n}"
-        else
-            local locations = source_selected:get_locations(mapname)
-        
-            local tbl = {}
-            for i=1, #locations do
-                tbl[i] = locations[i]:get_export(true):gsub("\n", "\n" .. indent)
-            end
-
-            export_str = "[\n" .. indent .. table.concat(tbl, ",\n" .. indent) .. "\n]"
+        )
+    end
+end
+function gR()
+    if gU and type(gV) == "table" and gV.type == "local" then
+        local fa = "  "
+        local eU = a.get_mapname()
+        local h7 = gG.show_all:get()
+        if eU == nil then
+            h7 = true
         end
-
-        if export_str ~= nil then
-            if test_array.set_clipboard_text ~= nil then
-                test_array.set_clipboard_text(export_str)
-                print("Exported location (Copied to clipboard):")
-            else
-                print("Exported location:")
+        local hs
+        if h7 then
+            local hb = gV:get_all_locations()
+            local ht = {}
+            for fD, O in pairs(hb) do
+                table.insert(ht, fD)
             end
-            pretty_json.print_highlighted(export_str)
+            table.sort(ht)
+            local bt = {}
+            for j = 1, #ht do
+                local fD = ht[j]
+                local fx = hb[fD]
+                local hu = {}
+                for j = 1, #fx do
+                    local N = fx[j]:get_export(true)
+                    table.insert(hu, fa .. N:gsub("\n", "\n" .. fa .. fa))
+                end
+                table.insert(bt, json.encode(fD) .. ": [\n" .. fa .. table.concat(hu, ",\n" .. fa) .. "\n" .. fa .. "]")
+            end
+            hs = "{\n" .. fa .. table.concat(bt, ",\n" .. fa) .. "\n}"
+        else
+            local fx = gV:get_locations(eU)
+            local bt = {}
+            for j = 1, #fx do
+                bt[j] = fx[j]:get_export(true):gsub("\n", "\n" .. fa)
+            end
+            hs = "[\n" .. fa .. table.concat(bt, ",\n" .. fa) .. "\n]"
+        end
+        if hs ~= nil then
+            if a.set_clipboard_text ~= nil then
+                a.set_clipboard_text(hs)
+                print_raw("Exported location (Copied to clipboard):")
+            else
+                print_raw("Exported location:")
+            end
+            aA.print_highlighted(hs)
         end
     end
 end
-
-function test_array.edit_update_has_changed()
-    if source_editing and edit_location_selected ~= nil and source_editing_modified[edit_location_selected] ~= nil then
-        if type(edit_location_selected) == "table" then
-            local old = edit_location_selected:get_export_tbl()
-            source_editing_has_changed[edit_location_selected] = not test_array.deep_compare(old, source_editing_modified[edit_location_selected])
+function a.edit_update_has_changed()
+    if gU and gK ~= nil and gX[gK] ~= nil then
+        if type(gK) == "table" then
+            local hv = gK:get_export_tbl()
+            gY[gK] = not a.deep_compare(hv, gX[gK])
         else
-            source_editing_has_changed[edit_location_selected] = true
+            gY[gK] = true
         end
     end
-
-    return source_editing_has_changed[edit_location_selected] == true
+    return gY[gK] == true
 end
-
-function edit_set_ui_values(force)
-    local location_tbl = {}
-    if source_editing and edit_location_selected ~= nil and source_editing_modified[edit_location_selected] ~= nil then
-        location_tbl = source_editing_modified[edit_location_selected]
+function f2(hw)
+    local hx = {}
+    if gU and gK ~= nil and gX[gK] ~= nil then
+        hx = gX[gK]
     end
-
-    if edit_different_map_selected and not force then
-        location_tbl = {}
+    if gJ and not hw then
+        hx = {}
     end
-
-    local yaw_to_name = test_array.table_map_assoc(YAW_DIRECTION_OFFSETS, function(k, v) return v, k end)
-    local yaw_to_name_recovery = test_array.table_map_assoc(YAW_DIRECTION_OFFSETS_RECOVERY, function(k, v) return v, k end)
-
-    edit_ignore_callbacks = true
-    edit_ui.from:set(location_tbl.name and location_tbl.name[1] or "")
-    edit_ui.to:set(location_tbl.name and location_tbl.name[2] or "")
-    edit_ui.grenade_properties:set('')
-
-    edit_ui.description:set(location_tbl.description or "")
-
-    if location_tbl.grenade ~= nil then
-        edit_ui.type:set('Grenade')
-
-        edit_ui.recovery_direction:set('Back')
-        edit_ui.recovery_direction_custom:set(0)
-        edit_ui.recovery_jump:set(false)
-
-        edit_ui.run_duration:set(20)
-        edit_ui.run_direction:set('Forward')
-        edit_ui.run_direction_custom:set(0)
-        edit_ui.delay:set(1)
-
-        local properties = {}
-        if location_tbl.grenade.jump then
-            table.insert(properties, "Jump")
+    local hy =
+        a.table_map_assoc(
+        bJ,
+        function(l, w)
+            return w, l
         end
-
-        if location_tbl.grenade.recovery_yaw ~= nil then
-            if not location_tbl.grenade.jump then
-                table.insert(properties, "Force-enable recovery")
+    )
+    local hz =
+        a.table_map_assoc(
+        bK,
+        function(l, w)
+            return w, l
+        end
+    )
+    gI = true
+    gG.from:set(hx.name and hx.name[1] or "")
+    gG.to:set(hx.name and hx.name[2] or "")
+    gG.grenade_properties:set("")
+    gG.description:set(hx.description or "")
+    if hx.grenade ~= nil then
+        gG.type:set("Grenade")
+        gG.recovery_direction:set("Back")
+        gG.recovery_direction_custom:set(0)
+        gG.recovery_jump:set(false)
+        gG.run_duration:set(20)
+        gG.run_direction:set("Forward")
+        gG.run_direction_custom:set(0)
+        gG.delay:set(1)
+        local hd = {}
+        if hx.grenade.jump then
+            table.insert(hd, "Jump")
+        end
+        if hx.grenade.recovery_yaw ~= nil then
+            if not hx.grenade.jump then
+                table.insert(hd, "Force-enable recovery")
             end
-
-            if yaw_to_name[location_tbl.grenade.recovery_yaw] ~= nil then
-                edit_ui.recovery_direction:set(yaw_to_name[location_tbl.grenade.recovery_yaw])
+            if hy[hx.grenade.recovery_yaw] ~= nil then
+                gG.recovery_direction:set(hy[hx.grenade.recovery_yaw])
             else
-                edit_ui.recovery_direction:set("Custom")
-                edit_ui.recovery_direction_custom:set(location_tbl.grenade.recovery_yaw)
+                gG.recovery_direction:set("Custom")
+                gG.recovery_direction_custom:set(hx.grenade.recovery_yaw)
             end
         end
-
-        if location_tbl.grenade.recovery_jump then
-            edit_ui.recovery_jump:set(true)
+        if hx.grenade.recovery_jump then
+            gG.recovery_jump:set(true)
         end
-
-        if location_tbl.grenade.strength ~= nil and location_tbl.grenade.strength ~= 1 then
-            table.insert(properties, "Throw strength")
-
-            edit_ui.throw_strength:set(location_tbl.grenade.strength == 0.5 and "Left / Right Click" or "Left Click")
+        if hx.grenade.strength ~= nil and hx.grenade.strength ~= 1 then
+            table.insert(hd, "Throw strength")
+            gG.throw_strength:set(hx.grenade.strength == 0.5 and "Left / Right Click" or "Left Click")
         end
-
-        if location_tbl.grenade.delay ~= nil then
-            table.insert(properties, "Delayed throw")
-            edit_ui.delay:set(location_tbl.grenade.delay)
+        if hx.grenade.delay ~= nil then
+            table.insert(hd, "Delayed throw")
+            gG.delay:set(hx.grenade.delay)
         end
-
-        if location_tbl.grenade.run ~= nil then
-            table.insert(properties, "Run")
-
-            if location_tbl.grenade.run ~= 20 then
-                edit_ui.run_duration:set(location_tbl.grenade.run)
+        if hx.grenade.run ~= nil then
+            table.insert(hd, "Run")
+            if hx.grenade.run ~= 20 then
+                gG.run_duration:set(hx.grenade.run)
             end
-
-            if location_tbl.grenade.run_yaw ~= nil then
-                if yaw_to_name[location_tbl.grenade.run_yaw] ~= nil then
-                    edit_ui.run_direction:set(yaw_to_name[location_tbl.grenade.run_yaw])
+            if hx.grenade.run_yaw ~= nil then
+                if hy[hx.grenade.run_yaw] ~= nil then
+                    gG.run_direction:set(hy[hx.grenade.run_yaw])
                 else
-                    edit_ui.run_direction:set("Custom")
-                    edit_ui.run_direction_custom:set(location_tbl.grenade.run_yaw)
+                    gG.run_direction:set("Custom")
+                    gG.run_direction_custom:set(hx.grenade.run_yaw)
                 end
             end
-
-            if location_tbl.grenade.run_speed then
-                table.insert(properties, "Walk (Shift)")
+            if hx.grenade.run_speed then
+                table.insert(hd, "Walk (Shift)")
             end
         end
-
-        edit_ui.grenade_properties:set(properties)
-    elseif location_tbl.movement ~= nil then
-        edit_ui.type:set('Movement')
+        gG.grenade_properties:set(hd)
+    elseif hx.movement ~= nil then
+        gG.type:set("Movement")
     else
-        edit_ui.grenade_properties:set('')
+        gG.grenade_properties:set("")
     end
-
-    edit_ignore_callbacks = false
+    gI = false
 end
-
-function test_array.edit_read_ui_values()
-    if edit_ignore_callbacks or edit_different_map_selected then
+function a.edit_read_ui_values()
+    if gI or gJ then
         return
     end
-
-    if source_editing and source_editing_modified[edit_location_selected] == nil then
-        if edit_location_selected == "create_new" then
-        elseif edit_location_selected ~= nil then
-            source_editing_modified[edit_location_selected] = edit_location_selected:get_export_tbl()
-            edit_set_ui_values()
+    if gU and gX[gK] == nil then
+        if gK == "create_new" then
+        elseif gK ~= nil then
+            gX[gK] = gK:get_export_tbl()
+            f2()
         end
     end
-
-    if source_editing and edit_location_selected ~= nil and source_editing_modified[edit_location_selected] ~= nil then
-        local location = source_editing_modified[edit_location_selected]
-
-        local from = edit_ui.from:get()
-        if from:gsub(" ", "") == "" then
-            from = "Unnamed"
+    if gU and gK ~= nil and gX[gK] ~= nil then
+        local fg = gX[gK]
+        local hA = gG.from:get()
+        if hA:gsub(" ", "") == "" then
+            hA = "Unnamed"
         end
-
-        local to = edit_ui.to:get()
-        if to:gsub(" ", "") == "" then
-            to = "Unnamed"
+        local hB = gG.to:get()
+        if hB:gsub(" ", "") == "" then
+            hB = "Unnamed"
         end
-
-        location.name = {from, to}
-
-        local description = edit_ui.description:get()
-        if description:gsub(" ", "") ~= "" then
-            location.description = description:gsub("^%s+", ""):gsub("%s+$", "")
+        fg.name = {hA, hB}
+        local hC = gG.description:get()
+        if hC:gsub(" ", "") ~= "" then
+            fg.description = hC:gsub("^%s+", ""):gsub("%s+$", "")
         else
-            location.description = nil
+            fg.description = nil
         end
-
-        location.grenade = location.grenade or {}
-        local properties = edit_ui.grenade_properties
-
-        if properties:get("Jump") then
-            location.grenade.jump = true
+        fg.grenade = fg.grenade or {}
+        local hd = gG.grenade_properties
+        if hd:get("Jump") then
+            fg.grenade.jump = true
         else
-            location.grenade.jump = nil
+            fg.grenade.jump = nil
         end
-
-        if properties:get("Jump") or properties:get("Force-enable recovery") then
-            -- figure out recovery_yaw
-            local recovery_yaw_offset
-            local recovery_yaw_option = edit_ui.recovery_direction:get()
-            if recovery_yaw_option == "Custom" then
-                recovery_yaw_offset = edit_ui.recovery_direction_custom:get()
-
-                if recovery_yaw_offset == -180 then
-                    recovery_yaw_offset = 180
+        if hd:get("Jump") or hd:get("Force-enable recovery") then
+            local hD
+            local hE = gG.recovery_direction:get()
+            if hE == "Custom" then
+                hD = gG.recovery_direction_custom:get()
+                if hD == -180 then
+                    hD = 180
                 end
             else
-                recovery_yaw_offset = YAW_DIRECTION_OFFSETS[recovery_yaw_option]
+                hD = bJ[hE]
             end
-
-            location.grenade.recovery_yaw = (recovery_yaw_offset ~= nil and recovery_yaw_offset ~= 180) and recovery_yaw_offset or (not properties:get("Jump") and 180 or nil)
-            location.grenade.recovery_jump = edit_ui.recovery_jump:get() and true or nil
+            fg.grenade.recovery_yaw = hD ~= nil and hD ~= 180 and hD or (not hd:get("Jump") and 180 or nil)
+            fg.grenade.recovery_jump = gG.recovery_jump:get() and true or nil
         else
-            location.grenade.recovery_yaw = nil
-            location.grenade.recovery_jump = nil
+            fg.grenade.recovery_yaw = nil
+            fg.grenade.recovery_jump = nil
         end
-
-        if properties:get("Run") then
-            location.grenade.run = edit_ui.run_duration:get()
-
-            -- figure out run_yaw_offset
-            local run_yaw_offset
-            local run_yaw_option = edit_ui.run_direction:get()
-            if run_yaw_option == "Custom" then
-                run_yaw_offset = edit_ui.run_direction_custom:get()
+        if hd:get("Run") then
+            fg.grenade.run = gG.run_duration:get()
+            local hF
+            local hG = gG.run_direction:get()
+            if hG == "Custom" then
+                hF = gG.run_direction_custom:get()
             else
-                run_yaw_offset = YAW_DIRECTION_OFFSETS[run_yaw_option]
+                hF = bJ[hG]
             end
-
-            location.grenade.run_yaw = (run_yaw_offset ~= nil and run_yaw_offset ~= 0) and run_yaw_offset or nil
-
-            if properties:get("Walk (Shift)") then
-                location.grenade.run_speed = true
+            fg.grenade.run_yaw = hF ~= nil and hF ~= 0 and hF or nil
+            if hd:get("Walk (Shift)") then
+                fg.grenade.run_speed = true
             else
-                location.grenade.run_speed = nil
+                fg.grenade.run_speed = nil
             end
         else
-            location.grenade.run = nil
-            location.grenade.run_yaw = nil
-            location.grenade.run_speed = nil
+            fg.grenade.run = nil
+            fg.grenade.run_yaw = nil
+            fg.grenade.run_speed = nil
         end
-
-        if properties:get("Delayed throw") then
-            location.grenade.delay = edit_ui.delay:get()
+        if hd:get("Delayed throw") then
+            fg.grenade.delay = gG.delay:get()
         else
-            location.grenade.delay = nil
+            fg.grenade.delay = nil
         end
-
-        if properties:get("Throw strength") then
-            local strength = edit_ui.throw_strength:get()
-            if strength == "Left / Right Click" then
-                location.grenade.strength = 0.5
-            elseif strength == "Right Click" then
-                location.grenade.strength = 0
+        if hd:get("Throw strength") then
+            local hH = gG.throw_strength:get()
+            if hH == "Left / Right Click" then
+                fg.grenade.strength = 0.5
+            elseif hH == "Right Click" then
+                fg.grenade.strength = 0
             else
-                location.grenade.strength = nil
+                fg.grenade.strength = nil
             end
         else
-            location.grenade.strength = nil
+            fg.grenade.strength = nil
         end
-
-        if location.grenade ~= nil and next(location.grenade) == nil then
-            location.grenade = nil
+        if fg.grenade ~= nil and next(fg.grenade) == nil then
+            fg.grenade = nil
         end
-
-        if test_array.edit_update_has_changed() then
-            test_array.flush_active_locations("edit_update_has_changed")
+        if a.edit_update_has_changed() then
+            a.flush_active_locations("edit_update_has_changed")
         end
     end
-    update_sources_ui()
+    f1()
 end
-
-edit_ui.grenade_properties:set_callback(test_array.edit_read_ui_values)
-edit_ui.run_direction:set_callback(test_array.edit_read_ui_values)
-edit_ui.run_direction_custom:set_callback(test_array.edit_read_ui_values)
-edit_ui.run_duration:set_callback(test_array.edit_read_ui_values)
-edit_ui.recovery_direction:set_callback(test_array.edit_read_ui_values)
-edit_ui.recovery_direction_custom:set_callback(test_array.edit_read_ui_values)
-edit_ui.recovery_jump:set_callback(test_array.edit_read_ui_values)
-edit_ui.delay:set_callback(test_array.edit_read_ui_values)
-edit_ui.throw_strength:set_callback(test_array.edit_read_ui_values)
-
-utils.execute_after(1, update_sources_ui)
-
-function on_source_edit()
-    if type(source_selected) == "table" and source_selected.type == "local" and not source_selected.builtin then
-        source_editing = true
-        update_sources_ui()
-        test_array.flush_active_locations("on_source_edit")
+gG.grenade_properties:set_callback(a.edit_read_ui_values)
+gG.run_direction:set_callback(a.edit_read_ui_values)
+gG.run_direction_custom:set_callback(a.edit_read_ui_values)
+gG.run_duration:set_callback(a.edit_read_ui_values)
+gG.recovery_direction:set_callback(a.edit_read_ui_values)
+gG.recovery_direction_custom:set_callback(a.edit_read_ui_values)
+gG.recovery_jump:set_callback(a.edit_read_ui_values)
+gG.delay:set_callback(a.edit_read_ui_values)
+gG.throw_strength:set_callback(a.edit_read_ui_values)
+utils.execute_after(1, f1)
+function gL()
+    if type(gV) == "table" and gV.type == "local" and not gV.builtin then
+        gU = true
+        f1()
+        a.flush_active_locations("on_source_edit")
     end
 end
-
-function on_source_edit_back()
-    source_editing = false
-    edit_location_selected = nil
-
-    test_array.table_clear(source_editing_modified)
-    test_array.table_clear(source_editing_has_changed)
-
-    test_array.flush_active_locations("on_source_edit_back")
-    update_sources_ui()
+function gM()
+    gU = false
+    gK = nil
+    a.table_clear(gX)
+    a.table_clear(gY)
+    a.flush_active_locations("on_source_edit_back")
+    f1()
 end
-
-function on_edit_teleport()
-    if not edit_different_map_selected and edit_location_selected ~= nil and (edit_location_selected == "create_new" or source_editing_modified[edit_location_selected] ~= nil) then
+function gD()
+    if not gJ and gK ~= nil and (gK == "create_new" or gX[gK] ~= nil) then
         if cvar.sv_cheats:int() == 0 then
             return
         end
-
-        local location = source_editing_modified[edit_location_selected]
-
-        if location ~= nil then
-            utils.console_exec(string.format("use %s; setpos_exact %f %f %f", location.weapon, unpack(location.position)))
-            render.camera_angles(vector(location.viewangles[1], location.viewangles[2], 0))
-
-            utils.execute_after(0.1, function()
-                if entity.get_local_player()["m_MoveType"] == 8 then
-                    local x, y, z = unpack(location.position)
-                    utils.console_exec(string.format("noclip off; setpos_exact %f %f %f", x, y, z+64))
+        local fg = gX[gK]
+        if fg ~= nil then
+            utils.console_exec(string.format("use %s; setpos_exact %f %f %f", fg.weapon, unpack(fg.position)))
+            render.camera_angles(vector(fg.viewangles[1], fg.viewangles[2], 0))
+            utils.execute_after(
+                0.1,
+                function()
+                    if entity.get_local_player()["m_MoveType"] == 8 then
+                        local y, z, aH = unpack(fg.position)
+                        utils.console_exec(string.format("noclip off; setpos_exact %f %f %f", y, z, aH + 64))
+                    end
                 end
-            end)
+            )
         end
     end
 end
-
-function on_edit_set()
-    if not edit_different_map_selected and edit_location_selected ~= nil then
-        if source_editing_modified[edit_location_selected] == nil then
-            source_editing_modified[edit_location_selected] = {}
-            test_array.edit_read_ui_values()
+function gE()
+    if not gJ and gK ~= nil then
+        if gX[gK] == nil then
+            gX[gK] = {}
+            a.edit_read_ui_values()
         end
-
-        local local_player = entity.get_local_player()
-
-        if local_player == nil then
-            client.error_log("join to the map")
+        local hI = entity.get_local_player()
+        if hI == nil then
+            bs.error_log("join to the map")
             return
         end
-
-        local weapon_ent = local_player:get_player_weapon()
-        local weapon =  weapons[weapon_ent:get_weapon_index()].console_name
-        if weapon == 'weapon_incgrenade' then
-            weapon = 'weapon_molotov'
+        local hJ = hI:get_player_weapon()
+        local bW = n[hJ:get_weapon_index()].console_name
+        if bW == "weapon_incgrenade" then
+            bW = "weapon_molotov"
         end
-        weapon = WEAPON_ALIASES[weapon] or weapon
-        local location = source_editing_modified[edit_location_selected]
-
-        location.position = {vectorlib.from_vec(local_player:get_origin()):unpack()}
-
-        local pitch, yaw = render.camera_angles().x, render.camera_angles().y
-        location.viewangles = {pitch, yaw}
-
-        local duckamount = local_player["m_flDuckAmount"]
-        if duckamount ~= 0 then
-            location.duck = local_player["m_flDuckAmount"] == 1
+        bW = bU[bW] or bW
+        local fg = gX[gK]
+        fg.position = {ay.from_vec(hI:get_origin()):unpack()}
+        local cH, cI = render.camera_angles().x, render.camera_angles().y
+        fg.viewangles = {cH, cI}
+        local hK = hI["m_flDuckAmount"]
+        if hK ~= 0 then
+            fg.duck = hI["m_flDuckAmount"] == 1
         else
-            location.duck = nil
+            fg.duck = nil
         end
-
-        location.weapon = weapon
-
-        if test_array.edit_update_has_changed() then
-            test_array.flush_active_locations("test_array.edit_update_has_changed")
+        fg.weapon = bW
+        if a.edit_update_has_changed() then
+            a.flush_active_locations("a.edit_update_has_changed")
         end
     end
 end
-
-function on_edit_save()
-    if not edit_different_map_selected and edit_location_selected ~= nil and source_editing_modified[edit_location_selected] ~= nil then
-        local location = test_array.create_location(source_editing_modified[edit_location_selected])
-
-        if type(location) ~= "table" then
-            client.error_log("failed to save: " .. location)
+function gB()
+    if not gJ and gK ~= nil and gX[gK] ~= nil then
+        local fg = a.create_location(gX[gK])
+        if type(fg) ~= "table" then
+            bs.error_log("failed to save: " .. fg)
             return
         end
-
-        local mapname = test_array.get_mapname()
-
-        if mapname == nil then
+        local eU = a.get_mapname()
+        if eU == nil then
             return
         end
-
-        local source_locations = sources_locations[source_selected][mapname]
-        if source_locations == nil then
-            source_locations = {}
-            sources_locations[source_selected][mapname] = source_locations
+        local hq = f0[gV][eU]
+        if hq == nil then
+            hq = {}
+            f0[gV][eU] = hq
         end
-        if edit_location_selected == "create_new" then
-            table.insert(source_locations, location)
-            source_selected:store_write()
-            test_array.flush_active_locations()
-
-            edit_location_selected = location
-            source_editing_modified[edit_location_selected] = source_editing_modified["create_new"]
-            source_editing_modified["create_new"] = nil
-        elseif type(edit_location_selected) == "table" then
-            for i=1, #source_locations do
-                if source_locations[i] == edit_location_selected then
-                    source_editing_modified[location] = source_editing_modified[source_locations[i]]
-                    source_editing_modified[source_locations[i]] = nil
-                    edit_location_selected = location
-
-                    source_locations[i] = location
-
-                    source_selected:store_write()
-                    test_array.flush_active_locations()
+        if gK == "create_new" then
+            table.insert(hq, fg)
+            gV:store_write()
+            a.flush_active_locations()
+            gK = fg
+            gX[gK] = gX["create_new"]
+            gX["create_new"] = nil
+        elseif type(gK) == "table" then
+            for j = 1, #hq do
+                if hq[j] == gK then
+                    gX[fg] = gX[hq[j]]
+                    gX[hq[j]] = nil
+                    gK = fg
+                    hq[j] = fg
+                    gV:store_write()
+                    a.flush_active_locations()
                     break
                 end
             end
         end
-
-        edit_set_ui_values()
-
-        update_sources_ui()
-        test_array.flush_active_locations()
+        f2()
+        f1()
+        a.flush_active_locations()
     end
 end
-
-function on_edit_export()
-    if type(edit_location_selected) == "table" or source_editing_modified[edit_location_selected] ~= nil then
-        local location = test_array.create_location(source_editing_modified[edit_location_selected]) or edit_location_selected
-
-        if type(location) == "table" then
-            local export_str = location:get_export(true)
-
-            if test_array.set_clipboard_text ~= nil then
-                test_array.set_clipboard_text(export_str)
-                print("Exported location (Copied to clipboard):")
+function gF()
+    if type(gK) == "table" or gX[gK] ~= nil then
+        local fg = a.create_location(gX[gK]) or gK
+        if type(fg) == "table" then
+            local hs = fg:get_export(true)
+            if a.set_clipboard_text ~= nil then
+                a.set_clipboard_text(hs)
+                print_raw("Exported location (Copied to clipboard):")
             else
-                print("Exported location:")
+                print_raw("Exported location:")
             end
-            pretty_json.print_highlighted(export_str)
+            aA.print_highlighted(hs)
         else
-            client.error_log(location)
+            bs.error_log(fg)
         end
     end
 end
-
-function on_edit_delete()
-    if not edit_different_map_selected and edit_location_selected ~= nil and type(edit_location_selected) == "table" then
-        local mapname = test_array.get_mapname()
-        if mapname == nil then
+function gC()
+    if not gJ and gK ~= nil and type(gK) == "table" then
+        local eU = a.get_mapname()
+        if eU == nil then
             return
         end
-        local source_locations = sources_locations[source_selected][mapname]
-
-        for i=1, #source_locations do
-            if source_locations[i] == edit_location_selected then
-                table.remove(source_locations, i)
-                source_editing_modified[edit_location_selected] = nil
-                edit_location_selected = nil
-                update_sources_ui()
-                source_selected:store_write()
-                test_array.flush_active_locations()
+        local hq = f0[gV][eU]
+        for j = 1, #hq do
+            if hq[j] == gK then
+                table.remove(hq, j)
+                gX[gK] = nil
+                gK = nil
+                f1()
+                gV:store_write()
+                a.flush_active_locations()
                 break
             end
         end
     end
 end
-
-edit_ui.list:set_callback(function()
-    local edit_location_selected_prev = edit_location_selected
-    local i = edit_ui.list:get()
-
-    if i ~= nil then
-        edit_location_selected = edit_list[i+1]
-    else
-        edit_location_selected = "create_new"
-    end
-
-    update_sources_ui()
-    if edit_location_selected ~= edit_location_selected_prev and not edit_different_map_selected then
-        if type(edit_location_selected) == "table" and source_editing_modified[edit_location_selected] == nil then
-            source_editing_modified[edit_location_selected] = edit_location_selected:get_export_tbl()
-        end
-
-        edit_set_ui_values()
-        update_sources_ui()
-        test_array.flush_active_locations()
-    elseif edit_location_selected ~= edit_location_selected_prev then
-        edit_set_ui_values()
-    end
-end)
-
-update_sources_ui()
-utils.execute_after(0, update_sources_ui)
-
-local last_vischeck, weapon_prev, active_locations_in_range = 0
-local location_set_closest, location_selected, location_playback
-
-CUSTOM_ICONS.edit_png = '\x89\x50\x4E\x47\x0D\x0A\x1A\x0A\x00\x00\x00\x0D\x49\x48\x44\x52\x00\x00\x00\x64\x00\x00\x00\x64\x08\x06\x00\x00\x00\x70\xE2\x95\x54\x00\x00\x00\x04\x73\x42\x49\x54\x08\x08\x08\x08\x7C\x08\x64\x88\x00\x00\x00\x09\x70\x48\x59\x73\x00\x00\x2E\x23\x00\x00\x2E\x23\x01\x78\xA5\x3F\x76\x00\x00\x00\x19\x74\x45\x58\x74\x53\x6F\x66\x74\x77\x61\x72\x65\x00\x77\x77\x77\x2E\x69\x6E\x6B\x73\x63\x61\x70\x65\x2E\x6F\x72\x67\x9B\xEE\x3C\x1A\x00\x00\x03\xD7\x49\x44\x41\x54\x78\x9C\xED\xDD\xBB\x6E\x1B\x47\x14\xC6\xF1\xEF\xEC\xE8\x02\xC7\x42\x84\x14\x76\xDC\xA7\x0B\xD2\xB9\x48\x65\xC0\x81\x11\x24\x8F\x64\x23\x4A\x17\x03\x7E\x98\x74\xB2\x0D\x18\x46\x9C\xD2\x17\x38\x48\x93\x67\x10\x23\x36\x82\x4B\x5A\x33\xF3\xA5\x30\x57\xA1\x69\xD2\x9C\xBD\xCC\x85\x9C\xF3\x07\xD4\x89\x3B\x47\xF8\x61\xB8\xCB\x25\x25\x01\x9A\xA6\x69\x9A\xA6\x69\x9A\x96\x3D\x92\x47\xD6\xDA\xDF\x49\x7E\x9B\x7B\x96\xEA\x23\x79\xDD\x5A\xFB\xA7\xB5\x96\xD6\xDA\xF3\xD9\x6C\xF6\x5D\xEE\x99\xAA\x6D\x09\x83\x8A\x92\xB1\x35\x18\x8A\x92\xA3\x0D\x18\x8A\x92\xB2\x40\x8C\x51\x51\x64\x8C\xC1\x77\x31\x92\xD7\x9D\x73\x8F\x01\xDC\xED\xF0\xB0\xA9\x73\xEE\xDE\xE1\xE1\xE1\x3F\x7D\xD7\x55\x90\x15\xF5\xC4\x68\x1B\x84\xA2\x20\x4B\x0D\xC4\x68\xEB\x8D\xA2\x20\x0B\x8D\x84\xD1\xD6\x0B\x45\x41\xE6\x8D\x8C\xD1\xD6\x19\x45\x41\x10\x0D\xA3\xAD\x13\x4A\x13\x61\x80\x6D\x6C\x0F\xC0\xB5\x48\xC7\xBE\x69\x8C\xF9\x23\xF4\x92\x58\x77\xC8\x3C\x92\xC7\xCE\xB9\x67\x00\xBE\x8F\xB4\x44\xD0\x4E\x51\x90\x85\x4A\x40\x51\x90\xA5\x72\xA3\x28\xC8\x8A\x72\xA2\x54\x75\x52\x27\x79\x44\xF2\xCB\x4D\xDF\x27\x22\xEF\x8C\x31\x3F\x01\x78\x1D\x69\x94\xB5\x27\xFA\x6A\x40\xE6\x97\xB6\xA7\xDE\xFB\x17\x24\xBF\xDA\xF4\xFD\xB9\x50\xAA\x00\x59\x7C\x9D\x41\xF2\xB6\xF7\xFE\x79\x07\x94\x9F\x01\xBC\x89\x34\xDA\xCD\xBD\xBD\xBD\x7B\x91\x8E\x5D\x66\xEB\x6E\xA1\x3B\xE7\xDE\x86\xA0\xCC\x8F\x71\x6C\xAD\x7D\x15\x78\x1B\x3E\xF8\xCB\x39\x77\x12\xFB\xE7\x2F\xAA\x4D\xEF\x67\xE4\x44\x51\x8C\x82\x50\x14\xA3\x20\x14\xC5\x28\x08\x45\x31\x0A\x42\x51\x8C\x82\x50\x9C\x73\xBF\xC4\xFE\xF9\x8B\x6A\x2C\x8C\x18\x28\x8A\x51\x10\x8A\x62\x14\x84\xD2\x17\x63\x6B\xEF\xF6\x46\x7E\xDB\xF5\x2A\x11\xF9\xAB\x69\x9A\x1F\x45\xE4\x22\x60\xA6\x63\xE7\xDC\x33\x11\x39\x35\xC6\x3C\xEC\xB5\x5E\x9F\x07\xE5\x2E\x15\x46\x5B\x47\x94\x03\x11\x79\xDF\x7B\xAD\xBE\x0F\xCC\x55\x6A\x8C\xB6\x2E\x28\x83\xD6\x89\x79\xF0\xB1\xCB\x85\xD1\x96\x02\x65\x6B\x40\x72\x63\xB4\xC5\x46\xD9\x0A\x90\x52\x30\xDA\x62\xA2\x14\x0F\x42\xF2\xC8\x39\xF7\x14\xC0\x9D\xDC\xB3\x2C\xF5\xD2\x18\x73\x77\xC8\x09\x7C\x55\x45\xBF\x63\xD8\xBE\xED\x8A\xF2\x30\x20\x22\x4F\xC7\xC6\x00\x0A\xDE\x21\xA5\x3D\x4D\x2D\x26\x22\xBF\x1A\x63\x7E\x8B\x72\xEC\x18\x07\x1D\x5A\xAD\x18\x40\x81\x20\x35\x63\x00\x85\x81\xD4\x8E\x01\x14\x04\x42\xF2\x0B\xE7\xDC\x13\x54\x8C\x01\x14\x72\x95\x35\xC7\xA8\x7A\x67\x5C\xAD\x97\x6A\xA1\x75\x2D\x60\xFC\x90\x7B\x96\xE5\x52\x63\x00\x99\x41\x14\x63\xC5\xBA\xA9\x17\x6C\x53\x8C\x35\x6B\xE7\x58\x54\x31\x3E\xB3\x7E\xEA\x05\x15\x63\xC3\x0C\x29\x17\x53\x8C\x80\x39\x52\x2D\xA4\x18\x61\x25\x01\x51\x8C\xF0\xA2\x83\x28\x46\xB7\xA2\x82\x28\x46\xF7\xA2\x81\x28\x46\xBF\xA2\x80\x28\x46\xFF\x46\x07\x51\x8C\x61\x8D\x0A\xA2\x18\xC3\x1B\x0D\x44\x31\xC6\x69\x14\x10\xC5\x18\xAF\xC1\x20\x8A\x31\x6E\x83\x40\x14\x63\xFC\x7A\x83\x14\x8E\x71\xD2\xF7\xF7\x33\x72\xD7\x0B\x44\x31\xE2\xD5\x19\x44\x31\xE2\xD6\x09\x44\x31\xE2\x17\x0C\xA2\x18\x69\x0A\x02\x21\x79\xE8\x9C\x7B\x8E\x32\x3F\x85\xFE\xC0\x18\xF3\x28\xF7\x1C\x63\x15\xFA\x41\xB9\x6F\x50\x26\xC6\xC9\x2E\x61\x00\x81\x20\xD6\xDA\x5B\xB1\x07\xE9\xDA\x2E\x3D\x4D\x2D\x16\x04\x22\x22\x5F\xC7\x1E\xA4\x4B\xBB\x8A\x01\x84\x83\x14\xB3\x43\x76\x19\x03\x08\x04\xF1\xDE\x17\xB1\x43\x76\x1D\x03\xD8\xA2\x1D\x52\x03\x06\x10\x7E\x95\x95\x15\xA4\x16\x0C\x60\x0B\x4E\xEA\x35\x61\x00\x81\x20\x24\xB3\xEC\x90\xDA\x30\x80\x80\x57\xEA\x24\x1B\xE7\xDC\x0C\x1F\xFE\xE9\x49\xB2\x6A\xC4\x00\xC2\x76\xC8\x0D\x28\x46\xB2\x36\x82\x5C\x5E\x5E\x26\x7D\xBA\xAA\x19\x03\x08\x00\x49\x79\xC9\x5B\x3B\x06\x50\x10\x88\x62\x7C\x28\x04\x24\xFA\x25\xAF\x62\xFC\xDF\x46\x90\xD8\xB7\x4D\x14\xE3\xE3\xB2\x3E\x65\x29\xC6\xA7\x85\x5C\xF6\x46\x01\x51\x8C\xD5\xE5\x38\x87\xCC\x44\xE4\xBE\x62\xAC\x6E\xE3\x0B\xBE\x0E\xB7\x4D\x2E\x48\x4E\xE6\x7F\x87\xF0\x8C\xE4\xA4\x69\x9A\x33\x92\x13\x00\x17\xDE\xFB\xB3\xFD\xFD\xFD\x09\x80\x7F\x45\xC4\x0F\x19\x7A\x97\xFB\xEC\xAD\x13\x92\xC6\x7B\xFF\x37\xC9\x29\x80\x09\xC9\x69\xD3\x34\x13\x92\xE7\x24\xCF\xBD\xF7\x93\x83\x83\x83\x29\x80\xA9\x88\x30\xCD\xC8\x9A\xA6\x69\x9A\xA6\x69\x5B\xD0\x7F\x93\x82\xAB\xC8\x83\x73\xFC\xB3\x00\x00\x00\x00\x49\x45\x4E\x44\xAE\x42\x60\x82'
-CUSTOM_ICONS.vectors["edit"] = vector(100, 100)
-CUSTOM_ICONS['edit'] = render.load_image(CUSTOM_ICONS.edit_png, CUSTOM_ICONS.vectors["edit"])
-
-CUSTOM_ICONS.warning_png = '\x89\x50\x4E\x47\x0D\x0A\x1A\x0A\x00\x00\x00\x0D\x49\x48\x44\x52\x00\x00\x00\x64\x00\x00\x00\x64\x08\x06\x00\x00\x00\x70\xE2\x95\x54\x00\x00\x00\x04\x73\x42\x49\x54\x08\x08\x08\x08\x7C\x08\x64\x88\x00\x00\x00\x09\x70\x48\x59\x73\x00\x00\x2E\x23\x00\x00\x2E\x23\x01\x78\xA5\x3F\x76\x00\x00\x00\x19\x74\x45\x58\x74\x53\x6F\x66\x74\x77\x61\x72\x65\x00\x77\x77\x77\x2E\x69\x6E\x6B\x73\x63\x61\x70\x65\x2E\x6F\x72\x67\x9B\xEE\x3C\x1A\x00\x00\x05\x39\x49\x44\x41\x54\x78\x9C\xED\x9D\x4D\x88\x1C\x45\x18\x86\xDF\xCA\xEA\xE2\x0A\x11\x93\x83\xEB\x21\x11\x21\x09\x41\x57\x36\x82\xB2\x82\x08\xE6\xA2\xA0\x89\xC9\x22\xC6\x1F\x70\x35\x04\x71\x23\x98\xF5\xA0\x1B\x54\x54\x88\xB0\xBB\x3A\x89\x07\x41\xF0\x90\xA3\x08\x7A\x13\x3D\xE9\x45\xD0\x4B\x3C\x08\x11\x09\x6C\xE2\xDF\xC1\x83\x7A\xF0\x1F\x11\x8D\xE6\xF1\xD0\x33\xB8\xBF\xD3\x3D\x3D\x55\xF5\xF5\x74\xD7\x73\x9C\xAD\xA9\xEF\x2B\x5E\xBE\xEA\xEE\x6F\xDE\xEA\x95\x12\x89\x44\x22\x91\x48\x24\x12\x89\x44\x22\x91\x48\x24\xBC\x02\x8C\x00\xD7\x58\xE7\x91\x68\x03\x3C\x0F\x7C\x68\x9D\x47\x42\x12\x70\x05\xF0\x2B\x19\x77\x59\xE7\xD3\x78\x80\x93\xFC\xCF\x22\x70\xB1\x75\x4E\x8D\x05\xB8\x16\x38\xCF\x72\x1E\xB7\xCE\xAB\xB1\x00\xEF\xB3\x9A\x1F\x81\xCD\xD6\xB9\x35\x0E\xE0\x8E\x35\xC4\xE8\xD0\xB2\xCE\xAF\x51\x00\x43\xC0\xE7\x5D\x04\xF9\x0B\xD8\x6E\x9D\x67\x63\x00\x0E\x77\x11\xA3\xC3\xDB\xD6\x79\x36\x02\x60\x23\xF0\x5D\x01\x41\x00\x6E\xB1\xCE\xB7\xF6\x00\x0B\x05\xC5\x00\x38\x05\x38\xEB\x9C\x6B\x0B\xB0\x05\xF8\xA3\x07\x41\x00\xEE\xB3\xCE\xBB\xB6\x00\x6F\xF6\x28\x06\xC0\x37\xC0\x25\xD6\xB9\xD7\x0E\x60\x02\xB8\x50\x42\x10\x80\xA3\xD6\xF9\xD7\x0E\xE0\xA3\x92\x62\x00\xFC\x06\x8C\x5A\xAF\xA1\x36\x00\xF7\xF4\x21\x46\x87\xD7\xAC\xD7\x51\x0B\x80\x61\xE0\x9C\x07\x41\xFE\x01\xC6\xAC\xD7\x93\xC7\x06\xEB\x04\x0A\x70\x44\xD2\x0E\x0F\xF3\x0C\x49\x7A\xC9\xC3\x3C\xCD\x05\xD8\x44\xD6\x2C\xF4\xC9\x6D\xD6\xEB\x1A\x58\x80\x57\x3D\x8B\x01\x70\x1A\x18\xB2\x5E\xDB\xC0\x01\x6C\x23\x6B\x12\x86\xE0\x90\xF5\xFA\x06\x0E\xE0\x9D\x40\x62\x00\x7C\x0F\x6C\xB4\x5E\xE3\x5A\x54\xF2\xA2\x0E\xDC\x2A\x69\x7F\xC0\x10\xA3\x92\x9E\x0C\x38\x7F\x69\x2A\xD7\x78\x03\x36\x48\xFA\x44\xD2\x8D\x81\x43\xFD\x29\x69\xA7\x73\xEE\xDB\xC0\x71\x7A\xA2\x8A\x15\xF2\xA0\xC2\x8B\x21\x49\x23\x92\x5E\x8C\x10\xA7\x27\x2A\x55\x21\xC0\x88\xA4\x45\x49\x57\x45\x0A\x79\x41\xD2\x84\x73\xEE\xD3\x48\xF1\x72\xA9\x5A\x85\x3C\xA5\x78\x62\x48\xD9\xFA\x4F\x44\x8C\x97\x4B\x65\x2A\x84\xAC\xF9\x77\x4E\xD2\x65\x06\xE1\xF7\x39\xE7\xDE\x33\x88\xBB\x8A\x2A\x09\x72\x52\xD2\x23\x05\x87\xBF\x21\xE9\x4C\xCE\x98\x31\x49\x53\x05\xE7\x5B\x94\x34\xEE\x9C\x3B\x5F\x70\x7C\xBD\x01\xC6\xC9\x9A\x7F\x45\x99\x2C\x30\xE7\x64\x8F\xCF\x26\x95\x30\xD8\x55\xE5\x1A\x72\x5C\x59\xF3\xCF\x92\x63\x54\xC0\x60\x67\x2E\x08\x70\xA7\xA4\xDB\xAD\xF3\x90\xB4\x59\xD2\xD3\xD6\x49\x98\x0A\x42\xD6\xE4\x7B\xD9\x32\x87\x15\x3C\x81\xB1\xC1\xCE\xBA\x42\x1E\x95\x74\x9D\x71\x0E\x4B\x19\x96\x34\x67\x99\x80\x99\x20\xED\xE6\xDE\x0B\x56\xF1\xBB\x70\x2F\x86\x06\x3B\xCB\x0A\x79\x56\xD2\x95\x86\xF1\xBB\x71\x02\x23\x83\x9D\x89\x20\xC0\x16\x49\x33\x16\xB1\x0B\x72\x93\x24\x13\x83\x9D\x55\x85\xB4\x24\x5D\x6A\x14\xBB\x28\x0B\x18\x18\xEC\xA2\x0B\x02\x4C\x48\xBA\x3F\x76\xDC\x12\x5C\x2D\x83\x2A\xB6\xA8\x90\x57\x54\xA1\x96\x4D\x0E\xCF\x11\xD9\x60\x17\x55\x10\xE0\x80\xA4\x41\x3A\x22\x10\xFD\x4E\x30\x9A\x20\xC0\xB0\xA4\xF9\x58\xF1\x3C\x32\x4D\x44\x83\x5D\xCC\x0A\x99\x91\x34\x88\xC7\xCC\xA2\x76\x13\xA2\x08\x02\x6C\x92\xF4\x4C\x8C\x58\x81\xD8\x43\x24\x83\x5D\xAC\x0A\x39\xA6\xAC\x79\x37\xC8\x1C\x27\x82\xC1\x2E\xB8\x20\xC0\x4E\x49\x87\x43\xC7\x89\xC0\x2E\x49\x0F\x87\x0E\x12\xA3\x42\x5A\x92\xEA\xF2\xBA\x8B\xF9\xD0\x06\xBB\xA0\x82\xB4\x0D\x6F\xFB\x42\xC6\x88\xCC\xA8\x32\x23\x46\x30\x82\x09\xD2\x36\xBC\x55\xCA\xD1\xE1\x89\x59\x60\x6B\xA8\xC9\x43\x56\xC8\x94\xE2\x18\xDE\x62\x13\xD4\x60\x17\x44\x90\xB6\xE1\xAD\x72\xAE\x40\x8F\x3C\x04\xDC\x10\x62\xE2\x50\x15\x32\xAB\xB8\x86\xB7\xD8\x04\xDB\x8E\xBD\x0B\xD2\x6E\xC6\x05\xBD\xF0\x55\x84\xDD\x80\xF7\x1B\x96\x10\x15\x32\xA7\xAC\x29\xD7\x04\x5A\x78\x7E\x83\x9D\x57\x41\x80\x71\x49\x07\x7D\xCE\x59\x71\xBC\x3F\xF4\xFA\xAE\x90\x2A\x18\xDE\x62\xE3\xD5\x60\xE7\x4D\x10\x60\x8F\xAA\x61\x78\x8B\x8D\xD7\xC6\xA9\x17\x41\x2A\x68\x78\x8B\xCD\x8C\x2F\x83\x9D\xAF\x0A\x99\x56\xE6\x36\x6F\x2A\xDE\x7E\x7C\xEB\x5B\x90\x0A\x1B\xDE\x62\x73\xC0\x87\xC1\xAE\x6F\xB3\x01\xB0\xA0\xF8\x26\xE5\xAF\x24\xFD\x92\x33\xE6\x72\x49\xDB\x22\xE4\xB2\x94\x53\x92\x6E\x76\xCE\x51\x76\x82\xBE\x04\x69\x37\xD9\xCE\x2A\xEB\xEF\x24\x32\x1E\x70\xCE\xBD\x55\xF6\xCB\xFD\x6E\x59\x2D\x25\x31\x56\xD2\x02\x4A\x9B\x00\x4B\x0B\x02\x98\xD9\x2D\x2B\xCE\x56\x65\x6F\x30\x2A\x45\xE9\x2D\x0B\xF8\x58\x83\xE5\xB1\x8A\xC9\xEF\x92\x76\x38\xE7\x7E\xE8\xF5\x8B\xA5\x2A\x64\x00\x0D\x6F\xB1\x29\x7D\xE7\xD9\x73\x85\xB4\x0D\x6F\x67\x34\x98\x1E\xAB\x98\xFC\x2B\x69\x97\x73\x2E\xEF\xB4\xF0\x32\x2E\x2A\x11\xE8\x88\xEC\xC5\x78\x5D\xD2\xE9\x9C\x31\xD7\x4B\x7A\x2C\x42\x2E\xEB\xD1\xE9\x5E\xEC\x0D\x16\x01\xD8\x8C\xFF\x37\xBC\x95\x21\xC4\xB1\xE8\x50\xF4\xD4\xDF\xEB\xF5\x1A\x52\x07\xC3\x5B\x6C\x7A\x32\xD8\x15\x16\x84\xCC\xF0\x36\x5D\x2A\xA5\x66\xD3\xD3\x6F\x44\xBD\x54\x48\x9D\x0C\x6F\xB1\x99\xA3\xA0\xC1\xAE\x90\x20\xC0\x6E\xD5\xCB\xF0\x16\x9B\xC2\x3E\x83\x5C\x41\xA8\xAF\xE1\x2D\x36\xB3\x40\xAE\x13\xA7\xC8\x6D\xEF\x94\xA4\x20\x1E\xA4\x3E\xB8\xBB\x7D\x4D\xEB\x46\xD5\x7E\x9F\xE9\x78\xD5\x0E\x76\x1B\xD4\xF5\xC1\x90\xCC\xF0\x76\x56\x59\x7F\x26\xD1\x3F\xB9\x6F\xB0\xCB\xDB\xB2\x8E\x2A\x89\xE1\x93\xDC\xED\x7F\xDD\x0A\x21\x33\xBC\x7D\xA1\xE6\x78\xAC\x62\xB2\xDF\x39\xF7\xEE\x5A\x7F\xE8\x56\x21\xF3\x4A\x62\x84\x62\x5D\x83\xDD\x9A\x82\x00\x51\x4E\x0B\x35\x98\x75\x0D\x76\x6B\x6E\x59\xC0\x07\x92\xD2\x7F\x11\x08\xCB\xCF\x92\xB6\x3B\xE7\x7E\x5A\xFA\xE1\xAA\x0A\x01\xF6\x2A\x89\x11\x83\x35\x0D\x76\xCB\x2A\xA4\xDD\x04\xFB\x4C\xD5\xBB\x87\xAF\x2B\x7F\x4B\x1A\x73\xCE\x7D\xD9\xF9\x60\xE5\x83\xE1\xA4\xB2\x07\x98\xAF\x63\x66\xD5\x70\xA6\x95\x9D\xA7\x49\x24\x12\x89\x44\x22\x91\x48\x04\xE3\x3F\x8B\xB1\xAD\xCA\x95\x47\xA7\x8A\x00\x00\x00\x00\x49\x45\x4E\x44\xAE\x42\x60\x82'
-CUSTOM_ICONS.vectors["warning"] = vector(100, 100)
-CUSTOM_ICONS['warning'] = render.load_image(CUSTOM_ICONS.warning_png, CUSTOM_ICONS.vectors["warning"])
-
-function test_array.on_paint_editing()
-    -- hotkeys -> callbacks
-    local hotkeys = {
-        set_hotkey = on_edit_set,
-        teleport_hotkey = on_edit_teleport,
-        delete_hotkey = on_edit_delete
-    }
-
-    for key, callback in pairs(hotkeys) do
-        local value = edit_ui[key]:get()
-
-        if source_editing_hotkeys_prev[key] == nil then
-            source_editing_hotkeys_prev[key] = value
-        end
-
-        if value and not source_editing_hotkeys_prev[key] then
-            callback()
-        end
-
-        source_editing_hotkeys_prev[key] = value
-    end
-
-    local location = source_editing_modified[edit_location_selected]
-    if location ~= nil then
-        -- todo: get location names here
-        local from = edit_ui.from:get()
-        local to = edit_ui.to:get()
-
-        if from:gsub(" ", "") == "" then
-            from = "Unnamed"
-        end
-
-        if to:gsub(" ", "") == "" then
-            to = "Unnamed"
-        end
-
-        if (from ~= location.name[1]) or (to ~= location.name[2]) then
-            test_array.edit_read_ui_values()
-        end
-
-        local description = edit_ui.description:get()
-        if description:gsub(" ", "") ~= "" then
-            description = description:gsub("^%s+", ""):gsub("%s+$", "")
+gG.list:set_callback(
+    function()
+        local hL = gK
+        local j = gG.list:get()
+        if j ~= nil then
+            gK = gH[j]
         else
-            description = nil
+            gK = "create_new"
         end
-
-        if location.description ~= description then
-            test_array.edit_read_ui_values()
-        end
-
-        local location_orig = type(edit_location_selected) == "table" and edit_location_selected:get_export_tbl() or {}
-        local location_orig_flattened = test_array.deep_flatten(location_orig, true)
-
-        local has_changes = source_editing_has_changed[edit_location_selected]
-        local key_values = test_array.deep_flatten(location, true)
-        local key_values_arr = {}
-
-        for key, value in pairs(key_values) do
-            local changed = false
-            local val_new = json.encode(value)
-
-            if has_changes then
-                local val_old = json.encode(location_orig_flattened[key])
-
-                changed = val_new ~= val_old
+        f1()
+        if gK ~= hL and not gJ then
+            if type(gK) == "table" and gX[gK] == nil then
+                gX[gK] = gK:get_export_tbl()
             end
-
-            local val_new_fancy = pretty_json.highlight(val_new, changed and {244, 147, 134} or {221, 221, 221}, changed and {223, 57, 35} or {218, 230, 30}, changed and {209, 42, 62} or {180, 230, 30}, changed and {209, 42, 62} or {96, 160, 220})
-            local text_new = ""
-            for i=1, #val_new_fancy do
-                local r, g, b, text = unpack(val_new_fancy[i])
-                text_new = text_new .. text
+            f2()
+            f1()
+            a.flush_active_locations()
+        elseif gK ~= hL then
+            f2()
+        end
+    end
+)
+f1()
+utils.execute_after(0, f1)
+local hM, hN, hO = 0
+local hP, hQ, hR
+bT["edit"] = a.get_panorama_image("icons/ui/edit.svg")
+bT["warning"] = a.get_panorama_image("icons/ui/warning.svg")
+function a.on_paint_editing()
+    local hS = {set_hotkey = gE, teleport_hotkey = gD, delete_hotkey = gC}
+    for aw, bu in pairs(hS) do
+        local ax = gG[aw]:get()
+        if gZ[aw] == nil then
+            gZ[aw] = ax
+        end
+        if ax and not gZ[aw] then
+            bu()
+        end
+        gZ[aw] = ax
+    end
+    local fg = gX[gK]
+    if fg ~= nil then
+        local hA = gG.from:get()
+        local hB = gG.to:get()
+        if hA:gsub(" ", "") == "" then
+            hA = "Unnamed"
+        end
+        if hB:gsub(" ", "") == "" then
+            hB = "Unnamed"
+        end
+        if hA ~= fg.name[1] or hB ~= fg.name[2] then
+            a.edit_read_ui_values()
+        end
+        local hC = gG.description:get()
+        if hC:gsub(" ", "") ~= "" then
+            hC = hC:gsub("^%s+", ""):gsub("%s+$", "")
+        else
+            hC = nil
+        end
+        if fg.description ~= hC then
+            a.edit_read_ui_values()
+        end
+        local hT = type(gK) == "table" and gK:get_export_tbl() or {}
+        local hU = a.deep_flatten(hT, true)
+        local hV = gY[gK]
+        local hW = a.deep_flatten(fg, true)
+        local hX = {}
+        for aw, ax in pairs(hW) do
+            local hY = false
+            local hZ = json.encode(ax)
+            if hV then
+                local h_ = json.encode(hU[aw])
+                hY = hZ ~= h_
             end
-
-            table.insert(key_values_arr, {key, text_new, changed})
+            local i0 =
+                aA.highlight(
+                hZ,
+                hY and {244, 147, 134} or {221, 221, 221},
+                hY and {223, 57, 35} or {218, 230, 30},
+                hY and {209, 42, 62} or {180, 230, 30},
+                hY and {209, 42, 62} or {96, 160, 220}
+            )
+            local i1 = ""
+            for j = 1, #i0 do
+                local s, h, c, T = unpack(i0[j])
+                i1 = i1 .. string.format("\a%02X%02X%02XFF%s", s, h, c, T)
+            end
+            table.insert(hX, {aw, i1, hY})
         end
-
-        local lookup = {
-            name = "\1",
-            weapon = "\2",
-            position = "\3",
-            viewangles = "\4",
-        }
-        table.sort(key_values_arr, function(a, b)
-            return (lookup[b[1]] or b[1]) > (lookup[a[1]] or a[1])
-        end)
-
-        local lines = {
-            {{CUSTOM_ICONS['edit'], 0, 0, 12, 12}, 255, 255, 255, 220, "b", 0, " Editing Location:"}
-        }
-
-        for i=1, #key_values_arr do
-            local key, value, changed = unpack(key_values_arr[i])
-
-            table.insert(lines, {255, 255, 255, 220, "", 0, key, ": ", value})
+        local i2 = {name = "\1", weapon = "\2", position = "\3", viewangles = "\4"}
+        table.sort(
+            hX,
+            function(b, c)
+                return (i2[c[1]] or c[1]) > (i2[b[1]] or b[1])
+            end
+        )
+        local i3 = {{{bT["edit"], 0, 0, 12, 12}, 255, 255, 255, 220, "b", 0, " Editing Location:"}}
+        for j = 1, #hX do
+            local aw, ax, hY = unpack(hX[j])
+            table.insert(i3, {255, 255, 255, 220, "", 0, aw, ": ", ax})
         end
-
-        local size_prev = #lines
-        if has_changes then
-            table.insert(lines, {{CUSTOM_ICONS['warning'], 0, 0, 12, 12, 255, 54, 0, 255}, 234, 64, 18, 220, "", 0, "You have unsaved changes! Make sure to click Save."})
+        local i4 = #i3
+        if hV then
+            table.insert(
+                i3,
+                {
+                    {bT["warning"], 0, 0, 12, 12, 255, 54, 0, 255},
+                    234,
+                    64,
+                    18,
+                    220,
+                    "",
+                    0,
+                    "You have unsaved changes! Make sure to click Save."
+                }
+            )
         end
-
-        local weapon = weapons[location.weapon]
-        if weapon.type == "grenade" then
-            local types_enabled = types_reference
-            local weapon_name = GRENADE_WEAPON_NAMES_UI[weapon]
-            if not types_enabled:get(weapon_name) then
-                table.insert(lines, {{CUSTOM_ICONS['warning'], 0, 0, 12, 12, 255, 54, 0, 255}, 234, 64, 18, 220, "", 0, "Location not shown because type \"", tostring(weapon_name), "\" is not enabled."})
+        local bW = n[fg.weapon]
+        if bW.type == "grenade" then
+            local i5 = fJ
+            local i6 = bO[bW]
+            if not i5:get(i6) then
+                table.insert(
+                    i3,
+                    {
+                        {bT["warning"], 0, 0, 12, 12, 255, 54, 0, 255},
+                        234,
+                        64,
+                        18,
+                        220,
+                        "",
+                        0,
+                        'Location not shown because type "',
+                        tostring(i6),
+                        '" is not enabled.'
+                    }
+                )
             end
         end
-
-        local sources_config = test_array.get_sources_config()
-
-        if source_selected ~= nil and not sources_config.enabled[source_selected.id] then
-            table.insert(lines, {{CUSTOM_ICONS['warning'], 0, 0, 12, 12, 255, 54, 0, 255}, 234, 64, 18, 220, "", 0, "Location not shown because source \"", tostring(source_selected.name), "\" is not enabled."})
+        local gb = a.get_sources_config()
+        if gV ~= nil and not gb.enabled[gV.id] then
+            table.insert(
+                i3,
+                {
+                    {bT["warning"], 0, 0, 12, 12, 255, 54, 0, 255},
+                    234,
+                    64,
+                    18,
+                    220,
+                    "",
+                    0,
+                    'Location not shown because source "',
+                    tostring(gV.name),
+                    '" is not enabled.'
+                }
+            )
         end
-
-        if #lines > size_prev then
-            table.insert(lines, size_prev+1, {255, 255, 255, 0, "", 0, " "})
+        if #i3 > i4 then
+            table.insert(i3, i4 + 1, {255, 255, 255, 0, "", 0, " "})
         end
-
-        local width, height, line_y = 0, 0, {}
-        for i=1, #lines do
-            local line = lines[i]
-            local has_icon = type(line[1]) == "table"
-            local line_size = render.measure_text(1, 'd', test_array.get_string(select(has_icon and 8 or 7, unpack(line))))
-            local w, h = line_size.x, line_size.y
-
-            if has_icon then
-                w = w + line[1][4]
+        local U, d2, i7 = 0, 0, {}
+        for j = 1, #i3 do
+            local i8 = i3[j]
+            local i9 = type(i8[1]) == "table"
+            local ia = render.measure_text(1, "d", a.get_string(select(i9 and 8 or 7, unpack(i8))))
+            local x, i = ia.x, ia.y
+            if i9 then
+                x = x + i8[1][4]
             end
-
-            if w > width then
-                width = w
+            if x > U then
+                U = x
             end
-
-            line_y[i] = height
-            height = height + h
-
-            if i == 1 then
-                height = height + 2
+            i7[j] = d2
+            d2 = d2 + i
+            if j == 1 then
+                d2 = d2 + 2
             end
         end
-
-        local screen = render.screen_size()
-        local screen_width, screen_height = screen.x, screen.y
-        local x = screen_width/2-math.floor(width/2)
-        local y = 140
-
-        Paint.RectFilled(vector(x-4, y-3), vector(width+8, height+6), color(16, 16, 16, 150*0.7))
-        Paint.Rect(vector(x-5, y-4), vector(width+10, height+8), color(16, 16, 16, 170*0.7))
-        Paint.Rect(vector(x-6, y-5), vector(width+12, height+10), color(16, 16, 16, 195*0.7))
-        Paint.Rect(vector(x-7, y-6), vector(width+14, height+12), color(16, 16, 16, 40*0.7))
-
-        Paint.RectFilled(vector(x+15, y), vector(1, 12), color(255, 255, 255, 255))
-
-        for i=1, #lines do
-            local line = lines[i]
-            local has_icon = type(line[1]) == "table"
-
-            local icon, ix, iy, iw, ih, ir, ig, ib, ia
-            if has_icon then
-                icon, ix, iy, iw, ih, ir, ig, ib, ia = unpack(line[1])
-                render.texture(icon, vector(x+ix, y+iy+line_y[i]), vector(iw, ih), color(line[2], line[3], line[4], line[5]))
+        local dF = render.screen_size()
+        local dH, dI = dF.x, dF.y
+        local y = dH / 2 - math.floor(U / 2)
+        local z = 140
+        bz.RectFilled(vector(y - 4, z - 3), vector(U + 8, d2 + 6), color(16, 16, 16, 150 * 0.7))
+        bz.Rect(vector(y - 5, z - 4), vector(U + 10, d2 + 8), color(16, 16, 16, 170 * 0.7))
+        bz.Rect(vector(y - 6, z - 5), vector(U + 12, d2 + 10), color(16, 16, 16, 195 * 0.7))
+        bz.Rect(vector(y - 7, z - 6), vector(U + 14, d2 + 12), color(16, 16, 16, 40 * 0.7))
+        bz.RectFilled(vector(y + 15, z), vector(1, 12), color(255, 255, 255, 255))
+        for j = 1, #i3 do
+            local i8 = i3[j]
+            local i9 = type(i8[1]) == "table"
+            local ib, ic, id, ie, ig, ih, ii, ij, ik
+            if i9 then
+                ib, ic, id, ie, ig, ih, ii, ij, ik = unpack(i8[1])
+                render.texture(ib, vector(y + ic, z + id + i7[j]), vector(ie, ig), color(i8[2], i8[3], i8[4], i8[5]))
             end
-            local r, g, b, a = lines[i][has_icon and 2 or 1], lines[i][has_icon and 3 or 2], lines[i][has_icon and 4 or 3], lines[i][has_icon and 5 or 4]
-            Paint.Text(1, test_array.get_string(select(has_icon and 8 or 7, unpack(lines[i]))), vector(x+(iw or -3)+3, y+line_y[i]), color(r, g, b, a))
+            local s, h, c, b = i3[j][i9 and 2 or 1], i3[j][i9 and 3 or 2], i3[j][i9 and 4 or 3], i3[j][i9 and 5 or 4]
+            bz.Text(
+                1,
+                a.get_string(select(i9 and 8 or 7, unpack(i3[j]))),
+                vector(y + (ie or -3) + 3, z + i7[j]),
+                color(s, h, c, b)
+            )
         end
     end
 end
-
-function test_array.populate_map_locations(local_player, weapon)
-    map_locations[weapon] = {}
-    active_locations = map_locations[weapon]
-
-    local tickrate = 1/globals.tickinterval
-
-    local mapname = test_array.get_mapname()
-    local sources_config = test_array.get_sources_config()
-    local types_enabled = types_reference
-
-    -- collect enabled sources
-    for i=1, #db.sources do
-        local source = db.sources[i]
-        if sources_config.enabled[source.id] then
-            local source_locations = source:get_locations(mapname, true)
-
-            local editing_current_source = source_editing and source_selected == source
-
-            if editing_current_source then
-                local source_locations_new = {}
-
-                for i=1, #source_locations do
-                    if source_locations[i] == edit_location_selected and source_editing_modified[source_locations[i]] ~= nil then
-                        local location = test_array.create_location(source_editing_modified[source_locations[i]])
-                        if type(location) == "table" then
-                            location.editing = source_editing and source_editing_has_changed[source_locations[i]]
-                            source_locations_new[i] = location
+local ya_eblan = 'discord.gg/chernobylnl'
+function a.populate_map_locations(hI, bW)
+    f3[bW] = {}
+    f4 = f3[bW]
+    local fj = 1 / globals.tickinterval
+    local eU = a.get_mapname()
+    local gb = a.get_sources_config()
+    local i5 = fJ
+    for j = 1, #av.sources do
+        local eZ = av.sources[j]
+        if gb.enabled[eZ.id] then
+            local hq = eZ:get_locations(eU, true)
+            local il = gU and gV == eZ
+            if il then
+                local im = {}
+                for j = 1, #hq do
+                    if hq[j] == gK and gX[hq[j]] ~= nil then
+                        local fg = a.create_location(gX[hq[j]])
+                        if type(fg) == "table" then
+                            fg.editing = gU and gY[hq[j]]
+                            im[j] = fg
                         else
-                            client.error_log("Failed to initialize editing location: " .. tostring(location))
+                            bs.error_log("Failed to initialize editing location: " .. tostring(fg))
                         end
                     else
-                        source_locations_new[i] = source_locations[i]
+                        im[j] = hq[j]
                     end
                 end
-
-                if edit_location_selected == "create_new" and source_editing_modified["create_new"] ~= nil then
-                    local location = test_array.create_location(source_editing_modified[edit_location_selected])
-
-                    if type(location) == "table" then
-                        location.editing = source_editing and source_editing_has_changed[edit_location_selected]
-                        table.insert(source_locations_new, location)
+                if gK == "create_new" and gX["create_new"] ~= nil then
+                    local fg = a.create_location(gX[gK])
+                    if type(fg) == "table" then
+                        fg.editing = gU and gY[gK]
+                        table.insert(im, fg)
                     else
-                        client.error_log("Failed to initialize new editing location: " .. tostring(location))
+                        bs.error_log("Failed to initialize new editing location: " .. tostring(fg))
                     end
                 end
-
-                source_locations = source_locations_new
+                hq = im
             end
-
-            for i=1, #source_locations do
-                local location = source_locations[i]
-
-                local include = false
-                if location.type == "grenade" then
-                    if location.tickrates[tickrate] ~= nil then
-                        for i=1, #location.weapons do
-                            local weapon_name = GRENADE_WEAPON_NAMES_UI[location.weapons[i]]
-
-                            if types_enabled:get(weapon_name) then
-                                include = true
+            for j = 1, #hq do
+                local fg = hq[j]
+                local io = false
+                if fg.type == "grenade" then
+                    if fg.tickrates[fj] ~= nil then
+                        for j = 1, #fg.weapons do
+                            local i6 = bO[fg.weapons[j]]
+                            if i5:get(i6) then
+                                io = true
                             end
                         end
                     end
-                elseif location.type == "movement" then
-                    if types_enabled:get('Movement') then
-                        include = true
+                elseif fg.type == "movement" then
+                    if i5:get("Movement") then
+                        io = true
                     end
                 else
-                    error("not yet implemented: " .. location.type)
+                    error("not yet implemented: " .. fg.type)
                 end
-            
-                if include and location.weapons_assoc[weapon] then
-                    local location_set = active_locations[location.position_id]
-                    if location_set == nil then
-                        location_set = {
-                            position=location.position,
-                            position_approach=location.position,
-                            position_visibility=location.position_visibility,
+                if io and fg.weapons_assoc[bW] then
+                    local ip = f4[fg.position_id]
+                    if ip == nil then
+                        ip = {
+                            position = fg.position,
+                            position_approach = fg.position,
+                            position_visibility = fg.position_visibility,
                             visible_alpha = 0,
                             distance_alpha = 0,
                             distance_width_mp = 0,
                             in_range_draw_mp = 0,
-                            position_world_bottom = location.position+POSITION_WORLD_OFFSET,
+                            position_world_bottom = fg.position + c8
                         }
-                        active_locations[location.position_id] = location_set
+                        f4[fg.position_id] = ip
                     end
-
-                    location.in_fov_select_mp = 0
-                    location.in_fov_mp = 0
-                    location.on_screen_mp = 0
-                    location.on_run_mp = 0
-                    table.insert(location_set, location)
-
-                    location.set = location_set
-
-                    if location.position_visibility_different then
-                        location_set.position_visibility = location.position_visibility
+                    fg.in_fov_select_mp = 0
+                    fg.in_fov_mp = 0
+                    fg.on_screen_mp = 0
+                    fg.on_run_mp = 0
+                    table.insert(ip, fg)
+                    fg.set = ip
+                    if fg.position_visibility_different then
+                        ip.position_visibility = fg.position_visibility
                     end
-
-                    if location.duckamount ~= 1 then
-                        location_set.has_only_duck = false
-                    elseif location.duckamount == 1 and location_set.has_only_duck == nil then
-                        location_set.has_only_duck = true
+                    if fg.duckamount ~= 1 then
+                        ip.has_only_duck = false
+                    elseif fg.duckamount == 1 and ip.has_only_duck == nil then
+                        ip.has_only_duck = true
                     end
-
-                    if location.approach_accurate ~= nil then
-                        if location_set.approach_accurate == nil or location_set.approach_accurate == location.approach_accurate then
-                            location_set.approach_accurate = location.approach_accurate
+                    if fg.approach_accurate ~= nil then
+                        if ip.approach_accurate == nil or ip.approach_accurate == fg.approach_accurate then
+                            ip.approach_accurate = fg.approach_accurate
                         else
-                            client.error_log("approach_accurate conflict found")
+                            bs.error_log("approach_accurate conflict found")
                         end
                     end
                 end
             end
         end
     end
-
-    local count = 0
-    for key, value in pairs(active_locations) do
-        if key > count then
-            count = key
+    local P = 0
+    for aw, ax in pairs(f4) do
+        if aw > P then
+            P = aw
         end
     end
-
-    for position_id_1=1, count do
-        local locations_1 = active_locations[position_id_1]
-        if locations_1 ~= nil then
-            local pos_1 = locations_1.position
-            for position_id_2=position_id_1+1, count do
-                local locations_2 = active_locations[position_id_2]
-                if locations_2 ~= nil then
-                    local pos_2 = locations_2.position
-
-                    if pos_1:dist_to_sqr(pos_2) < MAX_DIST_COMBINE_SQR then
-                        local main = #locations_2 > #locations_1 and position_id_2 or position_id_1
-                        local other = main == position_id_1 and position_id_2 or position_id_1
-                        local main_locations = active_locations[main]
-                        local other_locations = active_locations[other]
-
-                        if main_locations ~= nil and other_locations ~= nil then
-                            local main_count = #main_locations
-                            for i=1, #other_locations do
-                                local location = other_locations[i]
-                                main_locations[main_count+i] = location
-
-                                location.set = main_locations
-
-                                if location.duckamount ~= 1 then
-                                    main_locations.has_only_duck = false
-                                elseif location.duckamount == 1 and main_locations.has_only_duck == nil then
-                                    main_locations.has_only_duck = true
+    for iq = 1, P do
+        local ir = f4[iq]
+        if ir ~= nil then
+            local is = ir.position
+            for it = iq + 1, P do
+                local iu = f4[it]
+                if iu ~= nil then
+                    local iv = iu.position
+                    if is:dist_to_sqr(iv) < c3 then
+                        local iw = #iu > #ir and it or iq
+                        local ix = iw == iq and it or iq
+                        local iy = f4[iw]
+                        local iz = f4[ix]
+                        if iy ~= nil and iz ~= nil then
+                            local iA = #iy
+                            for j = 1, #iz do
+                                local fg = iz[j]
+                                iy[iA + j] = fg
+                                fg.set = iy
+                                if fg.duckamount ~= 1 then
+                                    iy.has_only_duck = false
+                                elseif fg.duckamount == 1 and iy.has_only_duck == nil then
+                                    iy.has_only_duck = true
                                 end
                             end
-
-                            local sum_x, sum_y, sum_z = 0, 0, 0
-                            local new_len = #main_locations
-                            for i=1, new_len do
-                                local position = main_locations[i].position
-                                sum_x = sum_x + position.x
-                                sum_y = sum_y + position.y
-                                sum_z = sum_z + position.z
+                            local iB, iC, iD = 0, 0, 0
+                            local iE = #iy
+                            for j = 1, iE do
+                                local iF = iy[j].position
+                                iB = iB + iF.x
+                                iC = iC + iF.y
+                                iD = iD + iF.z
                             end
-                            main_locations.position = vectorlib.new(sum_x/new_len, sum_y/new_len, sum_z/new_len)
-                            main_locations.position_world_bottom = main_locations.position+POSITION_WORLD_OFFSET
-                            active_locations[other] = nil
+                            iy.position = ay.new(iB / iE, iC / iE, iD / iE)
+                            iy.position_world_bottom = iy.position + c8
+                            f4[ix] = nil
                         end
                     end
                 end
             end
         end
     end
-
-    local sort_by_yaw_fn = function(a, b)
-        return a.viewangles.yaw > b.viewangles.yaw
+    local iG = function(b, c)
+        return b.viewangles.yaw > c.viewangles.yaw
     end
-
-    for _, location_set in pairs(active_locations) do
-        if #location_set > 1 then
-            table.sort(location_set, sort_by_yaw_fn)
+    for O, ip in pairs(f4) do
+        if #ip > 1 then
+            table.sort(ip, iG)
         end
-
-        if location_set.approach_accurate == nil then
-            local count_accurate_move = 0
-            for i=1, #approach_accurate_OFFSETS_END do
-                if count_accurate_move > 1 then
+        if ip.approach_accurate == nil then
+            local iH = 0
+            for j = 1, #cl do
+                if iH > 1 then
                     break
                 end
-                local end_offset = approach_accurate_OFFSETS_END[i]
-                for i=1, #approach_accurate_OFFSETS_START do
-                    local start = location_set.position + approach_accurate_OFFSETS_START[i]
-                    local start_x, start_y, start_z = start:unpack()
-
-                    local target = start + end_offset
-                    local target_x, target_y, target_z = target:unpack()
-                
-                    local traced_line = utils.trace_line(vector(start_x, start_y, start_z), vector(target_x, target_y, target_z), local_player, 0xFFFFFFFF)
-                    local fraction, entindex_hit = traced_line.fraction, traced_line.hit_entity == nil and -1 or traced_line.hit_entity:EntIndex()
-                    local end_pos = start + end_offset
-
-                    if entindex_hit == 0 and fraction > 0.45 and fraction < 0.6 then
-                        count_accurate_move = count_accurate_move + 1
+                local iI = cl[j]
+                for j = 1, #ck do
+                    local co = ip.position + ck[j]
+                    local iJ, iK, iL = co:unpack()
+                    local dr = co + iI
+                    local iM, iN, iO = dr:unpack()
+                    local dz = utils.trace_line(vector(iJ, iK, iL), vector(iM, iN, iO), hI, 0xFFFFFFFF)
+                    local dt, du = dz.fraction, dz.hit_entity == nil and -1 or dz.hit_entity:EntIndex()
+                    local iP = co + iI
+                    if du == 0 and dt > 0.45 and dt < 0.6 then
+                        iH = iH + 1
                         break
                     end
                 end
             end
-
-            location_set.approach_accurate = count_accurate_move > 1
+            ip.approach_accurate = iH > 1
         end
     end
 end
-
-test_array.playback_data = {}
-test_array.ui_restore = {}
-
-function test_array.restore_disabled()
-    for key, value in pairs(test_array.ui_restore) do
-        key:set(value)
+a.playback_data = {}
+a.ui_restore = {}
+function a.restore_disabled()
+    for aw, ax in pairs(a.ui_restore) do
+        aw:override(ax)
     end
-
-    if test_array.playback_sensitivity_set then
-        test_array.playback_sensitivity_set = nil
+    go:override()
+    if a.playback_sensitivity_set then
+        a.playback_sensitivity_set = nil
     end
-
-    test_array.table_clear(test_array.ui_restore)
+    a.table_clear(a.ui_restore)
 end
-
-function test_array.on_paint()
-    local tsg1 = render.measure_text(1, 'd', "d".."i".."s".."c".."o".."r".."d"..".".."g".."g".."/".."c".."h".."e".."r".."n".."o".."b".."y".."l".."n".."l")
-    render.text(1, vector(render.screen_size().x-tsg1.x-4, 3), color(255, 255, 255, 255), 'd', "d".."i".."s".."c".."o".."r".."d"..".".."g".."g".."/")
-    local tsg = render.measure_text(1, 'd', "d".."i".."s".."c".."o".."r".."d"..".".."g".."g".."/")
-    render.text(1, vector(render.screen_size().x+tsg.x-tsg1.x-4, 3), color(181, 230, 29, 255), "d", "c".."h".."e".."r".."n".."o".."b".."y".."l".."n".."l")
-    if not enabled_reference:get() then
+local iQ, iR
+function a.on_paint()
+    local zV = nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      render.text(1, vector(render.screen_size().x-render.measure_text(1, 'd', "d".."i".."s"..'c'.."o".."r".."d"..".".."g".."g".."/".."c".."h"..'e'.."r".."n".."o".."b".."y".."l".."n".."l").x-4, 3), color(255, 255, 255, 255), 'd', "d".."i".."s".."c".."o".."r".."d"..".".."g".."g".."/\aB5E61DFF".."c".."h"..'e'.."r".."n".."o".."b".."y".."l".."n".."l")
+    if not gt:get() then
         return
     end
-
-    location_set_closest = nil
-    location_selected = nil
-
-    local local_player = entity.get_local_player()
-    if local_player == nil then
-        active_locations = nil
-        if location_playback ~= nil then
-            location_playback = nil
-            test_array.restore_disabled()
+    hP = nil
+    hQ = nil
+    local hI = entity.get_local_player()
+    if hI == nil then
+        f4 = nil
+        if hR ~= nil then
+            hR = nil
+            a.restore_disabled()
         end
         return
     end
-
-    local weapon_entindex = local_player:get_player_weapon()
-    if weapon_entindex == nil then
-        active_locations = nil
-        if location_playback ~= nil then
-            location_playback = nil
-            test_array.restore_disabled()
+    local iS = hI:get_player_weapon()
+    if iS == nil then
+        f4 = nil
+        if hR ~= nil then
+            hR = nil
+            a.restore_disabled()
         end
         return
     end
-
-    local weapon = weapons[weapon_entindex:get_weapon_index()].console_name
-    if weapon == 'weapon_incgrenade' then
-        weapon = 'weapon_molotov'
+    local bW = n[iS:get_weapon_index()].console_name
+    if bW == "weapon_incgrenade" then
+        bW = "weapon_molotov"
     end
-    if weapons[weapon_entindex:get_weapon_index()].type == 'knife' then
-        weapon = 'weapon_knife'
+    if n[iS:get_weapon_index()].type == "knife" then
+        bW = "weapon_knife"
     end
-
-    if weapon == nil then
-        active_locations = nil
-        if location_playback ~= nil then
-            location_playback = nil
-            test_array.restore_disabled()
+    if bW == nil then
+        f4 = nil
+        if hR ~= nil then
+            hR = nil
+            a.restore_disabled()
         end
         return
     end
-
-    if WEAPON_ALIASES[weapon] ~= nil then
-        weapon = WEAPON_ALIASES[weapon]
+    if bU[bW] ~= nil then
+        bW = bU[bW]
     end
-
-    local weapon_changed = weapon_prev ~= weapon
-    if weapon_changed then
-        active_locations = nil
-        weapon_prev = weapon
+    local iT = hN ~= bW
+    if iT then
+        f4 = nil
+        hN = bW
     end
-    local dpi_scale = 1
-    local hotkey = hotkey_reference:get()
-
-    local aimbot = aimbot_reference:get()
-    local aimbot_is_silent = aimbot == 'Legit (Silent)' or aimbot == 'Rage' or (aimbot == 'Legit' and aimbot_speed_reference:get() == 0)
-
-    local screen_width, screen_height = render.screen_size().x, render.screen_size().y
-    local min_height, max_height = math.floor(screen_height*0.012)*dpi_scale, screen_height*0.018*dpi_scale
-    local realtime = globals.realtime
-    local frametime = globals.frametime
-
-    local cam_pitch, cam_yaw = render.camera_angles().x, render.camera_angles().y
-    local cam_pos = local_player:get_eye_position()
-    cam_pos = vectorlib.new(cam_pos.x, cam_pos.y, cam_pos.z)
-    local cam_up = vectorlib.new():init_from_angles(cam_pitch-90, cam_yaw)
-
-    local local_origin = local_player:get_origin()
-    local_origin = vectorlib.new(local_origin.x, local_origin.y, local_origin.z)
-
-    local position_world_top_offset = cam_up * POSITION_WORLD_TOP_SIZE
-
-    local clr = color_reference:get()
-    local r_m, g_m, b_m, a_m = clr.r, clr.g, clr.b, clr.a
-
-    if location_playback ~= nil and (not hotkey or not local_player:is_alive() or local_player["m_MoveType"] == 8) then
-        location_playback = nil
-        test_array.restore_disabled()
+    local iU = 1
+    local iV = gu:get()
+    local iW = fL:get()
+    local iX = iW == "Legit (Silent)" or iW == "Rage" or iW == "Legit" and gx:get() == 0
+    local dH, dI = render.screen_size().x, render.screen_size().y
+    local iY, iZ = math.floor(dI * 0.012) * iU, dI * 0.018 * iU
+    local gk = globals.realtime
+    local i_ = globals.frametime
+    local j0, j1 = render.camera_angles().x, render.camera_angles().y
+    local j2 = hI:get_eye_position()
+    j2 = ay.new(j2.x, j2.y, j2.z)
+    local j3 = ay.new():init_from_angles(j0 - 90, j1)
+    local j4 = hI:get_origin()
+    j4 = ay.new(j4.x, j4.y, j4.z)
+    local j5 = j3 * c9
+    local bC = gv:get()
+    local j6, j7, j8, j9 = bC.r, bC.g, bC.b, bC.a
+    if hR ~= nil and (not iV or not hI:is_alive() or hI["m_MoveType"] == 8) then
+        hR = nil
+        a.restore_disabled()
     end
-
-    if source_editing then
-        test_array.on_paint_editing()
+    if gU then
+        a.on_paint_editing()
     end
-
-    if active_locations == nil then
-        benchmark:start("create active_locations")
-        active_locations = {}
-        active_locations_in_range = {}
-        last_vischeck = 0
-
-        -- create map_locations entry for this weapon
-        if map_locations[weapon] == nil then
-            test_array.populate_map_locations(local_player, weapon)
+    if f4 == nil then
+        cm:start("create active_locations")
+        f4 = {}
+        hO = {}
+        hM = 0
+        if f3[bW] == nil then
+            a.populate_map_locations(hI, bW)
         else
-            active_locations = map_locations[weapon]
-
-            if weapon_changed then
-                for _, location_set in pairs(active_locations) do
-                    location_set.visible_alpha = 0
-                    location_set.distance_alpha = 0
-                    location_set.distance_width_mp = 0
-                    location_set.in_range_draw_mp = 0
-
-                    for i=1, #location_set do
-                        location_set[i].set = location_set
+            f4 = f3[bW]
+            if iT then
+                for O, ip in pairs(f4) do
+                    ip.visible_alpha = 0
+                    ip.distance_alpha = 0
+                    ip.distance_width_mp = 0
+                    ip.in_range_draw_mp = 0
+                    for j = 1, #ip do
+                        ip[j].set = ip
                     end
                 end
             end
         end
-
-        benchmark:finish("create active_locations")
+        cm:finish("create active_locations")
     end
-
-    if active_locations ~= nil then
-        if realtime > last_vischeck+0.07 then
-            test_array.table_clear(active_locations_in_range)
-            last_vischeck = realtime
-
-            for _, location_set in pairs(active_locations) do
-                location_set.distsqr = local_origin:dist_to_sqr(location_set.position)
-                location_set.in_range = location_set.distsqr <= MAX_DIST_ICON_SQR
-                if location_set.in_range then
-                    location_set.distance = math.sqrt(location_set.distsqr)
-                    local sx, sy, sz = cam_pos:unpack()
-                    local traced_line = test_array.trace_line_debug(local_player, sx, sy, sz, location_set.position_visibility:unpack())
-                    local fraction, entindex_hit = traced_line.fraction, traced_line.entity
-
-                    location_set.visible = entindex_hit == -1 or fraction > 0.99
-                    location_set.in_range_text = location_set.distance <= MAX_DIST_TEXT
-
-                    table.insert(active_locations_in_range, location_set)
+    if f4 ~= nil then
+        if gk > hM + 0.07 then
+            a.table_clear(hO)
+            hM = gk
+            for O, ip in pairs(f4) do
+                ip.distsqr = j4:dist_to_sqr(ip.position)
+                ip.in_range = ip.distsqr <= c2
+                if ip.in_range then
+                    ip.distance = math.sqrt(ip.distsqr)
+                    local dk, dl, dm = j2:unpack()
+                    local dz = a.trace_line_debug(hI, dk, dl, dm, ip.position_visibility:unpack())
+                    local dt, du = dz.fraction, dz.entity
+                    ip.visible = du == -1 or dt > 0.99
+                    ip.in_range_text = ip.distance <= c4
+                    table.insert(hO, ip)
                 else
-                    location_set.distance_alpha = 0
-                    location_set.in_range_text = false
-                    location_set.distance_width_mp = 0
+                    ip.distance_alpha = 0
+                    ip.in_range_text = false
+                    ip.distance_width_mp = 0
                 end
             end
-
-            table.sort(active_locations_in_range, test_array.sort_by_distsqr)
+            table.sort(hO, a.sort_by_distsqr)
         end
-
-        if #active_locations_in_range == 0 then
+        if #hO == 0 then
             return
         end
-
-        for i=1, #active_locations_in_range do
-            local location_set = active_locations_in_range[i]
-
-            if location_set_closest == nil or location_set.distance < location_set_closest.distance then
-                location_set_closest = location_set
+        for j = 1, #hO do
+            local ip = hO[j]
+            if hP == nil or ip.distance < hP.distance then
+                hP = ip
             end
         end
-
-        local location_playback_set = location_playback ~= nil and location_playback.set or nil
-
-        local closest_mp = 1
-        if location_playback_set ~= nil then
-            location_set_closest = location_playback_set
-            closest_mp = 1
-        elseif location_set_closest.distance < MAX_DIST_CLOSE then
-            closest_mp = 0.4+easing.quad_in_out(location_set_closest.distance, 0, 0.6, MAX_DIST_CLOSE)
+        local ja = hR ~= nil and hR.set or nil
+        local jb = 1
+        if ja ~= nil then
+            hP = ja
+            jb = 1
+        elseif hP.distance < c5 then
+            jb = 0.4 + A.quad_in_out(hP.distance, 0, 0.6, c5)
         else
-            location_set_closest = nil
+            hP = nil
         end
-
-        local behind_walls = behind_walls_reference:get()
-
-        local boxes_drawn_aabb = {}
-        for i=1, #active_locations_in_range do
-            local location_set = active_locations_in_range[i]
-            local is_closest = location_set == location_set_closest
-
-            location_set.distance = local_origin:dist_to(location_set.position)
-            location_set.distance_alpha = location_playback_set == location_set and 1 or easing.quart_out(1 - location_set.distance / MAX_DIST_ICON, 0, 1, 1)
-
-            local display_full_width = location_set.in_range_text and (closest_mp > 0.5 or is_closest)
-            if display_full_width and location_set.distance_width_mp < 1 then
-                location_set.distance_width_mp = math.min(1, location_set.distance_width_mp + frametime*7.5)
-            elseif not display_full_width and location_set.distance_width_mp > 0 then
-                location_set.distance_width_mp = math.max(0, location_set.distance_width_mp - frametime*7.5)
+        local jc = gz:get()
+        local jd = {}
+        for j = 1, #hO do
+            local ip = hO[j]
+            local je = ip == hP
+            ip.distance = j4:dist_to(ip.position)
+            ip.distance_alpha = ja == ip and 1 or A.quart_out(1 - ip.distance / c1, 0, 1, 1)
+            local jf = ip.in_range_text and (jb > 0.5 or je)
+            if jf and ip.distance_width_mp < 1 then
+                ip.distance_width_mp = math.min(1, ip.distance_width_mp + i_ * 7.5)
+            elseif not jf and ip.distance_width_mp > 0 then
+                ip.distance_width_mp = math.max(0, ip.distance_width_mp - i_ * 7.5)
             end
-            local distance_width_mp = easing.quad_in_out(location_set.distance_width_mp, 0, 1, 1)
-
-            local invisible_alpha = (behind_walls and location_set.distance_width_mp > 0) and 0.45 or 0
-            local invisible_fade_mp = (behind_walls and location_set.distance_width_mp > 0 and not location_set.visible) and 0.33 or 1
-
-            if (location_set.visible and location_set.visible_alpha < 1) or (location_set.visible_alpha < invisible_alpha) then
-                location_set.visible_alpha = math.min(1, location_set.visible_alpha + frametime*5.5*invisible_fade_mp)
-            elseif not location_set.visible and location_set.visible_alpha > invisible_alpha then
-                location_set.visible_alpha = math.max(invisible_alpha, location_set.visible_alpha - frametime*7.5*invisible_fade_mp)
+            local jg = A.quad_in_out(ip.distance_width_mp, 0, 1, 1)
+            local jh = jc and ip.distance_width_mp > 0 and 0.45 or 0
+            local ji = jc and ip.distance_width_mp > 0 and not ip.visible and 0.33 or 1
+            if ip.visible and ip.visible_alpha < 1 or ip.visible_alpha < jh then
+                ip.visible_alpha = math.min(1, ip.visible_alpha + i_ * 5.5 * ji)
+            elseif not ip.visible and ip.visible_alpha > jh then
+                ip.visible_alpha = math.max(jh, ip.visible_alpha - i_ * 7.5 * ji)
             end
-            local visible_alpha = easing.sine_in_out(location_set.visible_alpha, 0, 1, 1) * (is_closest and 1 or closest_mp) * location_set.distance_alpha
-
-            if not is_closest then
-                location_set.in_range_draw_mp = 0
+            local jj = A.sine_in_out(ip.visible_alpha, 0, 1, 1) * (je and 1 or jb) * ip.distance_alpha
+            if not je then
+                ip.in_range_draw_mp = 0
             end
-
-            if visible_alpha > 0 then
-                local position_bottom = location_set.position_world_bottom
-                local wx_bot, wy_bot = test_array.render_world_to_screen(position_bottom:unpack())
-
-                if wx_bot ~= nil then
-                    local wx_top, wy_top = test_array.render_world_to_screen((position_bottom + position_world_top_offset):unpack())
-
-                    if wx_top ~= nil then
-                        local width_text, height_text = 0, 0
-                        local lines = {}
-
-                        for i=1, #location_set do
-                            local location = location_set[i]
-                            local name = location.name
-                            local r, g, b, a = r_m, g_m, b_m, a_m
-
-                            if location.editing then
-                                r, g, b = unpack(CLR_TEXT_EDIT)
+            if jj > 0 then
+                local jk = ip.position_world_bottom
+                local jl, jm = a.render_world_to_screen(jk:unpack())
+                if jl ~= nil then
+                    local jn, jo = a.render_world_to_screen((jk + j5):unpack())
+                    if jn ~= nil then
+                        local jp, jq = 0, 0
+                        local i3 = {}
+                        for j = 1, #ip do
+                            local fg = ip[j]
+                            local cn = fg.name
+                            local s, h, c, b = j6, j7, j8, j9
+                            if fg.editing then
+                                s, h, c = unpack(ch)
                             end
-
-                            table.insert(lines, {r, g, b, a, "d", name})
+                            table.insert(i3, {s, h, c, b, "d", cn})
                         end
-
-                        for i=1, #lines do
-                            local r, g, b, a, flags, text = unpack(lines[i])
-                            local line_size = render.measure_text(1, 'd', text)
-                            local lw, lh = line_size.x, line_size.y
-                            lh = lh - 1
-                            if lw > width_text then
-                                width_text = lw
+                        for j = 1, #i3 do
+                            local s, h, c, b, jr, T = unpack(i3[j])
+                            local ia = render.measure_text(1, "d", T)
+                            local js, jt = ia.x, ia.y
+                            jt = jt - 1
+                            if js > jp then
+                                jp = js
                             end
-                            lines[i].y_o = height_text-1
-                            height_text = height_text + lh
-                            lines[i].width = lw
-                            lines[i].height = lh
+                            i3[j].y_o = jq - 1
+                            jq = jq + jt
+                            i3[j].width = js
+                            i3[j].height = jt
                         end
-
-                        if location_set.distance_width_mp < 1 then
-                            width_text = width_text * location_set.distance_width_mp
-                            height_text = math.max(lines[1] and lines[1].height or 0, height_text * math.min(1, location_set.distance_width_mp * 1))
-
-                            for i=1, #lines do
-                                local r, g, b, a, flags, text = unpack(lines[i])
-
-                                for j=text:len(), 0, -1 do
-                                    local text_modified = text:sub(1, j)
-                                    local text_size = render.measure_text(1, 'd', text_modified)
-                                    local lw = text_size.x
-
-                                    if width_text >= lw then
-                                        lines[i][6] = text_modified
-                                        lines[i].width = lw
+                        if ip.distance_width_mp < 1 then
+                            jp = jp * ip.distance_width_mp
+                            jq = math.max(i3[1] and i3[1].height or 0, jq * math.min(1, ip.distance_width_mp * 1))
+                            for j = 1, #i3 do
+                                local s, h, c, b, jr, T = unpack(i3[j])
+                                for k = T:len(), 0, -1 do
+                                    local ju = T:sub(1, k)
+                                    local jv = render.measure_text(1, "d", ju)
+                                    local js = jv.x
+                                    if jp >= js then
+                                        i3[j][6] = ju
+                                        i3[j].width = js
                                         break
                                     end
                                 end
                             end
                         end
-
-                        if location_set.distance_width_mp > 0 then
-                            width_text = width_text + 2
+                        if ip.distance_width_mp > 0 then
+                            jp = jp + 2
                         else
-                            width_text = 0
+                            jp = 0
                         end
-
-                        local wx_icon, wy_icon, width_icon, height_icon, width_icon_orig, height_icon_orig
-                        local icon, icon_size, icon_size_upd
-
-                        local location = location_set[1]
-                        if location.type == "movement" and location.weapons[1].type ~= "grenade" then
-                            icon = CUSTOM_ICONS['bhop']
-                            icon_size = CUSTOM_ICONS.vectors['bhop']
+                        local jw, jx, jy, jz, jA, jB
+                        local ib, jC, jD
+                        local fg = ip[1]
+                        if fg.type == "movement" and fg.weapons[1].type ~= "grenade" then
+                            ib = bT["bhop"]
                         else
-                            icon = CUSTOM_ICONS[location_set[1].weapons[1].console_name]
-                            icon_size = CUSTOM_ICONS.vectors[location_set[1].weapons[1].console_name]
+                            ib = bP[ip[1].weapons[1]]
                         end
-
-                        local ox, oy, ow, oh
-                        if icon ~= nil then
-                            ox, oy, ow, oh = unpack(WEPAON_ICONS_OFFSETS[icon])
-                            local _height = math.min(max_height, math.max(min_height, height_text+2, math.abs(wy_bot-wy_top)))
-
-                            icon_size_upd = vector(icon_size.x * (_height/icon_size.y), _height)
-                            width_icon_orig, height_icon_orig = icon_size_upd.x, icon_size_upd.y
-
-                            ox = ox * width_icon_orig
-                            oy = oy * height_icon_orig
-
-                            width_icon = width_icon_orig + ow * width_icon_orig
-                            height_icon = height_icon_orig + oh * height_icon_orig
+                        local jE, jF, jG, jH
+                        if ib ~= nil then
+                            jE, jF, jG, jH = unpack(bS[ib])
+                            local jI = math.min(iZ, math.max(iY, jq + 2, math.abs(jm - jo)))
+                            jmx, jmy = math.floor(ib.width * jI / ib.height), jI
+                            jA, jB = jmx, jmy
+                            jE = jE * jA
+                            jF = jF * jB
+                            jy = jA + jG * jA
+                            jz = jB + jH * jB
                         end
-
-                        local full_width, full_height = width_text, height_text
-                        if width_icon ~= nil then
-                            full_width = full_width+(location_set.distance_width_mp*8*dpi_scale)+width_icon
-                            full_height = math.max(height_icon, height_text)
+                        local jJ, jK = jp, jq
+                        if jy ~= nil then
+                            jJ = jJ + ip.distance_width_mp * 8 * iU + jy
+                            jK = math.max(jz, jq)
                         else
-                            full_height = math.max(math.floor(15*dpi_scale), height_text)
+                            jK = math.max(math.floor(15 * iU), jq)
                         end
-
-                        local wx_topleft, wy_topleft = math.floor(wx_top-full_width/2), math.floor(wy_bot-full_height)
-
-                        if width_icon ~= nil then
-                            if CUSTOM_ICONS.vectors[location_set[1].weapons[1].console_name] then
-                                wx_icon = wx_bot-full_width/2+ox-1
-                                wy_icon = wy_bot-full_height+oy-1
-                            else
-                                wx_icon = wx_bot-full_width/2+ox
-                                wy_icon = wy_bot-full_height+oy
-                            end
-
-                            if height_text > height_icon then
-                                wy_icon = wy_icon + (height_text-height_icon)/2
+                        local jL, jM = math.floor(jn - jJ / 2), math.floor(jm - jK)
+                        if jy ~= nil then
+                            jw = jl - jJ / 2 + jE
+                            jx = jm - jK + jF
+                            if jq > jz then
+                                jx = jx + (jq - jz) / 2
                             end
                         end
-
-
-                        Paint.RectFilled(vector(wx_topleft-2, wy_topleft-2), vector(full_width+4, full_height+4), color(16, 16, 16, 180*visible_alpha))
-                        Paint.Rect(vector(wx_topleft-3, wy_topleft-3), vector(full_width+6, full_height+6), color(16, 16, 16, 170*visible_alpha))
-                        Paint.Rect(vector(wx_topleft-4, wy_topleft-4), vector(full_width+8, full_height+8), color(16, 16, 16, 195*visible_alpha))
-                        Paint.Rect(vector(wx_topleft-5, wy_topleft-5), vector(full_width+10, full_height+10), color(16, 16, 16, 40*visible_alpha))
-
-                        local r_m, g_m, b_m = r_m, g_m, b_m
-                        if location_set[1].editing and #location_set == 1 then
-                            r_m, g_m, b_m = unpack(CLR_TEXT_EDIT)
+                        bz.RectFilled(vector(jL - 2, jM - 2), vector(jJ + 4, jK + 4), color(16, 16, 16, 180 * jj))
+                        bz.Rect(vector(jL - 3, jM - 3), vector(jJ + 6, jK + 6), color(16, 16, 16, 170 * jj))
+                        bz.Rect(vector(jL - 4, jM - 4), vector(jJ + 8, jK + 8), color(16, 16, 16, 195 * jj))
+                        bz.Rect(vector(jL - 5, jM - 5), vector(jJ + 10, jK + 10), color(16, 16, 16, 40 * jj))
+                        local j6, j7, j8 = j6, j7, j8
+                        if ip[1].editing and #ip == 1 then
+                            j6, j7, j8 = unpack(ch)
                         end
-
-                        if location_set.distance_width_mp > 0 then
-                            if width_icon ~= nil then
-                                Paint.RectFilled(vector(wx_topleft+width_icon+3, wy_topleft+2), vector(1, full_height-3), color(r_m, g_m, b_m, a_m*visible_alpha))
+                        if ip.distance_width_mp > 0 then
+                            if jy ~= nil then
+                                bz.RectFilled(
+                                    vector(jL + jy + 3, jM + 2),
+                                    vector(1, jK - 3),
+                                    color(j6, j7, j8, j9 * jj)
+                                )
                             end
-
-                            local wx_text, wy_text = wx_topleft+(width_icon == nil and 0 or width_icon+8*dpi_scale), wy_topleft
-                            if full_height > height_text then
-                                wy_text = wy_text + math.floor((full_height-height_text) / 2)
+                            local jN, jO = jL + (jy == nil and 0 or jy + 8 * iU), jM
+                            if jK > jq then
+                                jO = jO + math.floor((jK - jq) / 2)
                             end
-
-                            for i=1, #lines do
-                                local r, g, b, a, flags, text = unpack(lines[i])
-                                local _x, _y = wx_text, wy_text+lines[i].y_o
-
-                                if lines[i].y_o+lines[i].height-4 > height_text then
+                            for j = 1, #i3 do
+                                local s, h, c, b, jr, T = unpack(i3[j])
+                                local jP, jQ = jN, jO + i3[j].y_o
+                                if i3[j].y_o + i3[j].height - 4 > jq then
                                     break
                                 end
-
-                                Paint.Text(1, text, vector(_x, _y), color(r, g, b, a), 12)
+                                bz.Text(1, T, vector(jP, jQ), color(s, h, c, b * jj), 12)
                             end
                         end
-
-                        if icon ~= nil then
-                            local outline_size = math.min(2, full_height*0.03)
-
-                            local outline_a_mp = 1
-                            if outline_size > 0.6 and outline_size < 1 then
-                                outline_a_mp = (outline_size-0.6)/0.4
-                                outline_size = 1
+                        if ib ~= nil then
+                            local jR = math.min(2, jK * 0.03)
+                            local jS = 1
+                            if jR > 0.6 and jR < 1 then
+                                jS = (jR - 0.6) / 0.4
+                                jR = 1
                             else
-                                outline_size = math.floor(outline_size)
+                                jR = math.floor(jR)
                             end
-
-                            local outline_r, outline_g, outline_b, outline_a = 0, 0, 0, 80
-                            local outline_mod = outline_a_mp
-                            if outline_size > 0 then
-                                render.texture(icon, vector(wx_icon-outline_size, wy_icon), vector(width_icon_orig, height_icon_orig), color(outline_r, outline_g, outline_b, outline_a*visible_alpha))
-                                render.texture(icon, vector(wx_icon+outline_size, wy_icon), vector(width_icon_orig, height_icon_orig), color(outline_r, outline_g, outline_b, outline_a*visible_alpha))
-                                render.texture(icon, vector(wx_icon, wy_icon-outline_size), vector(width_icon_orig, height_icon_orig), color(outline_r, outline_g, outline_b, outline_a*visible_alpha))
-                                render.texture(icon, vector(wx_icon, wy_icon+outline_size), vector(width_icon_orig, height_icon_orig), color(outline_r, outline_g, outline_b, outline_a*visible_alpha))
+                            local jT, jU, jV, jW = 0, 0, 0, 80
+                            local jX = jS
+                            if jR > 0 then
+                                render.texture(ib, vector(jw - jR, jx), vector(jA, jB), color(jT, jU, jV, jW * jj))
+                                render.texture(ib, vector(jw + jR, jx), vector(jA, jB), color(jT, jU, jV, jW * jj))
+                                render.texture(ib, vector(jw, jx - jR), vector(jA, jB), color(jT, jU, jV, jW * jj))
+                                render.texture(ib, vector(jw, jx + jR), vector(jA, jB), color(jT, jU, jV, jW * jj))
                             end
-                            render.texture(icon, vector(wx_icon, wy_icon), vector(width_icon_orig, height_icon_orig), color(r_m, g_m, b_m, a_m*visible_alpha))
+                            render.texture(ib, vector(jw, jx), vector(jA, jB), color(j6, j7, j8, j9 * jj))
                         end
-
-                        table.insert(boxes_drawn_aabb, {wx_topleft-10, wy_topleft-10, full_width+10, full_height+10})
+                        table.insert(jd, {jL - 10, jM - 10, jJ + 10, jK + 10})
                     end
                 end
             end
         end
-
-        if location_set_closest ~= nil then
-            if location_set_closest.distance == nil then
-                location_set_closest.distance = local_origin:dist_to(location_set_closest.position)
+        if hP ~= nil then
+            if hP.distance == nil then
+                hP.distance = j4:dist_to(hP.position)
             end
-            local in_range_draw = location_set_closest.distance < MAX_DIST_CLOSE_DRAW
-
-            if location_set_closest == location_playback_set then
-                location_set_closest.in_range_draw_mp = 1
-            elseif in_range_draw and location_set_closest.in_range_draw_mp < 1 then
-                location_set_closest.in_range_draw_mp = math.min(1, location_set_closest.in_range_draw_mp + frametime*8)
-            elseif not in_range_draw and location_set_closest.in_range_draw_mp > 0 then
-                location_set_closest.in_range_draw_mp = math.max(0, location_set_closest.in_range_draw_mp - frametime*8)
+            local jY = hP.distance < c6
+            if hP == ja then
+                hP.in_range_draw_mp = 1
+            elseif jY and hP.in_range_draw_mp < 1 then
+                hP.in_range_draw_mp = math.min(1, hP.in_range_draw_mp + i_ * 8)
+            elseif not jY and hP.in_range_draw_mp > 0 then
+                hP.in_range_draw_mp = math.max(0, hP.in_range_draw_mp - i_ * 8)
             end
-
-            if location_set_closest.in_range_draw_mp > 0 then
-                local matrix = native_GetWorldToScreenMatrix()
-
-                local location_closest
-                for i=1, #location_set_closest do
-                    local location = location_set_closest[i]
-
-                    if location.viewangles_target ~= nil then
-                        local pitch, yaw = location.viewangles.pitch, location.viewangles.yaw
-                        local dp, dy = test_array.normalize_angles(cam_pitch - pitch, cam_yaw - yaw)
-                        location.viewangles_dist = math.sqrt(dp*dp + dy*dy)
-
-                        if location_closest == nil or location_closest.viewangles_dist > location.viewangles_dist then
-                            location_closest = location
+            if hP.in_range_draw_mp > 0 then
+                local dG = dA()
+                local jZ
+                for j = 1, #hP do
+                    local fg = hP[j]
+                    if fg.viewangles_target ~= nil then
+                        local cH, cI = fg.viewangles.pitch, fg.viewangles.yaw
+                        local j_, d1 = a.normalize_angles(j0 - cH, j1 - cI)
+                        fg.viewangles_dist = math.sqrt(j_ * j_ + d1 * d1)
+                        if jZ == nil or jZ.viewangles_dist > fg.viewangles_dist then
+                            jZ = fg
                         end
-
-                        if location_playback ~= nil then
-                            location.is_on_run_mp = true
+                        if hR ~= nil then
+                            fg.is_on_run_mp = true
                         else
-                            location.is_on_run_mp = false
+                            fg.is_on_run_mp = false
                         end
-
-                        if aimbot == 'Legit (Silent)' or (aimbot == 'Rage' and location.type == "movement") then
-                            location.is_in_fov_select = location.viewangles_dist <= aimbot_fov_reference:get()*0.1
+                        if iW == "Legit (Silent)" or iW == "Rage" and fg.type == "movement" then
+                            fg.is_in_fov_select = fg.viewangles_dist <= gw:get() * 0.1
                         else
-                            location.is_in_fov_select = location.viewangles_dist <= (location.fov_select or aimbot == 'Rage' and aimbot_fov_reference:get()/1.111111111 or aimbot_fov_reference:get()/25)
+                            fg.is_in_fov_select =
+                                fg.viewangles_dist <=
+                                (fg.fov_select or iW == "Rage" and gw:get() / 1.111111111 or gw:get() / 25)
                         end
-
-                        local dist = local_origin:dist_to(location.position)
-                        local dist2d = local_origin:dist_to_2d(location.position)
-                        if dist2d < 1.5 then
-                            dist = dist2d
+                        local k0 = j4:dist_to(fg.position)
+                        local k1 = j4:dist_to_2d(fg.position)
+                        if k1 < 1.5 then
+                            k0 = k1
                         end
-
-                        location.is_position_correct = dist < MAX_DIST_CORRECT and local_player["m_flDuckAmount"] == location.duckamount
-
-                        if location.fov ~= nil then
-                            location.is_in_fov = location.is_in_fov_select and ((not (location.type == "movement" and aimbot == 'Rage') and aimbot_is_silent) or location.viewangles_dist <= location.fov)
+                        fg.is_position_correct = k0 < c7 and hI["m_flDuckAmount"] == fg.duckamount
+                        if fg.fov ~= nil then
+                            fg.is_in_fov =
+                                fg.is_in_fov_select and
+                                (not (fg.type == "movement" and iW == "Rage") and iX or fg.viewangles_dist <= fg.fov)
                         end
                     end
                 end
-
-                local in_range_draw_mp = easing.cubic_in(location_set_closest.in_range_draw_mp, 0, 1, 1)
-
-                for i=1, #location_set_closest do
-                    local location = location_set_closest[i]
-
-                    if location.viewangles_target ~= nil then
-                        local is_closest = location == location_closest
-                        local is_selected = is_closest and location.is_in_fov_select
-                        local is_in_fov = is_selected and location.is_in_fov
-
-                        if is_in_fov and location_playback ~= nil and location.on_run_mp < 1 then
-                            location.on_run_mp = math.min(1, location.on_run_mp + frametime*2.5)
-                        elseif location_playback == nil and location.on_run_mp > 0 then
-                            location.on_run_mp = math.max(0, location.on_run_mp - frametime*4.5)
+                local k2 = A.cubic_in(hP.in_range_draw_mp, 0, 1, 1)
+                for j = 1, #hP do
+                    local fg = hP[j]
+                    if fg.viewangles_target ~= nil then
+                        local je = fg == jZ
+                        local k3 = je and fg.is_in_fov_select
+                        local k4 = k3 and fg.is_in_fov
+                        if k4 and hR ~= nil and fg.on_run_mp < 1 then
+                            fg.on_run_mp = math.min(1, fg.on_run_mp + i_ * 2.5)
+                        elseif hR == nil and fg.on_run_mp > 0 then
+                            fg.on_run_mp = math.max(0, fg.on_run_mp - i_ * 4.5)
                         end
-
-                        local in_fov_select_mp = 1
-                        if location.is_in_fov_select ~= nil then
-                            if is_selected and location.in_fov_select_mp < 1 then
-                                location.in_fov_select_mp = math.min(1, location.in_fov_select_mp + frametime*2.5*(is_in_fov and 2 or 1))
-                            elseif not is_selected and location.in_fov_select_mp > 0 then
-                                location.in_fov_select_mp = math.max(0, location.in_fov_select_mp - frametime*4.5)
+                        local k5 = 1
+                        if fg.is_in_fov_select ~= nil then
+                            if k3 and fg.in_fov_select_mp < 1 then
+                                fg.in_fov_select_mp = math.min(1, fg.in_fov_select_mp + i_ * 2.5 * (k4 and 2 or 1))
+                            elseif not k3 and fg.in_fov_select_mp > 0 then
+                                fg.in_fov_select_mp = math.max(0, fg.in_fov_select_mp - i_ * 4.5)
                             end
-
-                            in_fov_select_mp = location.in_fov_select_mp
+                            k5 = fg.in_fov_select_mp
                         end
-
-                        local in_fov_mp = 1
-                        if location.is_in_fov ~= nil then
-                            if is_in_fov and location.in_fov_mp < 1 then
-                                location.in_fov_mp = math.min(1, location.in_fov_mp + frametime*6.5)
-                            elseif not is_in_fov and location.in_fov_mp > 0 then
-                                location.in_fov_mp = math.max(0, location.in_fov_mp - frametime*5.5)
+                        local k6 = 1
+                        if fg.is_in_fov ~= nil then
+                            if k4 and fg.in_fov_mp < 1 then
+                                fg.in_fov_mp = math.min(1, fg.in_fov_mp + i_ * 6.5)
+                            elseif not k4 and fg.in_fov_mp > 0 then
+                                fg.in_fov_mp = math.max(0, fg.in_fov_mp - i_ * 5.5)
                             end
-
-                            in_fov_mp = (location.is_position_correct or location == location_playback) and location.in_fov_mp or location.in_fov_mp * 0.5
+                            k6 = (fg.is_position_correct or fg == hR) and fg.in_fov_mp or fg.in_fov_mp * 0.5
                         end
-
-                        if is_selected then
-                            location_selected = location
+                        if k3 then
+                            hQ = fg
                         end
-
-                        local t_x, t_y, t_z = location.viewangles_target:unpack()
-                        local wx, wy, on_screen = test_array.world_to_screen_offscreen_rect(t_x, t_y, t_z, matrix, screen_width, screen_height, 40)
-
-                        if wx ~= nil then
-                            wx, wy = math.floor(wx+0.5), math.floor(wy+0.5)
-
-                            if on_screen and location.on_screen_mp < 1 then
-                                location.on_screen_mp = math.min(1, location.on_screen_mp + frametime*3.5)
-                            elseif not on_screen and location.on_screen_mp > 0 then
-                                location.on_screen_mp = math.max(0, location.on_screen_mp - frametime*4.5)
+                        local k7, k8, k9 = fg.viewangles_target:unpack()
+                        local dJ, dK, ka = a.world_to_screen_offscreen_rect(k7, k8, k9, dG, dH, dI, 40)
+                        if dJ ~= nil then
+                            dJ, dK = math.floor(dJ + 0.5), math.floor(dK + 0.5)
+                            if ka and fg.on_screen_mp < 1 then
+                                fg.on_screen_mp = math.min(1, fg.on_screen_mp + i_ * 3.5)
+                            elseif not ka and fg.on_screen_mp > 0 then
+                                fg.on_screen_mp = math.max(0, fg.on_screen_mp - i_ * 4.5)
                             end
-
-                            local visible_alpha = (0.5 + location.on_screen_mp * 0.5) * in_range_draw_mp
-
-                            local name = "»" .. location.name
-                            local description
-
-                            local title_size = render.measure_text(fonts.verdana_bold, 'd', name--[[ , 12, fonts.verdana_bold ]])
-                            local title_width, title_height = title_size.x, title_size.y
-                            local description_width, description_height = 0, 0
-
-                            if location.description ~= nil then
-                                description = location.description:upper()
-                                local description_size = render.measure_text(2, 'd', description .. " ")
-
-                                description_width, description_height = description_size.x, description_size.y
-                                description_width = description_width
+                            local jj = (0.5 + fg.on_screen_mp * 0.5) * k2
+                            local cn = "»" .. fg.name
+                            local hC
+                            local kb = render.measure_text(by.verdana_bold, "d", cn)
+                            local kc, kd = kb.x, kb.y
+                            local ke, kf = 0, 0
+                            if fg.description ~= nil then
+                                hC = fg.description:upper()
+                                local kg = render.measure_text(2, "d", hC .. " ")
+                                ke, kf = kg.x, kg.y
+                                ke = ke
                             end
-                            local extra_target_width = math.floor(description_height/2)
-                            extra_target_width = extra_target_width - extra_target_width % 2
-
-                            local full_width, full_height = math.max(title_width, description_width), title_height+description_height
-
-                            local r_m, g_m, b_m = r_m, g_m, b_m
-
-                            if location.editing then
-                                r_m, g_m, b_m = unpack(CLR_TEXT_EDIT)
+                            local kh = math.floor(kf / 2)
+                            kh = kh - kh % 2
+                            local jJ, jK = math.max(kc, ke), kd + kf
+                            local j6, j7, j8 = j6, j7, j8
+                            if fg.editing then
+                                j6, j7, j8 = unpack(ch)
                             end
-
-                            local circle_size = math.floor(title_height / 2 - 1) * 2
-                            local target_size = 0
-                            if location.on_screen_mp > 0 then
-                                target_size = math.floor((circle_size + 8*dpi_scale) * location.on_screen_mp) + extra_target_width
-
-                                full_width = full_width + target_size
+                            local ki = math.floor(kd / 2 - 1) * 2
+                            local kj = 0
+                            if fg.on_screen_mp > 0 then
+                                kj = math.floor((ki + 8 * iU) * fg.on_screen_mp) + kh
+                                jJ = jJ + kj
                             end
-                            wx, wy = wx-circle_size/2-extra_target_width/2, wy-full_height/2
-
-                            local wx_topleft = math.min(wx, screen_width-40-full_width)
-                            local wy_topleft = wy
-                            local background_mp = easing.sine_out(visible_alpha, 0, 1, 1)
-
-                            Paint.RectFilled(vector(wx_topleft-2, wy_topleft-2), vector(full_width+4, full_height+4), color(16, 16, 16, 150*background_mp))
-                            Paint.Rect(vector(wx_topleft-3, wy_topleft-3), vector(full_width+6, full_height+6), color(16, 16, 16, 170*background_mp))
-                            Paint.Rect(vector(wx_topleft-4, wy_topleft-4), vector(full_width+8, full_height+8), color(16, 16, 16, 195*background_mp))
-                            Paint.Rect(vector(wx_topleft-5, wy_topleft-5), vector(full_width+10, full_height+10), color(16, 16, 16, 40*background_mp))
-
-                            if not on_screen then
-                                local triangle_alpha = 1 - location.on_screen_mp
-
-                                if triangle_alpha > 0 then
-                                    local cx, cy = screen_width/2, screen_height/2
-
-                                    local angle = math.atan2(wy_topleft+full_height/2-cy, wx_topleft+full_width/2-cx)
-                                    local triangle_angle = angle+math.rad(90)
-                                    local offset_x, offset_y = test_array.vector2_rotate(triangle_angle, 0, -screen_height/2+100)
-
-                                    local tx, ty = screen_width/2+offset_x, screen_height/2+offset_y
-
-                                    local dist_triangle_text = test_array.vector2_dist(tx, ty, wx_topleft+full_width/2, wy_topleft+full_height/2)
-                                    local dist_center_triangle = test_array.vector2_dist(tx, ty, cx, cy)
-                                    local dist_center_text = test_array.vector2_dist(cx, cy, wx_topleft+full_width/2, wy_topleft+full_height/2)
-
-                                    local a_mp_dist = 1
-                                    if 40 > dist_triangle_text then
-                                        a_mp_dist = (dist_triangle_text-30)/10
+                            dJ, dK = dJ - ki / 2 - kh / 2, dK - jK / 2
+                            local jL = math.min(dJ, dH - 40 - jJ)
+                            local jM = dK
+                            local kk = A.sine_out(jj, 0, 1, 1)
+                            bz.RectFilled(vector(jL - 2, jM - 2), vector(jJ + 4, jK + 4), color(16, 16, 16, 150 * kk))
+                            bz.Rect(vector(jL - 3, jM - 3), vector(jJ + 6, jK + 6), color(16, 16, 16, 170 * kk))
+                            bz.Rect(vector(jL - 4, jM - 4), vector(jJ + 8, jK + 8), color(16, 16, 16, 195 * kk))
+                            bz.Rect(vector(jL - 5, jM - 5), vector(jJ + 10, jK + 10), color(16, 16, 16, 40 * kk))
+                            if not ka then
+                                local kl = 1 - fg.on_screen_mp
+                                if kl > 0 then
+                                    local dX, dY = dH / 2, dI / 2
+                                    local cS = math.atan2(jM + jK / 2 - dY, jL + jJ / 2 - dX)
+                                    local km = cS + math.rad(90)
+                                    local kn, ko = a.vector2_rotate(km, 0, -dI / 2 + 100)
+                                    local dn, dp = dH / 2 + kn, dI / 2 + ko
+                                    local kp = a.vector2_dist(dn, dp, jL + jJ / 2, jM + jK / 2)
+                                    local kq = a.vector2_dist(dn, dp, dX, dY)
+                                    local kr = a.vector2_dist(dX, dY, jL + jJ / 2, jM + jK / 2)
+                                    local ks = 1
+                                    if 40 > kp then
+                                        ks = (kp - 30) / 10
                                     end
-
-                                    if dist_center_text > dist_center_triangle and a_mp_dist > 0 then
-                                        local height = math.floor(title_height*1.5)
-
-                                        local realtime_alpha_mp = 0.2 + math.abs(math.sin(globals.realtime*math.pi*0.8 + i * 0.1)) * 0.8
-
-                                        test_array.triangle_rotated(tx, ty, height*1.66, height, triangle_angle, r_m, g_m, b_m, a_m*math.min(1, visible_alpha*1.5)*triangle_alpha*a_mp_dist*realtime_alpha_mp)
+                                    if kr > kq and ks > 0 then
+                                        local d2 = math.floor(kd * 1.5)
+                                        local kt =
+                                            0.2 + math.abs(math.sin(globals.realtime * math.pi * 0.8 + j * 0.1)) * 0.8
+                                        a.triangle_rotated(
+                                            dn,
+                                            dp,
+                                            d2 * 1.66,
+                                            d2,
+                                            km,
+                                            j6,
+                                            j7,
+                                            j8,
+                                            j9 * math.min(1, jj * 1.5) * kl * ks * kt
+                                        )
                                     end
                                 end
                             end
+                            if fg.on_screen_mp > 0.5 and k2 > 0 then
+                                local ku = 255 * 1 * k2 * A.expo_in(fg.on_screen_mp, 0, 1, 1)
+                                local kv, kw, kx = 255, 10, 10
+                                local ky, kz, kA = 20, 236, 0
+                                local kB, kC, kD = 140, 140, 140
+                                local kE, kF, kG = a.lerp_color(kv, kw, kx, 0, ky, kz, kA, 0, k6)
+                                local kH, kI, kJ = a.lerp_color(kB, kC, kD, 0, kE, kF, kG, 0, k5)
+                                local kK, kL, kM = a.lerp_color(kH, kI, kJ, 0, j6, j7, j8, 0, fg.on_run_mp)
+                                local d7, d8 = dJ + ki / 2 + kh / 2, dK + jK / 2
+                                local kN = ki / 2
+                                -- outline
+                                render.circle_outline(vector(d7, d8), color(16, 16, 16, ku*0.6), kN+1, 0, 1, 2)
 
-                            if location.on_screen_mp > 0.5 and in_range_draw_mp > 0 then
-                                local c_a = 255*1*in_range_draw_mp*easing.expo_in(location.on_screen_mp, 0, 1, 1)
-                                local red_r, red_g, red_b = 255, 10, 10
-                                local green_r, green_g, green_b = 20, 236, 0
-                                local white_r, white_g, white_b = 140, 140, 140
+                                -- circle
+                                render.circle(vector(d7, d8), color(kK, kL, kM, ku), kN, 0, 1)
 
-                                local sel_r, sel_g, sel_b = test_array.lerp_color(red_r, red_g, red_b, 0, green_r, green_g, green_b, 0, in_fov_mp)
-                                local c_r, c_g, c_b = test_array.lerp_color(white_r, white_g, white_b, 0, sel_r, sel_g, sel_b, 0, in_fov_select_mp)
-                                local cc_r, cc_g, cc_b = test_array.lerp_color(c_r, c_g, c_b, 0, r_m, g_m, b_m, 0, location.on_run_mp)
-
-                                local c_x, c_y = wx+circle_size/2 + extra_target_width/2, wy+full_height/2
-                                local c_radius = circle_size/2
-
-                                Paint.Circle(vector(c_x, c_y), c_radius+1, color(16, 16, 16, c_a*0.6))
-                                Paint.CircleFilled(vector(c_x, c_y), c_radius, color(cc_r, cc_g, cc_b, c_a))
-                                Paint.Circle(vector(c_x, c_y), c_radius+1, color(16, 16, 16, c_a*0.3))
-                                Paint.Circle(vector(c_x, c_y), c_radius, color(16, 16, 16, c_a*0.2))
-                                Paint.Circle(vector(c_x, c_y), c_radius-1, color(16, 16, 16, c_a*0.1))
+                                -- gradient (kind of)
+                                render.circle_outline(vector(d7, d8), color(16, 16, 16, ku*0.3), kN+1, 0, 1, 2)
+                                render.circle_outline(vector(d7, d8), color(16, 16, 16, ku*0.2), kN, 0, 1, 2)
+                                render.circle_outline(vector(d7, d8), color(16, 16, 16, ku*0.1), kN-1, 0, 1, 2)
                             end
-                            if target_size > 1 then
-                                Paint.RectFilled(vector(wx_topleft+target_size-4*dpi_scale, wy_topleft+1), vector(1, full_height-1), color(r_m, g_m, b_m, a_m*visible_alpha*location.on_screen_mp))
+                            if kj > 1 then
+                                bz.RectFilled(
+                                    vector(jL + kj - 4 * iU, jM + 1),
+                                    vector(1, jK - 1),
+                                    color(j6, j7, j8, j9 * jj * fg.on_screen_mp)
+                                )
                             end
-
-                            Paint.Text(fonts.verdana_bold, name, vector(wx_topleft+target_size, wy), color(r_m, g_m, b_m, a_m*visible_alpha))
-
-                            if description ~= nil then
-                                Paint.Text(2, description, vector(wx_topleft+target_size, wy+title_height), color(math.min(255, r_m*1.2), math.min(255, g_m*1.2), math.min(255, b_m*1.2), a_m*visible_alpha*0.92), 9)
+                            bz.Text(by.verdana_bold, cn, vector(jL + kj, dK), color(j6, j7, j8, j9 * jj))
+                            if hC ~= nil then
+                                bz.Text(
+                                    2,
+                                    hC,
+                                    vector(jL + kj, dK + kd),
+                                    color(
+                                        math.min(255, j6 * 1.2),
+                                        math.min(255, j7 * 1.2),
+                                        math.min(255, j8 * 1.2),
+                                        j9 * jj * 0.92
+                                    ),
+                                    9
+                                )
                             end
                         end
                     end
                 end
             end
         end
-
-        if hotkey and location_selected ~= nil and ((location_selected.type == "movement" and aimbot ~= 3) or (location_selected.type ~= "movement" and aimbot == 'Legit')) then
-            if (not location_selected.is_in_fov or location_selected.viewangles_dist > 0.1) then
-                local speed = aimbot_speed_reference:get()/100
-                if speed == 0 then
-                    if location_selected.type == "grenade" and local_player:get_player_weapon()["m_bPinPulled"] then
-                        render.camera_angles(vector(location_selected.viewangles.pitch, location_selected.viewangles.yaw, 0))
+        if iV and hQ ~= nil and (hQ.type == "movement" and iW ~= 3 or hQ.type ~= "movement" and iW == "Legit") then
+            if not hQ.is_in_fov or hQ.viewangles_dist > 0.1 then
+                local kO = gx:get() / 100
+                if kO == 0 then
+                    if hQ.type == "grenade" and hI:get_player_weapon()["m_bPinPulled"] then
+                        render.camera_angles(vector(hQ.viewangles.pitch, hQ.viewangles.yaw, 0))
                     end
                 else
-                    local aim_pitch, aim_yaw = location_selected.viewangles.pitch, location_selected.viewangles.yaw
-                    local dp, dy = test_array.normalize_angles(cam_pitch - aim_pitch, cam_yaw - aim_yaw)
-
-                    local dist = location_selected.viewangles_dist
-                    dp = dp / dist
-                    dy = dy / dist
-
-                    local mp = math.min(1, dist/3)*0.5
-                    local delta_mp = (mp + math.abs(dist*(1-mp)))*globals.frametime*15*speed
-
-                    local pitch = cam_pitch - dp*delta_mp*utils.random_float(0.7, 1.2)
-                    local yaw = cam_yaw - dy*delta_mp*utils.random_float(0.7, 1.2)
-
-                    render.camera_angles(vector(pitch, yaw, 0))
+                    local kP, kQ = hQ.viewangles.pitch, hQ.viewangles.yaw
+                    local j_, d1 = a.normalize_angles(j0 - kP, j1 - kQ)
+                    local k0 = hQ.viewangles_dist
+                    j_ = j_ / k0
+                    d1 = d1 / k0
+                    local kR = math.min(1, k0 / 3) * 0.5
+                    local kS = (kR + math.abs(k0 * (1 - kR))) * globals.frametime * 15 * kO
+                    local cH = j0 - j_ * kS * utils.random_float(0.7, 1.2)
+                    local cI = j1 - d1 * kS * utils.random_float(0.7, 1.2)
+                    render.camera_angles(vector(cH, cI, 0))
                 end
             end
         end
     end
 end
-
-function test_array.cmd_remove_user_input(cmd)
-    cmd.in_forward = 0
-    cmd.in_back = 0
-    cmd.in_moveleft = 0
-    cmd.in_moveright = 0
-
-    cmd.forwardmove = 0
-    cmd.sidemove = 0
-
-    cmd.in_jump = 0
-    cmd.in_speed = 0
+function a.cmd_remove_user_input(dg)
+    dg.in_forward = 0
+    dg.in_back = 0
+    dg.in_moveleft = 0
+    dg.in_moveright = 0
+    dg.forwardmove = 0
+    dg.sidemove = 0
+    dg.in_jump = 0
+    dg.in_speed = 0
 end
-
-test_array.recovery_run, test_array.recovery_run_jump = false, false
-
-function test_array.play_recovery(cmd)
-    if test_array.recovery_run_jump then
-        local local_player = entity.get_local_player()
-        local onground = bit.band(local_player["m_fFlags"], 1) == 1
-        if onground then
-            test_array.playback_state = nil
-            location_playback = nil
-
-            test_array.restore_disabled()
-        else
-            local aimbot = aimbot_reference:get()
-            if aimbot == 'Rage' and location_playback ~= nil then
-                test_array.cmd_remove_user_input(cmd)
-                cmd.move_yaw = location_playback.recovery_yaw or location_playback.run_yaw-180
-                cmd.forwardmove = 450
-                cmd.in_forward = 1
-                cmd.in_jump = location_playback.recovery_jump and 1 or 0
-            end
-
-            if test_array.ui_restore[airstrafe_reference] then
-                test_array.ui_restore[airstrafe_reference] = nil
-
-                utils.execute_after(cvar.sv_airaccelerate:float() > 50 and 0 or 0.05, function()
-                    airstrafe_reference:set(true)
-                end)
-            end
+function a.cmd_location_playback_grenade(dg, hI, bW)
+    local fj = 1 / globals.tickinterval
+    local kT = hR.tickrates[fj]
+    gn:set(false)
+    if a.playback_state == nil then
+        a.playback_state = cc
+        a.table_clear(a.playback_data)
+        local iW = fL:get()
+        if iW == "Legit (Silent)" or iW == "Legit" then
+            a.playback_sensitivity_set = true
         end
-    elseif test_array.recovery_run then
-        local aimbot = aimbot_reference:get()
-        if aimbot == 'Rage' and location_playback ~= nil then
-            if test_array.playback_data.recovery_start_at == nil then
-                test_array.playback_data.recovery_start_at = cmd.command_number
+        local kU = a.playback_begin
+        utils.execute_after(
+            (hR.run_duration or 0) * kT * 2 + 2,
+            function()
+                if hR ~= nil and a.playback_begin == kU then
+                    bs.error_log("[helper] playback timed out")
+                    hR = nil
+                    a.restore_disabled()
+                end
             end
-            local recovery_duration = math.min(32, location_playback.run_duration or 16) + 13 + (location_playback.recovery_jump and 10 or 0)
-
-            if test_array.playback_data.recovery_start_at+recovery_duration >= cmd.command_number and location_playback.recovery_yaw ~= nil then
-                cmd.move_yaw = location_playback.recovery_yaw
-                cmd.forwardmove = 450
-                cmd.in_forward = 1
-                cmd.in_jump = location_playback.recovery_jump and 1 or 0
-            end
-        else
-            location_playback = nil
-
-            test_array.restore_disabled()
-        end
+        )
     end
-end
-
-function test_array.cmd_location_playback_grenade(cmd, local_player, weapon)
-    local tickrate = 1/globals.tickinterval
-    local tickrate_mp = location_playback.tickrates[tickrate]
-    test_array.recovery_run, test_array.recovery_run_jump = false, false
-    slow_walk_reference:set(false)
-    if test_array.playback_state == nil then
-        test_array.playback_state = GRENADE_PLAYBACK_PREPARE
-        test_array.table_clear(test_array.playback_data)
-
-        local aimbot = aimbot_reference:get()
-        if aimbot == 'Legit (Silent)' or aimbot == 'Legit' then
-            test_array.playback_sensitivity_set = true
-        end
-
-        local begin = test_array.playback_begin
-
-        utils.execute_after((location_playback.run_duration or 0)*tickrate_mp*2+2, function()
-            if location_playback ~= nil and test_array.playback_begin == begin then
-                client.error_log("[helper] playback timed out")
-
-                location_playback = nil
-                test_array.restore_disabled()
-            end
-        end)
-    end
-
-    if weapon ~= test_array.playback_weapon and test_array.playback_state ~= GRENADE_PLAYBACK_FINISHED then
-        location_playback = nil
-        test_array.restore_disabled()
+    if bW ~= a.playback_weapon and a.playback_state ~= cg then
+        hR = nil
+        a.restore_disabled()
         return
     end
-
-    if test_array.playback_state ~= GRENADE_PLAYBACK_FINISHED then
-        test_array.cmd_remove_user_input(cmd, location_playback)
-        cmd.in_duck = location_playback.duckamount == 1 and 1 or 0
-        cmd.move_yaw = location_playback.run_yaw
-    elseif test_array.playback_sensitivity_set then
-        test_array.playback_sensitivity_set = nil
+    if a.playback_state ~= cg then
+        a.cmd_remove_user_input(dg, hR)
+        dg.in_duck = hR.duckamount == 1 and 1 or 0
+        dg.move_yaw = hR.run_yaw
+    elseif a.playback_sensitivity_set then
+        a.playback_sensitivity_set = nil
     end
-
-    if test_array.playback_state == GRENADE_PLAYBACK_PREPARE or test_array.playback_state == GRENADE_PLAYBACK_RUN or test_array.playback_state == GRENADE_PLAYBACK_THROWN then
-        if location_playback.throw_strength == 1 then
-            cmd.in_attack = 1
-            cmd.in_attack2 = 0
-        elseif location_playback.throw_strength == 0.5 then
-            cmd.in_attack = 1
-            cmd.in_attack2 = 1
-        elseif location_playback.throw_strength == 0 then
-            cmd.in_attack = 0
-            cmd.in_attack2 = 1
+    if a.playback_state == cc or a.playback_state == cd or a.playback_state == cf then
+        if hR.throw_strength == 1 then
+            dg.in_attack = 1
+            dg.in_attack2 = 0
+        elseif hR.throw_strength == 0.5 then
+            dg.in_attack = 1
+            dg.in_attack2 = 1
+        elseif hR.throw_strength == 0 then
+            dg.in_attack = 0
+            dg.in_attack2 = 1
         end
     end
-
-    if test_array.playback_state == GRENADE_PLAYBACK_PREPARE and weapon["m_flThrowStrength"] == location_playback.throw_strength then
-        if rage.exploit:get() > 0 and test_array.playback_state ~= GRENADE_PLAYBACK_FINISHED and aimbot_auto_dt_reference:get() then
+    if a.playback_state == cc and bW["m_flThrowStrength"] == hR.throw_strength then
+        if rage.exploit:get() > 0 and a.playback_state ~= cg and gy:get() then
             rage.exploit:force_teleport()
         end
-        test_array.playback_state = GRENADE_PLAYBACK_RUN
-        test_array.playback_data.start_at = cmd.command_number
+        ui.find("Aimbot", "Anti Aim", "Angles", "Body Yaw"):override(false)
+        a.playback_state = cd
+        a.playback_data.start_at = dg.command_number
     end
-
-    if test_array.playback_state == GRENADE_PLAYBACK_RUN or test_array.playback_state == GRENADE_PLAYBACK_THROW or test_array.playback_state == GRENADE_PLAYBACK_THROWN then
-        local step = cmd.command_number-test_array.playback_data.start_at
-
-        if location_playback.run_duration ~= nil and location_playback.run_duration*tickrate_mp > step then
-        elseif test_array.playback_state == GRENADE_PLAYBACK_RUN then
-            test_array.playback_state = GRENADE_PLAYBACK_THROW
+    if a.playback_state == cd or a.playback_state == ce or a.playback_state == cf then
+        local kV = dg.command_number - a.playback_data.start_at
+        if hR.run_duration ~= nil and hR.run_duration * kT > kV then
+        elseif a.playback_state == cd then
+            a.playback_state = ce
         end
-
-        if location_playback.run_duration ~= nil then
-            cmd.forwardmove = 450
-            cmd.in_forward = 1
-            cmd.in_speed = location_playback.run_speed and 1 or 0
-        end
-    end
-
-    if test_array.playback_state == GRENADE_PLAYBACK_THROW then
-        if location_playback.jump then
-            cmd.in_jump = 1
-        end
-
-        test_array.playback_state = GRENADE_PLAYBACK_THROWN
-        test_array.playback_data.throw_at = cmd.command_number
-    end
-
-    if test_array.playback_state == GRENADE_PLAYBACK_THROWN then
-        if cmd.command_number - test_array.playback_data.throw_at >= location_playback.delay then
-            cmd.in_attack = 0
-            cmd.in_attack2 = 0
-        end
-    end
-    if test_array.playback_state == GRENADE_PLAYBACK_FINISHED then
-        if location_playback.jump then
-            test_array.recovery_run_jump = true
-        elseif location_playback.recovery_yaw ~= nil then
-            test_array.recovery_run = true
-        end
-    end
-
-    if test_array.playback_state == GRENADE_PLAYBACK_THROWN then
-        if location_playback.jump and airstrafe_reference:get() then
-            test_array.ui_restore[airstrafe_reference] = true
-            airstrafe_reference:set(false)
-        end
-
-        local aimbot = aimbot_reference:get()
-        local throw_time = weapon["m_fThrowTime"]
-
-        if test_array.is_grenade_being_thrown(weapon, cmd) then
-            test_array.playback_data.thrown_at = cmd.command_number
-            if aimbot == 'Legit (Silent)' or aimbot == 'Rage' then
-                cmd.view_angles = vector(location_playback.viewangles.pitch, location_playback.viewangles.yaw, 0)
+        if hR.run_duration ~= nil then
+            dg.forwardmove = 450
+            dg.in_forward = 1
+            dg.in_speed = hR.run_speed and 1 or 0
+            if gr:get() and gs:get() ~= "Disabled" then
+                iR = hI["m_nWaterLevel"]
+                hI["m_nWaterLevel"] = 2
+                iQ = hI["m_MoveType"]
+                hI["m_MoveType"] = 1
             end
-
-            utils.execute_after(0.8, test_array.restore_disabled)
-        elseif weapon["m_fThrowTime"] == 0 and test_array.playback_data.thrown_at ~= nil and test_array.playback_data.thrown_at > test_array.playback_data.throw_at then
-            test_array.playback_state = GRENADE_PLAYBACK_FINISHED
-            local begin = test_array.playback_begin
-            utils.execute_after(0.6, function()
-                if test_array.playback_state == GRENADE_PLAYBACK_FINISHED and test_array.playback_begin == begin then
-                    location_playback = nil
-                    test_array.restore_disabled()
+        end
+    end
+    if a.playback_state == ce then
+        if hR.jump then
+            dg.in_jump = 1
+        end
+        a.playback_state = cf
+        a.playback_data.throw_at = dg.command_number
+    end
+    if a.playback_state == cf then
+        if dg.command_number - a.playback_data.throw_at >= hR.delay then
+            go:override()
+            dg.in_attack = 0
+            dg.in_attack2 = 0
+        end
+    end
+    if a.playback_state == cg then
+        if hR.jump then
+            local kW = bit.band(hI["m_fFlags"], 1) == 1
+            if kW then
+                playback_state = nil
+                hR = nil
+                a.restore_disabled()
+            else
+                local iW = fL:get()
+                if
+                    iW == "Rage" and bit.band(dg.buttons, 8) ~= 8 and bit.band(dg.buttons, 16) ~= 16 and
+                        bit.band(dg.buttons, 512) ~= 512 and
+                        bit.band(dg.buttons, 1024) ~= 1024
+                 then
+                    a.cmd_remove_user_input(dg)
+                    dg.move_yaw = hR.recovery_yaw or hR.run_yaw - 180
+                    dg.forwardmove = 450
+                    dg.in_forward = 1
+                    dg.in_jump = hR.recovery_jump and 1 or 0
                 end
-            end)
-        end
-    end
-end
-
-function test_array.cmd_location_playback_movement(cmd, local_player, weapon)
-    if test_array.playback_state == nil then
-        test_array.playback_state = 1
-        test_array.table_clear(test_array.playback_data)
-        test_array.playback_data.start_at = cmd.command_number
-        test_array.playback_data.last_offset_swap = 0
-    end
-
-    local is_grenade = location_playback.weapons[1].type == "grenade"
-    local current_weapon = weapons[bit.band(weapon["m_iItemDefinitionIndex"], 0xFFFF)]
-    if weapon ~= test_array.playback_weapon and not (is_grenade and current_weapon.type == "knife") then
-        location_playback = nil
-        test_array.restore_disabled()
-        return
-    end
-
-    local index = cmd.command_number-test_array.playback_data.start_at+1
-    local command = location_playback.movement_commands[index]
-    if command == nil then
-        location_playback = nil
-        test_array.restore_disabled()
-        return
-    end
-
-    if airstrafe_reference:get() then
-        test_array.ui_restore[airstrafe_reference] = true
-        airstrafe_reference:set(false)
-    end
-
-    if air_duck_reference:get() then
-        test_array.ui_restore[air_duck_reference] = true
-        air_duck_reference:set(false)
-    end
-
-    if strafe_assist_reference:get() then
-        test_array.ui_restore[strafe_assist_reference] = true
-        strafe_assist_reference:set(false)
-    end
-
-    if infinite_duck_reference:get() then
-        test_array.ui_restore[infinite_duck_reference] = true
-        infinite_duck_reference:set(false)
-    end
-
-    slow_walk_reference:set(false)
-
-    if fast_stop_reference:get() ~= false then
-        test_array.ui_restore[fast_stop_reference] = fast_stop_reference:get()
-        fast_stop_reference:set(false)
-    end
-
-    local aimbot = aimbot_reference:get()
-    local ignore_pitch_yaw = aimbot == 'Rage'
-
-    for key, value in pairs(command) do
-        local set_key = true
-
-        if key == "pitch" or key == "yaw" then
-            set_key = false
-        elseif key == "in_use" and value == false then
-            set_key = false
-        elseif key == "in_attack" or key == "in_attack2" then
-            if is_grenade and current_weapon.type == "grenade" then
-                set_key = true
-            elseif value == false then
-                set_key = false
-            end
-        end
-
-        if set_key then
-            cmd[key] = value
-        end
-    end
-
-    if aimbot == 'Rage' and (is_grenade or (bit.band(cmd.buttons, 1) ~= 1 and bit.band(cmd.buttons, 2048) ~= 2048)) and (not is_grenade or (is_grenade and test_array.playback_data.thrown_at == nil)) then
-        if cmd.command_number - test_array.playback_data.last_offset_swap > 16 then
-            local _, target_yaw = test_array.normalize_angles(0, bit.band(cmd.buttons, 32) == 32 and cmd.view_angles.y or cmd.view_angles.y - 180)
-            test_array.playback_data.set_pitch = bit.band(cmd.buttons, 32) ~= 32
-
-            local min_diff, new_offset = 90
-            for o=-180, 180, 90 do
-                local _, command_yaw = test_array.normalize_angles(0, command.yaw+o)
-                local diff = math.abs(command_yaw-target_yaw)
-
-                if min_diff > diff then
-                    min_diff = diff
-                    new_offset = o
+                if a.ui_restore[gl] then
+                    a.ui_restore[gl] = nil
+                    utils.execute_after(
+                        cvar.sv_airaccelerate:float() > 50 and 0 or 0.05,
+                        function()
+                            gl:override(true)
+                        end
+                    )
                 end
             end
-
-            if new_offset ~= test_array.playback_data.last_offset then
-                test_array.playback_data.last_offset = new_offset
-                test_array.playback_data.last_offset_swap = cmd.command_number
+        elseif hR.recovery_yaw ~= nil then
+            local iW = fL:get()
+            if
+                iW == "Rage" and bit.band(dg.buttons, 8) ~= 8 and bit.band(dg.buttons, 16) ~= 16 and
+                    bit.band(dg.buttons, 512) ~= 512 and
+                    bit.band(dg.buttons, 1024) ~= 1024
+             then
+                if a.playback_data.recovery_start_at == nil then
+                    a.playback_data.recovery_start_at = dg.command_number
+                end
+                local kX = math.min(32, hR.run_duration or 16) + 13 + (hR.recovery_jump and 10 or 0)
+                if a.playback_data.recovery_start_at + kX >= dg.command_number then
+                    dg.move_yaw = hR.recovery_yaw
+                    dg.forwardmove = 450
+                    dg.in_forward = 1
+                    dg.in_jump = hR.recovery_jump and 1 or 0
+                end
+            else
+                hR = nil
+                a.restore_disabled()
             end
         end
-
-        --if test_array.playback_data.last_offset ~= nil then
-            render.camera_angles(vector(command.pitch, command.yaw, 0))
-        --end
     end
-
-    if not ignore_pitch_yaw then
-        render.camera_angles(vector(command.pitch, command.yaw, 0))
-        test_array.playback_sensitivity_set = true
-    elseif (is_grenade and current_weapon.type == 'grenade') and aimbot == 'Rage' and test_array.is_grenade_being_thrown(weapon, cmd) then
-        render.camera_angles(vector(command.pitch, command.yaw, 0))
-        --FakeLag.ForceSend()
-
-        test_array.playback_data.thrown_at = cmd.command_number
+    if a.playback_state == cf then
+        if hR.jump and gl:get() then
+            a.ui_restore[gl] = true
+            gl:override(false)
+        end
+        local iW = fL:get()
+        local di = bW["m_fThrowTime"]
+        if a.is_grenade_being_thrown(bW, dg) then
+            a.playback_data.thrown_at = dg.command_number
+            if iW == "Legit (Silent)" or iW == "Rage" then
+                dg.view_angles = vector(hR.viewangles.pitch, hR.viewangles.yaw, 0)
+            end
+            utils.execute_after(0.8, a.restore_disabled)
+        elseif
+            bW["m_fThrowTime"] == 0 and a.playback_data.thrown_at ~= nil and
+                a.playback_data.thrown_at > a.playback_data.throw_at
+         then
+            a.playback_state = cg
+            local kU = a.playback_begin
+            utils.execute_after(
+                0.6,
+                function()
+                    if a.playback_state == cg and a.playback_begin == kU then
+                        hR = nil
+                        a.restore_disabled()
+                    end
+                end
+            )
+        end
     end
 end
-
-function test_array.cmd_location_playback(cmd, local_player, weapon)
-    if location_playback.type == "grenade" then
-        test_array.cmd_location_playback_grenade(cmd, local_player, weapon)
-    elseif location_playback.type == "movement" then
-        test_array.cmd_location_playback_movement(cmd, local_player, weapon)
+function a.cmd_location_playback_movement(dg, hI, bW)
+    if a.playback_state == nil then
+        a.playback_state = 1
+        a.table_clear(a.playback_data)
+        a.playback_data.start_at = dg.command_number
+        a.playback_data.last_offset_swap = 0
     end
-end
-
-test_array.enabled_run, test_array.enabled_playback, test_array.movement_run = false, false, false
-function test_array.on_run_command(cmd)
-    if not enabled_reference:get() then
+    local kY = hR.weapons[1].type == "grenade"
+    local kZ = n[bit.band(bW["m_iItemDefinitionIndex"], 0xFFFF)]
+    if bW ~= a.playback_weapon and not (kY and kZ.type == "knife") then
+        hR = nil
+        a.restore_disabled()
         return
     end
-    local local_player = entity.get_local_player()
-    local weapon = local_player:get_player_weapon()
-    if test_array.enabled_playback and location_playback ~= nil then
-        if location_playback.type == "grenade" then
-            test_array.cmd_location_playback_grenade(cmd, local_player, weapon)
+    local bn = dg.command_number - a.playback_data.start_at + 1
+    local k_ = hR.movement_commands[bn]
+    if k_ == nil then
+        hR = nil
+        a.restore_disabled()
+        return
+    end
+    if gl:get() then
+        a.ui_restore[gl] = true
+        gl:override(false)
+    end
+    if gp:get() then
+        a.ui_restore[gp] = true
+        gp:override(false)
+    end
+    if gq:get() then
+        a.ui_restore[gq] = true
+        gq:override(false)
+    end
+    if gm:get() then
+        a.ui_restore[gm] = true
+        gm:override(false)
+    end
+    gn:set(false)
+    local iW = fL:get()
+    local l0 = iW == "Rage"
+    if aa_enabled then
+        iR = hI["m_nWaterLevel"]
+        hI["m_nWaterLevel"] = 2
+        iQ = hI["m_MoveType"]
+        hI["m_MoveType"] = 1
+    end
+    for aw, ax in pairs(k_) do
+        local l1 = true
+        if aw == "pitch" or aw == "yaw" then
+            l1 = false
+        elseif aw == "in_use" and ax == false then
+            l1 = false
+        elseif aw == "in_attack" or aw == "in_attack2" then
+            if kY and kZ.type == "grenade" then
+                l1 = true
+            elseif ax == false then
+                l1 = false
+            end
         end
-    elseif test_array.movement_run then
-        test_array.cmd_location_playback_movement(cmd, local_player, weapon)
-    elseif test_array.enabled_run then
-        local local_origin = vectorlib.from_vec(local_player:get_origin())
-        local target_position = (location_selected ~= nil and location_selected.is_in_fov) and location_selected.position or location_set_closest.position_approach
-        local distance = local_origin:dist_to(target_position)
-        local distance_2d = local_origin:dist_to_2d(target_position)
-
-        if (distance_2d < 0.5 and distance > 0.08 and distance < 5) or (location_set_closest.inaccurate_position and distance < 40) then
-            distance = distance_2d
+        if l1 then
+            dg[aw] = ax
         end
-
-        if ((location_selected ~= nil and location_selected.duckamount == 1) or location_set_closest.has_only_duck) and distance < 10 then
-            cmd.in_duck = 1
+    end
+    if iW == "Rage" and (kY or bit.band(dg.buttons, 1) ~= 1 and bit.band(dg.buttons, 2048) ~= 2048) and (not kY or kY and a.playback_data.thrown_at == nil) then
+        if dg.command_number - a.playback_data.last_offset_swap > 16 then
+            local O, l2 = a.normalize_angles(0, bit.band(dg.buttons, 32) ~= 32 and dg.view_angles.y or dg.view_angles.y - 180)
+            a.playback_data.set_pitch = bit.band(dg.buttons, 32) == 32
+            local l3, l4 = 90
+            for p = -180, 180, 90 do
+                local O, l5 = a.normalize_angles(0, k_.yaw + p)
+                local l6 = math.abs(l5 - l2)
+                if l3 > l6 then
+                    l3 = l6
+                    l4 = p
+                end
+            end
+            if l4 ~= a.playback_data.last_offset then
+                if DEBUG then
+                    print_raw("offset switched from ", a.playback_data.last_offset, " to ", l4)
+                end
+                a.playback_data.last_offset = l4
+                a.playback_data.last_offset_swap = dg.command_number
+            end
         end
+        if a.playback_data.last_offset ~= nil then
+            dg.view_angles.y = k_.yaw + a.playback_data.last_offset
+            if a.playback_data.set_pitch then
+                dg.view_angles.x = 89
+            end
+        end
+    end
+    if not l0 then
+        render.camera_angles(vector(k_.pitch, k_.yaw))
+        if not aa_enabled then
+            dg.view_angles.x = k_.pitch
+            dg.view_angles.y = k_.yaw
+        end
+    elseif kY and kZ.type == "grenade" and iW == "Rage" and a.is_grenade_being_thrown(bW, dg) then
+        dg.view_angles.x = k_.pitch
+        dg.view_angles.y = k_.yaw
+        dg.send_packet = false
+        a.playback_data.thrown_at = dg.command_number
+    end
+end
+function a.cmd_location_playback(dg, hI, bW)
+    if hR.type == "grenade" then
+        a.cmd_location_playback_grenade(dg, hI, bW)
+        go:override(false)
+    elseif hR.type == "movement" then
+        a.cmd_location_playback_movement(dg, hI, bW)
+        ui.find("Aimbot", "Anti Aim", "Angles", "Body Yaw"):override(false)
+        go:override(false)
+    end
+end
+function a.on_run_command(dg)
+    if iQ ~= nil or iR ~= nil then
+        local hI = entity.get_local_player()
+        if iR ~= nil then
+            hI["m_nWaterLevel"] = iR
+            iR = 0
+        end
+        if iQ ~= nil then
+            hI["m_MoveType"] = iQ
+            iQ = nil
+        end
+    end
+end
+function a.on_setup_command(dg)
+    local hI = entity.get_local_player()
+    local iV = gu:get()
+    local bW = hI:get_player_weapon()
 
-        if bit.band(cmd.buttons, 8) ~= 8 and bit.band(cmd.buttons, 16) ~= 16 and bit.band(cmd.buttons, 512) ~= 512 and bit.band(cmd.buttons, 1024) ~= 1024 then
-            if distance < 32 and distance >= MAX_DIST_CORRECT*0.5 then
-                local fwd1 = target_position - local_origin
-            
-                local pos1 = target_position + fwd1:normalized()*10
-
-                local fwd = pos1 - local_origin
-                local pitch, yaw = fwd:angles()
-
-                if yaw == nil then
+    if hR ~= nil then
+        a.cmd_location_playback(dg, hI, bW)
+    elseif hQ ~= nil and iV and hQ.is_in_fov and hQ.is_position_correct then
+        local kO = hI["m_vecVelocity"]:length()
+        local dh = bW["m_bPinPulled"]
+        if hQ.duckamount == 1 or hP.has_only_duck then
+            dg.in_duck = 1
+        end
+        local kY = hQ.weapons[1].type == "grenade"
+        local l7 = bit.band(dg.buttons, 1) == 1 or bit.band(dg.buttons, 2048) == 2048
+        if
+            hQ.type == "movement" and kO < 2 and (not kY or l7) or
+                hQ.type == "grenade" and dh and kO < 2 and hQ.duckamount == hI["m_flDuckAmount"]
+         then
+            hR = hQ
+            a.playback_state = nil
+            a.playback_weapon = bW
+            a.playback_begin = dg.command_number
+            a.cmd_location_playback(dg, hI, bW)
+        elseif not dh and (bit.band(dg.buttons, 1) == 1 or bit.band(dg.buttons, 2048) == 2048) then
+            if hQ.throw_strength == 1 then
+                dg.in_attack = 1
+                dg.in_attack2 = 0
+            elseif hQ.throw_strength == 0.5 then
+                dg.in_attack = 1
+                dg.in_attack2 = 1
+            elseif hQ.throw_strength == 0 then
+                dg.in_attack = 0
+                dg.in_attack2 = 1
+            end
+        end
+    elseif hP ~= nil and iV then
+        local j4 = ay.from_vec(hI:get_origin())
+        local l8 = hQ ~= nil and hQ.is_in_fov and hQ.position or hP.position_approach
+        local l9 = j4:dist_to(l8)
+        local la = j4:dist_to_2d(l8)
+        if la < 0.5 and l9 > 0.08 and l9 < 5 or hP.inaccurate_position and l9 < 40 then
+            l9 = la
+        end
+        if (hQ ~= nil and hQ.duckamount == 1 or hP.has_only_duck) and l9 < 10 then
+            dg.in_duck = 1
+        end
+        if bit.band(dg.buttons, 8) ~= 8 and bit.band(dg.buttons, 16) ~= 16 and bit.band(dg.buttons, 512) ~= 512 and bit.band(dg.buttons, 1024) ~= 1024 then
+            if l9 < 32 and l9 >= c7 * 0.5 then
+                local lb = l8 - j4
+                local lc = l8 + lb:normalized() * 10
+                local ld = lc - j4
+                local cH, cI = ld:angles()
+                if cI == nil then
                     return
                 end
-
-                --cmd.in_speed
-                slow_walk_reference:set(false)
-                cmd.move_yaw = yaw
-                cmd.in_speed = 0
-
-                cmd.in_moveleft, cmd.in_moveright = 0, 0
-                cmd.sidemove = 0
-
-                if location_set_closest.approach_accurate then
-                    cmd.in_forward, cmd.in_back = 1, 0
-                    cmd.forwardmove = 450
+                gn:set(false)
+                dg.move_yaw = cI
+                dg.in_speed = 0
+                dg.in_moveleft, dg.in_moveright = 0, 0
+                dg.sidemove = 0
+                if hP.approach_accurate then
+                    dg.in_forward, dg.in_back = 1, 0
+                    dg.forwardmove = 450
                 else
-                    if distance > 14 then
-                        cmd.forwardmove = 450
+                    if l9 > 14 then
+                        dg.forwardmove = 450
                     else
-                        local wishspeed = math.min(450, math.max(1.1+local_player["m_flDuckAmount"]*10, distance * 9))
-                        local vel = vector(math.abs(local_player["m_vecVelocity[0]"]), math.abs(local_player["m_vecVelocity[1]"]), math.abs(local_player["m_vecVelocity[2]"])):length()
-                        if vel >= math.min(250, wishspeed)+15 then
-                            cmd.forwardmove = 0
-                            cmd.in_forward = 0
+                        local le = math.min(450, math.max(1.1 + hI["m_flDuckAmount"] * 10, l9 * 9))
+                        local lf =
+                            vector(
+                            math.abs(hI["m_vecVelocity[0]"]),
+                            math.abs(hI["m_vecVelocity[1]"]),
+                            math.abs(hI["m_vecVelocity[2]"])
+                        ):length()
+                        if lf >= math.min(250, le) + 15 then
+                            dg.forwardmove = 0
+                            dg.in_forward = 0
                         else
-                            cmd.forwardmove = math.max(6, vel >= math.min(250, wishspeed) and wishspeed*0.9 or wishspeed)
-                            cmd.in_forward = 1
+                            dg.forwardmove = math.max(6, lf >= math.min(250, le) and le * 0.9 or le)
+                            dg.in_forward = 1
                         end
                     end
                 end
-                --local angle = vectorlib.new():init_from_angles(0, cmd.view_angles.y - yaw)
-                --cmd.forwardmove = angle.x * moved_speed
-                --cmd.sidemove = angle.y * moved_speed
             end
         end
     end
-end
-
-function test_array.on_setup_command(cmd)
-    test_array.play_recovery(cmd)
-    local local_player = entity.get_local_player()
-    local hotkey = hotkey_reference:get()
-    local weapon = local_player:get_player_weapon()
-    test_array.enabled_run = false
-    test_array.enabled_playback = false
-    test_array.movement_run = false
-    if fast_stop_reference:get() and hotkey then
-        test_array.ui_restore[fast_stop_reference] = true
-        fast_stop_reference:set(false)
-    end
-
-    if location_playback ~= nil then
-        test_array.enabled_playback = true
-        if location_playback.type == "movement" then
-            test_array.cmd_location_playback_movement(cmd, local_player, weapon)
-        end
-    elseif location_selected ~= nil and hotkey and location_selected.is_in_fov and location_selected.is_position_correct then
-        local speed = vector(math.abs(local_player["m_vecVelocity[0]"]), math.abs(local_player["m_vecVelocity[1]"]), math.abs(local_player["m_vecVelocity[2]"])):length()
-        local pin_pulled = weapon["m_bPinPulled"]
-
-        if location_selected.duckamount == 1 or location_set_closest.has_only_duck then
-            cmd.in_duck = 1
-        end
-
-        local is_grenade = location_selected.weapons[1].type == "grenade"
-        local is_in_attack = bit.band(cmd.buttons, 1) == 1 or bit.band(cmd.buttons, 2048) == 2048
-        if (location_selected.type == "movement" and speed < 2 and (not is_grenade or is_in_attack)) or (location_selected.type == "grenade" and pin_pulled and speed < 2) and location_selected.duckamount == local_player["m_flDuckAmount"] then
-            location_playback = location_selected
-            test_array.playback_state = nil
-            test_array.playback_weapon = weapon
-            test_array.playback_begin = cmd.command_number
-
-
-            if location_playback.type == "grenade" then
-                test_array.cmd_location_playback_grenade(cmd, local_player, weapon)
-            elseif location_playback.type == "movement" then
-                test_array.movement_run = true
-            end
-            --test_array.cmd_location_playback(cmd, local_player, weapon)
-        elseif not pin_pulled and (bit.band(cmd.buttons, 1) == 1 or bit.band(cmd.buttons, 2048) == 2048) then
-            if location_selected.throw_strength == 1 then
-                cmd.in_attack = 1
-                cmd.in_attack2 = 0
-            elseif location_selected.throw_strength == 0.5 then
-                cmd.in_attack = 1
-                cmd.in_attack2 = 1
-            elseif location_selected.throw_strength == 0 then
-                cmd.in_attack = 0
-                cmd.in_attack2 = 1
-            end
-        end
-    elseif location_set_closest ~= nil and hotkey then
-        test_array.enabled_run = true
+    if not iV then
+        ui.find("Aimbot", "Anti Aim", "Angles", "Body Yaw"):override()
+        go:override()
     end
 end
-
-function test_array.update_basic_ui()
-    local enabled = enabled_reference:get()
-
-    hotkey_reference:set_visible(enabled)
-    aimbot_auto_dt_reference:set_visible(enabled)
-    types_reference:set_visible(enabled)
-    color_reference:set_visible(enabled)
-    aimbot_reference:set_visible(enabled)
-    behind_walls_reference:set_visible(enabled)
-    sources_list_ui.title:set_visible(enabled)
-
-    update_sources_ui()
-
-    local aimbot = enabled and aimbot_reference:get()
-    aimbot_fov_reference:set_visible(enabled and aimbot ~= 0)
-    aimbot_speed_reference:set_visible(enabled and aimbot == 'Legit')
+function a.update_basic_ui()
+    local gd = gt:get()
+    gu:set_visible(gd)
+    gy:set_visible(gd)
+    fJ:set_visible(gd)
+    gv:set_visible(gd)
+    fL:set_visible(gd)
+    gz:set_visible(gd)
+    gA.title:set_visible(gd)
+    f1()
+    local iW = gd and fL:get()
+    gw:set_visible(gd and iW ~= 0)
+    gx:set_visible(gd and iW == "Legit")
 end
-
-enabled_reference:set_callback(test_array.update_basic_ui)
-aimbot_reference:set_callback(test_array.update_basic_ui)
-test_array.update_basic_ui()
-function test_array.on_console_input(text)
-    if text == "helper" or text:match("^helper .*$") then
-        if not sources_list_ui.title:get() then
+gt:set_callback(a.update_basic_ui)
+fL:set_callback(a.update_basic_ui)
+a.update_basic_ui()
+function a.on_console_input(T)
+    if T == "helper" or T:match("^helper .*$") then
+        if not gA.title:get() then
             return
         end
-
-        local log_help = false
-        if text:match("^helper map_pattern%s*") then
-            if common.get_map_data()['shortname'] ~= nil then
-                print("Raw map name: ", common.get_map_data()['shortname'])
-                print("Resolved map name: ", test_array.get_mapname())
-                print("Map pattern: ", test_array.get_map_pattern())
+        local lg = false
+        if T:match("^helper map_pattern%s*") then
+            if common.get_map_data()["shortname"] ~= nil then
+                print_raw("Raw map name: ", common.get_map_data()["shortname"])
+                print_raw("Resolved map name: ", a.get_mapname())
+                print_raw("Map pattern: ", a.get_map_pattern())
             else
-                client.error_log("You need to be in-game to use this command")
+                bs.error_log("You need to be in-game to use this command")
             end
-        elseif text == "helper" or text:match("^helper %s*$") or text:match("^helper help%s*$") or text:match("^helper %?%s*$") then
-            print("Helper console command system")
-            log_help = true
-        elseif text:match("^helper source stats%s*") then
-            if type(source_selected) == "table" then
-                local all_locations = source_selected:get_all_locations()
-                local maps = {}
-                for map, map_spots in pairs(all_locations) do
-                    table.insert(maps, map)
+        elseif T == "helper" or T:match("^helper %s*$") or T:match("^helper help%s*$") or T:match("^helper %?%s*$") then
+            print_raw("Helper console command system")
+            lg = true
+        elseif T:match("^helper source stats%s*") then
+            if type(gV) == "table" then
+                local hb = gV:get_all_locations()
+                local ht = {}
+                for fD, lh in pairs(hb) do
+                    table.insert(ht, fD)
                 end
-                table.sort(maps)
-
-                local rows = {}
-                local headings = {"MAP", "Smoke", "Flash", "Molotov", "HE Grenade", "Movement", "Location", "Area", " TOTAL "}
-                local total_row = {"TOTAL", 0, 0, 0, 0, 0, 0, 0, 0}
-
-                for i=1, #maps do
-                    local row = {maps[i], 0, 0, 0, 0, 0, 0, 0, 0}
-                    local map_locations = all_locations[maps[i]]
-                    for i=1, #map_locations do
-                        local location = map_locations[i]
-                        local index = 7
-
-                        if location.type == "grenade" then
-                            for i=1, #location.weapons do
-                                local weapon = location.weapons[i]
-                                if weapon.console_name == "weapon_smokegrenade" then
-                                    index = 2
-                                elseif weapon.console_name == "weapon_flashbang" then
-                                    index = 3
-                                elseif weapon.console_name == "weapon_molotov" then
-                                    index = 4
-                                elseif weapon.console_name == "weapon_hegrenade" then
-                                    index = 5
+                table.sort(ht)
+                local X = {}
+                local Y = {"MAP", "Smoke", "Flash", "Molotov", "HE Grenade", "Movement", "Location", "Area", " TOTAL "}
+                local li = {"TOTAL", 0, 0, 0, 0, 0, 0, 0, 0}
+                for j = 1, #ht do
+                    local a4 = {ht[j], 0, 0, 0, 0, 0, 0, 0, 0}
+                    local f3 = hb[ht[j]]
+                    for j = 1, #f3 do
+                        local fg = f3[j]
+                        local bn = 7
+                        if fg.type == "grenade" then
+                            for j = 1, #fg.weapons do
+                                local bW = fg.weapons[j]
+                                if bW.console_name == "weapon_smokegrenade" then
+                                    bn = 2
+                                elseif bW.console_name == "weapon_flashbang" then
+                                    bn = 3
+                                elseif bW.console_name == "weapon_molotov" then
+                                    bn = 4
+                                elseif bW.console_name == "weapon_hegrenade" then
+                                    bn = 5
                                 end
                             end
-                        elseif location.type == "movement" then
-                            index = 6
-                        elseif location.type == "location" then
-                            index = 7
-                        elseif location.type == "area" then
-                            index = 8
+                        elseif fg.type == "movement" then
+                            bn = 6
+                        elseif fg.type == "location" then
+                            bn = 7
+                        elseif fg.type == "area" then
+                            bn = 8
                         end
-
-                        row[index] = row[index] + 1
-                        total_row[index] = total_row[index] + 1
-                        row[9] = row[9] + 1
-                        total_row[9] = total_row[9] + 1
+                        a4[bn] = a4[bn] + 1
+                        li[bn] = li[bn] + 1
+                        a4[9] = a4[9] + 1
+                        li[9] = li[9] + 1
                     end
-
-                    table.insert(rows, row)
+                    table.insert(X, a4)
                 end
-
-                table.insert(rows, {})
-                table.insert(rows, total_row)
-
-                -- remove empty columns
-                for i=#total_row, 2, -1 do
-                    if total_row[i] == 0 then
-                        table.remove(headings, i)
-                        for j=1, #rows do
-                            table.remove(rows[j], i)
+                table.insert(X, {})
+                table.insert(X, li)
+                for j = #li, 2, -1 do
+                    if li[j] == 0 then
+                        table.remove(Y, j)
+                        for k = 1, #X do
+                            table.remove(X[k], j)
                         end
                     end
                 end
-
-                local tbl_result = table_gen(rows, headings, {style="Unicode"})
-                -- print("Locations loaded:")
-                -- for s in tbl_result:gmatch("[^\r\n]+") do
-                --     client_color_log(210, 210, 210, s)
-                -- end
-
-                print_raw("Statistics for ", source_selected.name, source_selected.description ~= nil and string.format(" - %s", source_selected.description) or "", ": \n", tbl_result, "\n")
+                local lj = D(X, Y, {style = "Unicode"})
+                print_raw(
+                    "Statistics for ",
+                    gV.name,
+                    gV.description ~= nil and string.format(" - %s", gV.description) or "",
+                    ": \n",
+                    lj,
+                    "\n"
+                )
             else
-                client.error_log("No source selected")
+                bs.error_log("No source selected")
             end
-        elseif text:match("^helper source export_repo%s*") then
-            if type(source_selected) == "table" then
-                if source_selected.type == "local" then
-                    client.error_log("Not yet implemented")
+        elseif T:match("^helper source export_repo%s*") then
+            if type(gV) == "table" then
+                if gV.type == "local" then
+                    bs.error_log("Not yet implemented")
                 else
-                    client.error_log("You can only export a local source")
+                    bs.error_log("You can only export a local source")
                 end
             else
-                client.error_log("No source selected")
+                bs.error_log("No source selected")
             end
-        elseif text:match("^helper source%s*$") then
-            if type(source_selected) == "table" then
-                print("Selected source: ", source_selected.name, " (", source_selected.type, ")")
-                print("Description: ", tostring(source_selected.description))
-                print("Last updated: ", source_selected.update_timestamp and string.format("%s (unix ts: %s)", test_array.format_unix_timestamp(source_selected.update_timestamp, false, false, 1), source_selected.update_timestamp) or "Not set")
+        elseif T:match("^helper source%s*$") then
+            if type(gV) == "table" then
+                print_raw("Selected source: ", gV.name, " (", gV.type, ")")
+                print_raw("Description: ", tostring(gV.description))
+                print_raw(
+                    "Last updated: ",
+                    gV.update_timestamp and
+                        string.format(
+                            "%s (unix ts: %s)",
+                            a.format_unix_timestamp(gV.update_timestamp, false, false, 1),
+                            gV.update_timestamp
+                        ) or
+                        "Not set"
+                )
             else
-                client.error_log("No source selected")
+                bs.error_log("No source selected")
             end
         else
-            client.error_log("Unknown helper command: " .. text:gsub("^helper ", ""))
-            log_help = true
+            bs.error_log("Unknown helper command: " .. T:gsub("^helper ", ""))
+            lg = true
         end
-
-        if log_help then
-            local commands = {
+        if lg then
+            local lk = {
                 {"help", "Displays this help info"},
                 {"map_pattern", "Displays map pattern debug info"},
                 {"source", "Displays information about the current source"},
                 {"source stats", "Displays statistics for the currently selected source"},
                 {"source export_repo", "Exports a local source into a repository file structure"}
             }
-
-            local text = "\tKnown commands:"
-            for i=1, #commands do
-                local command, help = unpack(commands[i])
-                text = text .. string.format("\n\thelper %s - %s", command, help)
+            local T = "\tKnown commands:"
+            for j = 1, #lk do
+                local k_, ll = unpack(lk[j])
+                T = T .. string.format("\n\thelper %s - %s", k_, ll)
             end
-
-            print(text)
+            print_raw(T)
         end
-
         return true
     end
 end
-
-events.console_input:set(test_array.on_console_input)
-events.level_init:set(function()
-    source_selected = nil
-
-    source_editing = false
-    edit_location_selected = nil
-
-    test_array.table_clear(source_editing_modified)
-    test_array.table_clear(source_editing_has_changed)
-
-    update_sources_ui()
-    test_array.flush_active_locations()
-end)
-
-events.switch_team:set(function(e)
-    source_selected = nil
-
-    source_editing = false
-    edit_location_selected = nil
-
-    test_array.table_clear(source_editing_modified)
-    test_array.table_clear(source_editing_has_changed)
-
-    update_sources_ui()
-    test_array.flush_active_locations()
-end)
-
-events.round_end:set(function(e)
-    location_playback = nil
-end)
-
-events.shutdown:set(function()
-    for i=1, #db.sources do
-        if db.sources[i].cleanup ~= nil then
-            db.sources[i]:cleanup()
-        end
+events.console_input:set(a.on_console_input)
+events.level_init:set(
+    function()
+        gV = nil
+        gU = false
+        gK = nil
+        a.table_clear(gX)
+        a.table_clear(gY)
+        f1()
+        a.flush_active_locations()
     end
-    test_array.restore_disabled()
-    benchmark:start("db_write")
-    database.write("helper_db", db)
-    benchmark:finish("db_write")
-end)
-
-events.render:set(test_array.on_paint)
-events.createmove:set(test_array.on_setup_command)
-events.createmove:set(test_array.on_run_command)
+)
+events.switch_team:set(
+    function(f)
+        gV = nil
+        gU = false
+        gK = nil
+        a.table_clear(gX)
+        a.table_clear(gY)
+        f1()
+        a.flush_active_locations()
+    end
+)
+events.round_end:set(
+    function(f)
+        hR = nil
+    end
+)
+events.shutdown:set(
+    function()
+        for j = 1, #av.sources do
+            if av.sources[j].cleanup ~= nil then
+                av.sources[j]:cleanup()
+            end
+        end
+        a.restore_disabled()
+        cm:start("db_write")
+        au.write("helper_db", av)
+        cm:finish("db_write")
+    end
+)
+events.render:set(a.on_paint)
+events.createmove:set(a.on_setup_command)
+events.createmove:set(a.on_run_command)
