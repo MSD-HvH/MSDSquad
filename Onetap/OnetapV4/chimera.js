@@ -1,15 +1,5 @@
 var chimera = {}
 
-//яночкаа ♥ //UPD а все яночка больше не нравится...
-
-//очень долго мне нравилась яна... я сам даже не знаю почему
-//делая дела в добром одиночестве часто думал о ней
-//она была моей томиэ, самой настоящей
-//сейчас же все иначе... даже не смотрю на нее...
-//мне не хочется этого делать, почему то
-//что то развергло меня с нею бессловесное 
-
-
 var on_load_screen_time = Globals.Realtime() //это максимально хуево выглядит, а еще и при каждой перезагрузке скрипта будет появляться
 
 var ui_handler = {}
@@ -29,6 +19,21 @@ var custom_scope = {}
 var kill_say = {}
 var menu_effects = {}
 var clantag = {}
+
+/*
+Привет. Как видишь, я убрал тектс чуть ниже, чтобы не все его видели при скачивании в дискорде. 
+
+Всегда кто-то откуда то уходит. Вот и мое время настало.
+Мне было интересно здесь играть со всеми людьми, с которыми
+меня свела жизнь. Всем пока, ребята! В этой жизни нельзя стоять на месте.
+
+Vura, Keni, Morty, Ocean, Richard, Nevkoz, Humansuit, Krest, Aired, Forgotten,
+Processor, Shredder, Johny, Sh1ma, Error, Wormeitor, Demon Slayer, Sabdeb,
+Crpple, Dan, MaV, Shirazu, Yems, Monroe, Flawless, Tema Bebrikov, Sa1mon,
+VK Fatality group and other guys ♥
+
+rejunked is gone
+*/
 
 kill_say.phrases = [
     
@@ -2274,7 +2279,19 @@ anti_bruteforce.handle = function() {
 
 
 configs.parse = function() {
-    DataFile.Save('chimera.config')
+
+    var config_name = [
+        'chimera.config',
+        'chimera2.config',
+        'chimera3.config',
+        'chimera4.config',
+        'chimera5.config'
+    ]
+
+    var current_value = menu.get_value('CONFIGS', '1', 'Slot')
+    var current_name = config_name[current_value]
+
+    DataFile.Save(current_name)
 
     for (h in menu.data.items) {
 
@@ -2284,23 +2301,34 @@ configs.parse = function() {
 
                 if (i.indexOf('Color') == -1) {
                     
-                    DataFile.SetKey('chimera.config', h + '|' + u + '|' + i , String(menu.get_value(h, u, i)))
-                   // Cheat.Print(h + '|' + u + '|' + '[Phase ' + i + '] Fake Limit' + ' | ' + Number(DataFile.GetKey('chimera.config', h + '|' + u + '|' + '[Phase ' + i + '] Fake Limit')) + '\n')
+                    DataFile.SetKey(current_name, h + '|' + u + '|' + i , String(menu.get_value(h, u, i)))
+                   // Cheat.Print(h + '|' + u + '|' + '[Phase ' + i + '] Fake Limit' + ' | ' + Number(DataFile.GetKey(current_name, h + '|' + u + '|' + '[Phase ' + i + '] Fake Limit')) + '\n')
                 }
                 else {
-                    DataFile.SetKey('chimera.config', h + '|' + u + '|' + i , String(menu.get_color(h, u, i)))
+                    DataFile.SetKey(current_name, h + '|' + u + '|' + i , String(menu.get_color(h, u, i)))
                 }
 
             }
         }
     }
 
-    DataFile.Save('chimera.config')
+    DataFile.Save(current_name)
 }
 
 configs.load = function() {
+
+    var config_name = [
+        'chimera.config',
+        'chimera2.config',
+        'chimera3.config',
+        'chimera4.config',
+        'chimera5.config'
+    ]
+
+    var current_value = menu.get_value('CONFIGS', '1', 'Slot')
+    var current_name = config_name[current_value]
     
-    DataFile.Load('chimera.config')
+    DataFile.Load(current_name)
 
     var antibrute_phases = -1
 
@@ -2317,7 +2345,7 @@ configs.load = function() {
                 
 
                 if (i.indexOf('Color') == -1) {
-                    var key = DataFile.GetKey('chimera.config', h + '|' + u + '|' + i)
+                    var key = DataFile.GetKey(current_name, h + '|' + u + '|' + i)
                     
                     var item = menu.data.items[h][u][i]
                     var type = item.type
@@ -2359,7 +2387,7 @@ configs.load = function() {
                 else {
 
                     var color = [0, 0, 0, 0]
-                    var value_string = DataFile.GetKey('chimera.config', h + '|' + u + '|' + i)
+                    var value_string = DataFile.GetKey(current_name, h + '|' + u + '|' + i)
                     
 
                     if (value_string.length == 0) {
@@ -2393,23 +2421,14 @@ configs.load = function() {
         menu.set_value('ABF', '1', '[Phase ' + j + '] Fake Limit', Number(DataFile.GetKey('chimera.config', 'ABF' + '|' + '1' + '|' + '[Phase ' + j + '] Fake Limit')))
     }
 }
+//menu.new_dropdown('ANTI AIM', '2', 'LBY Mode' + ' '.repeat(id + 1), ["Disabled", "Opposite", "Sway"]
+ui_handler.new_element('Configs', 'export_config', menu.new_dropdown('CONFIGS', '1', 'Slot', ["Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5"]))
 
 ui_handler.new_element('Configs', 'export_config', menu.new_button('CONFIGS', '1', 'Save config to scirpts derictory', function() {configs.parse()}))
 
 ui_handler.new_element('Configs', 'import_config', menu.new_button('CONFIGS', '1', 'Import config from scirpts derictory', function() {configs.load()}))
 
-ui_handler.new_element('Configs', 'label_info', menu.new_label('CONFIGS', '1', 'To load config first put it into scripts folder.'))
-
-/**
- * 
- * menu.colors = {
-    orange : [254, 124, 56, 255],
-    background : [15, 28, 40, 255],
-    light : [27, 38, 50, 255],
-    extra : [37, 48, 60, 255]
-}
-
- */
+ui_handler.new_element('Configs', 'label_info', menu.new_label('CONFIGS', '1', 'To load config first put it into scripts folder.\nSlot 1 - chimera.config. Slot X - chimeraX.config\n\nNOTICE: Dont try to load config whenever you dont\nhave it. You could create files manually. Also you\ncould select required config and press "Save" button\nto create it. File MUST be with .config extension\notherwise cheat wont accept it. Visit our discord\nserver to get help if necessary.\n\ndsc.gg/chimerajs'))
 
 ui_handler.new_element('Configs', 'main_light_color', menu.new_colorpicker('CONFIGS', '2', 'Main Light Color', undefined, [255, 184, 116, 255]))
 
