@@ -114,32 +114,26 @@ exports.createMenu = function(name, menu_size, cb) {
     this.themes = {};
 
     this.data = {};
-    this.indexes = {};
+    this.drag = {};
 
     /** @private */
     this.Preload = function() {
         UI.AddSliderInt(this.options["name"] + "_x", 0, screen[0]);
         UI.AddSliderInt(this.options["name"] + "_y", 0, screen[1]);
+        UI.AddSliderFloat(this.options["name"] + "_scale", 0.5, 3);
 
         if(build !== "dev") {
             UI.SetEnabled(this.options["name"] + "_x", 0);
             UI.SetEnabled(this.options["name"] + "_y", 0);
+            UI.SetEnabled(this.options["name"] + "_scale", 0);
         };
 
         this.options.sizes["menu"] = {
             width: menu_size[0] || 455,
             height: menu_size[1] || 340,
         };
-
-        this.options.sizes["navigation"] = {
-            width: (menu_size[0] || 455) / 6
-        };
-
-        this.options.sizes["fields"] = {
-            width: ((menu_size[0] || 455) - 30 - (menu_size[0] || 455) / 6) / 2
-        };
         
-        this.CreateTheme("Dark", {
+        this.AddTheme("Dark", {
             theme: [32, 32, 32, 255],
             header: [31, 31, 31, 255],
             inner: [22, 22, 22, 255],
@@ -152,9 +146,18 @@ exports.createMenu = function(name, menu_size, cb) {
         });
 
         this.data["tabs"] = {};
-        this.indexes["tabs"] = 0;
+
+        this.data["checkboxes"] = [];
+
+        this.data["items"] = [];
+
+        this.data.indexes = {
+            checkboxes: 0
+        };
 
         this.data.menu = {};
+
+        this.AddSubtab("Info");
 
         this.data["current_tab"] = Object.keys(this.data["tabs"])[0] || "";
     };
@@ -186,10 +189,6 @@ exports.createMenu = function(name, menu_size, cb) {
         return this.animations;
     };
 
-    this.GetIndexes = function() {
-        return this.indexes();
-    };
-
     this.DrawTabs = function() {
         const tab_keys = Object.keys(this.data["tabs"]);
         const sizes = this.options["sizes"];
@@ -197,7 +196,7 @@ exports.createMenu = function(name, menu_size, cb) {
         const data = this.data;
         const current_theme = this.themes["Dark"];
 
-        const font = Render.AddFont("Segoe UI", (sizes["navigation"].width - 5) / 6, 600);
+        const font = Render.AddFont("Segoe UI", ((sizes["menu"].width / 6) - 5) / 6, 600);
 
         const a_menua = (GetAnimation("menu_alpha")).number
         const a_tabsh = NewAnimation("tabs_height", UI.IsMenuOpen() ? 1 : 0);
@@ -205,12 +204,12 @@ exports.createMenu = function(name, menu_size, cb) {
         data.menu["navigation"] = { add_height: 0 };
 
         tab_keys.forEach(function(tab) {
-            Render.StringCustom(pos[0] + (sizes["navigation"].width / 2), (pos[1] + 10) + (data.menu["navigation"].add_height * a_tabsh), 1, tab, AnimateAlpha((data["current_tab"] === tab ? current_theme.accent : current_theme.text), a_menua), font);
+            Render.StringCustom(pos[0] + ((sizes["menu"].width / 6) / 2), (pos[1] + 10) + (data.menu["navigation"].add_height * a_tabsh), 1, tab, AnimateAlpha((data["current_tab"] === tab ? current_theme.accent : current_theme.text), a_menua), font);
 
             const x1 = pos[0] + 5;
             const y1 = (pos[1] + 5) + (data.menu["navigation"].add_height * a_tabsh);
 
-            const x2 = x1 + (sizes["navigation"].width - 5)
+            const x2 = x1 + ((sizes["menu"].width / 6) - 5)
             const y2 = y1 + Render.TextSizeCustom(tab, font)[1] + 10;
 
             if(Useful.Other.CursorBox(Input.GetCursorPosition(), x1, y1, x2, y2) && Input.IsKeyPressed(0x01)) data["current_tab"] = tab;
@@ -230,40 +229,116 @@ exports.createMenu = function(name, menu_size, cb) {
         const a_menua = NewAnimation("menu_alpha", UI.IsMenuOpen() ? 1 : 0);
         const a_menuh = NewAnimation("menu_height", UI.IsMenuOpen() ? 1 : 0);
 
+        const nav_width = (sizes["menu"].width / 6);
+        const field_width = ((sizes["menu"].width - nav_width) - 30) / 2
+
         Render.FilledRect(pos[0], pos[1], sizes["menu"].width, (sizes["menu"].height * a_menuh), AnimateAlpha(current_theme.theme, a_menua));
 
-        Render.FilledRect(pos[0], pos[1], sizes["navigation"].width, (sizes["menu"].height * a_menuh), AnimateAlpha(current_theme.inner, a_menua));
-        Render.Rect(pos[0], pos[1], sizes["navigation"].width, (sizes["menu"].height * a_menuh), AnimateAlpha(current_theme.stroke, a_menua));
+        Render.FilledRect(pos[0], pos[1], nav_width, (sizes["menu"].height * a_menuh), AnimateAlpha(current_theme.inner, a_menua));
+        Render.Rect(pos[0], pos[1], nav_width, (sizes["menu"].height * a_menuh), AnimateAlpha(current_theme.stroke, a_menua));
 
-        Render.FilledRect((pos[0] + sizes["navigation"].width) + 10, pos[1] + 10, sizes["fields"].width, (sizes["menu"].height * a_menuh) - 20, AnimateAlpha(current_theme.inner, a_menua));
-        Render.Rect((pos[0] + sizes["navigation"].width) + 10, pos[1] + 10, sizes["fields"].width, (sizes["menu"].height * a_menuh) - 20, AnimateAlpha(current_theme.stroke, a_menua));
+        Render.FilledRect((pos[0] + nav_width) + 10, pos[1] + 10, field_width, (sizes["menu"].height * a_menuh) - 20, AnimateAlpha(current_theme.inner, a_menua));
+        Render.Rect((pos[0] + nav_width) + 10, pos[1] + 10, field_width, (sizes["menu"].height * a_menuh) - 20, AnimateAlpha(current_theme.stroke, a_menua));
 
-        Render.FilledRect((pos[0] + sizes["navigation"].width + sizes["fields"].width) + 20, pos[1] + 10, sizes["fields"].width, (sizes["menu"].height * a_menuh) - 20, AnimateAlpha(current_theme.inner, a_menua));
-        Render.Rect((pos[0] + sizes["navigation"].width + sizes["fields"].width) + 20, pos[1] + 10, sizes["fields"].width, (sizes["menu"].height * a_menuh) - 20, AnimateAlpha(current_theme.stroke, a_menua));
+        Render.FilledRect((pos[0] + nav_width + field_width) + 20, pos[1] + 10, field_width, (sizes["menu"].height * a_menuh) - 20, AnimateAlpha(current_theme.inner, a_menua));
+        Render.Rect((pos[0] + nav_width + field_width) + 20, pos[1] + 10, field_width, (sizes["menu"].height * a_menuh) - 20, AnimateAlpha(current_theme.stroke, a_menua));
     };
 
-    this.AddSubtab = function(name) {
+    this.DrawElements = function() {
+        const data = this.GetData();
+        const pos = this.GetPosition();
+        const sizes = this.options["sizes"];
+
+        const nav_width = (sizes["menu"].width / 6);
+        const field_width = ((sizes["menu"].width - nav_width) - 30) / 2
+
+        const x = pos[0] + nav_width + 20;
+        const y = pos[1] + 20
+
+        var add_height = { "General": 0, "Other": 0 };
+
+        const AddWidth = function(Element) {
+            return (Element.path[1] == "General" ? 0 : field_width + 10)
+        };
+
+        const AddHeight = function(Element) {
+            return add_height[Element.path[1]]
+        };
+
+        const DrawCheckbox = function(E, x, y) {
+            Render.FilledRect(x + AddWidth(E), y + AddHeight(E), 20, 20, [255, 255, 255, 255]);
+
+            add_height[E.path[1]] += 30
+        };
+
+        this.data["items"].forEach(function(element, i) {
+            if(element.path[0] !== data["current_tab"]) return;
+
+            switch (element.type) {
+                case "checkbox":
+                    DrawCheckbox(element, x, y)
+                break;
+            }
+        });
+
+        sizes["menu"].height = menu_size[1]
+
+        if(add_height["General"] >= sizes["menu"].height - 15) sizes["menu"].height = add_height["General"] + 30;
+        if(add_height["Other"] >= sizes["menu"].height - 15) sizes["menu"].height = add_height["Other"] + 30;
+    };
+
+    this.AddCheckbox = function(path, name, cb, def) {
+        if(!path || typeof path != "object") return ThrowError("AddCheckbox", "You should put path: Array as first argument");
+        if(!this.data.tabs[path[0]]) return ThrowError("AddCheckbox", "You don't have \"" + path[0] + "\" subtab")
+        if(path[1] != "General" && path[1] != "Other") return ThrowError("AddCheckbox", "Second element of path should be \"General\" or \"Other\"")
+        if(!name) return ThrowError("AddCheckbox", "You should put name: String as second argument");
+        if(def && typeof def != "boolean") return ThrowError("AddCheckbox", "Default value should be boolean");
+
+        this.data.indexes["checkboxes"] += 1
+
+        const checkbox = {
+            id: this.data.indexes["checkboxes"],
+            add_height: 30,
+            type: "checkbox",
+            name: name,
+            path: path,
+            value: def || false,
+            visible: true,
+            animation: 0
+        };
+
+        this.data["checkboxes"].push(checkbox);
+        this.data.tabs[path[0]][path[1]].elements.push(checkbox);
+        this.data.items.push(checkbox);
+
+        if(cb) cb(checkbox)
+    };
+
+    this.AddSubtab = function(name, cb) {
         if(this.data.tabs[name]) return ThrowError("AddSubtab", "You can't create 2 tabs with same name");
 
         this.data.tabs[name] = {
             General: {
                 elements: [],
-                add_height: 0
             },
 
             Other: {
                 elements: [],
-                add_height: 0
             }
         };
+
+        if(cb) cb(this.data.tabs[name])
     };
 
-    this.CreateTheme = function(name, theme_object) {
-        if(this.themes[name]) return ThrowError("CreateTheme", "You can't create 2 themes with same name");
-
+    this.AddTheme = function(name, theme_object, cb) {
+        if(this.themes[name]) return ThrowError("AddTheme", "You can't create 2 themes with same name");
+        if(!theme_object) return ThrowError("AddTheme", "You should put theme settings: Object as second argument");
+        
         this.themes[name] = theme_object;
-    };
 
+        if(cb) cb(this.themes[name])
+    };
+    
     this.Preload();
     cb(this);
 
