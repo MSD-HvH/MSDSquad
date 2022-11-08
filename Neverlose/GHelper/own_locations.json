@@ -1,0 +1,187 @@
+[
+  {
+    "name": ["T Roof", "CT Stairs"],
+    "description": "Run + Jump",
+    "weapon": "weapon_molotov",
+    "position": [984.48394775391, -1227.8950195313, -108.96875],
+    "viewangles": [-29.424968719482, -165.91543579102],
+    "grenade": {
+      "jump": true,
+      "run": 11,
+      "recovery_jump": true,
+      "delay": 23
+    }
+  },
+  {
+    "name": ["T Roof", "Pit Holder"],
+    "description": "Run + Jump",
+    "weapon": "weapon_molotov",
+    "position": [984.49133300781, -1227.8934326172, -108.96875],
+    "viewangles": [6.43501329422, -166.36041259766],
+    "grenade": {
+      "jump": true,
+      "run": 14,
+      "recovery_jump": true
+    }
+  },
+  {
+    "name": ["T Roof", "A Plant"],
+    "description": "Run + Jump",
+    "weapon": "weapon_molotov",
+    "position": [838.14312744141, -1207.5252685547, -108.96875],
+    "viewangles": [-29.580003738403, -146.41542053223],
+    "grenade": {
+      "jump": true,
+      "run": 9,
+      "recovery_jump": true,
+      "delay": 23
+    }
+  },
+  {
+    "name": ["CT Stairs", "T Stairs"],
+    "description": "Risky",
+    "weapon": "weapon_molotov",
+    "position": [-538.40643310547, -1492.0712890625, -39.96875],
+    "viewangles": [-15.885031700134, -22.42631149292],
+    "grenade": {
+      "run": 4,
+      "recovery_yaw": 90,
+      "recovery_jump": true
+    }
+  },
+  {
+    "name": ["CT Stairs", "T Roof"],
+    "description": "Run + Jump [Risky]",
+    "weapon": "weapon_molotov",
+    "position": [-538.27325439453, -1492.0791015625, -39.96875],
+    "viewangles": [-29.195001602173, 24.689002990723],
+    "grenade": {
+      "jump": true,
+      "run": 14,
+      "run_yaw": -69,
+      "recovery_jump": true,
+      "delay": 25
+    }
+  },
+  {
+    "name": ["CT Stairs", "Under T Stairs"],
+    "description": "Run [Risky]",
+    "weapon": "weapon_molotov",
+    "position": [-523.81896972656, -1427.4262695313, -86.819412231445],
+    "viewangles": [9.8549547195435, -66.945953369141],
+    "grenade": {
+      "run": 9,
+      "recovery_yaw": 90,
+      "recovery_jump": true
+    }
+  },
+  {
+    "name": ["T Stairs", "CT Stairs"],
+    "description": "Run + Jump",
+    "weapon": "weapon_molotov",
+    "position": [-81.273147583008, -1447.8720703125, -115.96875],
+    "viewangles": [-14.72996711731, -62.956298828125],
+    "grenade": {
+      "jump": true,
+      "run": 12,
+      "recovery_jump": true
+    }
+  },
+  {
+    "name": ["T Stairs", "CT Stairs"],
+    "description": "Run + Jump [Risky]",
+    "weapon": "weapon_molotov",
+    "position": [-118.94114685059, -1418.0090332031, -72.175369262695],
+    "viewangles": [-4.8299655914307, -59.821300506592],
+    "grenade": {
+      "jump": true,
+      "run": 17,
+      "recovery_jump": true,
+      "delay": 3
+    }
+  },
+  {
+    "name": ["CT Stairs", "Short"],
+    "description": "Run + Jump",
+    "weapon": "weapon_molotov",
+    "position": [-447.95492553711, -1633.5311279297, -39.96875],
+    "viewangles": [0.010072268545628, 94.259941101074],
+    "grenade": {
+      "jump": true,
+      "run": 19,
+      "run_yaw": 25,
+      "recovery_jump": true,
+      "delay": 12
+    }
+  },
+  {
+    "name": ["CT Stairs", "Droproom"],
+    "description": "Run + Jump",
+    "weapon": "weapon_molotov",
+    "position": [-447.89486694336, -1633.5589599609, -39.96875],
+    "viewangles": [-0.59508526325226, 89.251983642578],
+    "grenade": {
+      "jump": true,
+      "run": 17,
+      "run_yaw": 55,
+      "delay": 8
+    }
+  },
+  {
+    "name": ["Under CT Stairs", "T Stairs"],
+    "description": "Safe",
+    "weapon": "weapon_molotov",
+    "position": [-572.30096435547, -1540.3853759766, -167.96875],
+    "viewangles": [-59.289962768555, 11.719923019409]
+  },
+  {
+    "name": ["Under CT Stairs", "Tetris"],
+    "description": "Safe",
+    "weapon": "weapon_molotov",
+    "position": [-572.283203125, -1540.3822021484, -167.96875],
+    "viewangles": [-65.560012817383, 7.2099213600159]
+  },
+  {
+    "name": ["Connector", "Palace [Deep]"],
+    "description": "Run + Jump [Risky]",
+    "weapon": "weapon_molotov",
+    "position": [-683.11065673828, -1306.5451660156, -167.96875],
+    "viewangles": [4.4549608230591, -51.390144348145],
+    "grenade": {
+      "jump": true,
+      "run": 25,
+      "recovery_yaw": 90,
+      "recovery_jump": true
+    }
+  },
+  {
+    "name": ["Connector", "Palace"],
+    "description": "Safe",
+    "weapon": "weapon_molotov",
+    "position": [-683.08142089844, -1306.5323486328, -167.96875],
+    "viewangles": [-18.92004776001, -49.795116424561],
+    "grenade": {
+      "run": 8
+    }
+  },
+  {
+    "name": ["Connector", "Under Palace"],
+    "description": "Safe",
+    "weapon": "weapon_molotov",
+    "position": [-683.17419433594, -1306.5120849609, -167.96875],
+    "viewangles": [-13.915034294128, -55.900157928467],
+    "grenade": {
+      "run": 2
+    }
+  },
+  {
+    "name": ["Connector", "Palace Hidden"],
+    "description": "Safe",
+    "weapon": "weapon_molotov",
+    "position": [-683.07611083984, -1306.5319824219, -167.96875],
+    "viewangles": [-18.315032958984, -55.240116119385],
+    "grenade": {
+      "run": 13
+    }
+  }
+]
