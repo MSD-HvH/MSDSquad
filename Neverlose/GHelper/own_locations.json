@@ -183,5 +183,47 @@
     "grenade": {
       "run": 13
     }
+  },
+  {
+    "name": ["Connector", "A Plant"],
+    "description": "Safe",
+    "weapon": "weapon_molotov",
+    "position": [-554.94274902344, -1309.0191650391, -163.96875],
+    "viewangles": [-12.594988822937, -72.23511505127]
+  },
+  {
+    "name": ["Pit", "Palace Hidden"],
+    "description": "Run + Jump [Risky]",
+    "weapon": "weapon_molotov",
+    "position": [116.01531982422, -1717.9819335938, -167.96875],
+    "viewangles": [-7.4250001907349, 96.419937133789],
+    "grenade": {
+      "jump": true,
+      "run": 13
+    }
+  },
+  {
+    "name": ["Connector", "Chair"],
+    "description": "Run + Jump",
+    "weapon": "weapon_molotov",
+    "position": [-633.97033691406, -856.52111816406, -255.7046661377],
+    "viewangles": [-7.9749240875244, 75.055023193359],
+    "grenade": {
+      "jump": true,
+      "run": 9,
+      "delay": 1
+    }
+  },
+  {
+    "name": ["Jungle", "City"],
+    "description": "Run + Jump",
+    "weapon": "weapon_molotov",
+    "position": [-879.99273681641, -1306.0471191406, -167.96875],
+    "viewangles": [-43.614963531494, -88.540084838867],
+    "grenade": {
+      "jump": true,
+      "run": 5,
+      "delay": 28
+    }
   }
 ]
