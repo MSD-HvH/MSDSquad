@@ -218,12 +218,23 @@
     "name": ["Jungle", "City"],
     "description": "Run + Jump",
     "weapon": "weapon_molotov",
-    "position": [-879.99273681641, -1306.0471191406, -167.96875],
-    "viewangles": [-43.614963531494, -88.540084838867],
+    "position": [-879.998046875, -1306.0396728516, -167.96875],
+    "viewangles": [-44.934993743896, -88.100852966309],
     "grenade": {
       "jump": true,
-      "run": 5,
+      "run": 4,
       "delay": 28
+    }
+  },
+  {
+    "name": ["Connector", "Chair"],
+    "description": "Run + Jump",
+    "weapon": "weapon_molotov",
+    "position": [-719.96740722656, -958.79986572266, -215.96875],
+    "viewangles": [3.0249884128571, 69.859001159668],
+    "grenade": {
+      "jump": true,
+      "run": 27
     }
   }
 ]
