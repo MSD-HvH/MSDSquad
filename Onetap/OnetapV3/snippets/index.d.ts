@@ -78,7 +78,7 @@ declare namespace UI {
      * Adds a textbox in which you can input text and read it later on.
      * Returns an path: string[].
      * 
-     * @param name nmae of text
+     * @param name name of text
      */
     function AddTextbox(name: string): string[];
 }
