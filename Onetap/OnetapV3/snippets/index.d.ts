@@ -1,8 +1,16 @@
-/** 
+/**
  * Сниппет для Onetap V3
  * 
  * @author Mased
- * @version 1.1.0
+ * @version 1.2.0
+ * 
+ * Полезные материалы:
+ * @link https://github.com/ZaUserA/OneTap-v3-Js
+ * @link https://gamesensical.gitbook.io/docs/developers/netprops
+ * @link https://github.com/MasedMSD/MSDSquad
+ * 
+ * Thanks april's github btw <3
+ * @link https://github.com/aprxl/scripting
  */
 
 type LengthArray <T, N extends number, R extends T[] = []> = number extends N ? T[] : R['length'] extends N ? R : LengthArray<T, N, [T, ...R]>;
@@ -15,7 +23,26 @@ type Subtabs = {
     "Misc": "GENERAL" | "PERFORMANCE & INFORMATION" | "SKINS" | "JAVASCRIPT";
 }
 
+/**
+ * An array of numbers (RGBA color)
+ */
 type Color = LengthArray<number, 4>
+
+/**
+ * The index of an entity.
+ */
+type EntityID = number;
+
+/**
+ * The index of a user in an event.
+ */
+type UserID = Number;
+
+/**
+ * An array containing three number corresponding to the X, Y and Z positions of a 3D point.
+ * Or, alternatively, an array containing the pitch, yaw and roll of an Euler angle.
+ */
+type Vector = number[];
 
 declare namespace Globals {
     /**
@@ -266,3 +293,215 @@ declare namespace UI {
      */
     function GetValue <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): boolean | 1 | 0;
 }
+
+declare namespace Entity {
+    /**
+     * Returns an array containing the data of a entity's bounding box: whether or not the box is valid, the box's top left corner X position,
+     * the box's top left Y position, the box's bottom right X position and the box's bottom right Y position.
+     * @param index The entity's index
+     */
+    function GetRenderBox(index: EntityID): number[];
+
+    /**
+     * Returns an array containing all of the weapon's entity indexes of a player.
+     * @param index 
+     */
+    function GetWeapons(index: EntityID): EntityID[];
+
+    /**
+     * Returns an array containing all entities of a certain class.
+     * @param class_index The class' index.
+     */
+    function GetEntitiesByClassID(class_index: number): EntityID[];
+
+    /**
+     * Returns the hitbox's position of an entity.
+     * @param index The entity's index
+     * @param hitbox_index The hitbox's index. Ranges from 0 to 18.
+     * 
+     * HITBOX_HEAD = 0
+     * HITBOX_NECK = 1
+     * HITBOX_PELVIS = 2
+     * HITBOX_BODY = 3
+     * HITBOX_THORAX = 4
+     * HITBOX_CHEST = 5
+     * HITBOX_UPPER_CHEST = 6
+     * HITBOX_LEFT_THIGH = 7
+     * HITBOX_RIGHT_THIGH = 8
+     * HITBOX_LEFT_CALF = 9
+     * HITBOX_RIGHT_CALF = 10
+     * HITBOX_LEFT_FOOT = 11
+     * HITBOX_RIGHT_FOOT = 12
+     * HITBOX_LEFT_HAND = 13
+     * HITBOX_RIGHT_HAND = 14
+     * HITBOX_LEFT_UPPER_ARM = 15
+     * HITBOX_LEFT_FOREARM = 16
+     * HITBOX_RIGHT_UPPER_ARM = 17
+     * HITBOX_RIGHT_FOREARM = 18
+     */
+    function GetHitboxPosition(index: EntityID, hitbox_index: number): Vector;
+
+    /**
+     * Returns the entity's eye position.
+     * @param index The entity's index
+     */
+    function GetEyePosition(index: EntityID): Vector;
+
+    /**
+     * Returns the game's CCSGameRulesProxy entity.
+     */
+    function GetGameRulesProxy(): EntityID;
+
+    /**
+     * Returns whether or not the specified entity is a bot.
+     * @param index The entity's index
+     */
+    function IsBot(index: EntityID): boolean;
+
+    /**
+     * Returns the weapon's entity index of a player.
+     * @param index The player's index
+     */
+    function GetWeapon(index: EntityID): EntityID;
+
+    /**
+     * Overrides a property of an entity. Cannot be used on players.
+     * @param index The entity's index
+     * @param table The property's table
+     * @param prop The property's name
+     * @param value The new value
+     */
+    function SetProp(index: EntityID, table: string, prop: string, value: any): any;
+
+    /**
+     * Gets a property from an entity. Returns property's name on failure.
+     * @param index The entity's index
+     * @param table The property's table
+     * @param prop The property's name
+     */
+    function GetProp(index: EntityID, table: string, prop: string): any;
+
+    /**
+     * Returns the entity's origin position.
+     * @param index The entity's index
+     */
+    function GetRenderOrigin(index: EntityID): Vector;
+
+    /**
+     * Returns the entity's name.
+     * @param index The entity's index
+     */
+    function GetName(index: EntityID): string;
+
+    /**
+     * Returns the entity's class name.
+     * @param index The entity's index
+     */
+    function GetClassName(index: EntityID): string;
+
+    /**
+     * Returns the entity's class identifier.
+     * @param index The entity's index
+     */
+    function GetClassID(index: EntityID): number;
+
+    /**
+     * Returns whether or not the specified entity is dormant.
+     * @param index The entity's index.
+     */
+    function IsDormant(index: EntityID): boolean;
+
+    /**
+     * Returns whether or not the specified entity is alive.
+     * @param index The entity's index.
+     */
+    function IsAlive(index: EntityID): boolean;
+
+    /**
+     * Returns whether or not the specified entity is valid.
+     * @param index The entity's index.
+     */
+    function IsValid(index: EntityID): boolean;
+
+    /**
+     * Returns whether or not the specified entity is ourselves.
+     * @param index The entity's index.
+     */
+    function IsLocalPlayer(index: EntityID): boolean;
+
+    /**
+     * Returns whether or not the specified entity is an enemy.
+     * @param index The entity's index.
+     */
+    function IsEnemy(index: EntityID): boolean;
+
+    /**
+     * Returns whether or not the specified entity is a teammate.
+     * @param index The entity's index.
+     */
+    function IsTeammate(index: EntityID): boolean;
+
+    /**
+     * Returns the entity index of the entity equivalent to the specified user index.
+     * @param index The user's index.
+     */
+    function GetEntityFromUserID(index: UserID): EntityID;
+
+    /**
+     * Returns the entity ID of the local player.
+     */
+    function GetLocalPlayer(): EntityID;
+
+    /**
+     * Returns an array with all teammates in the server.
+     */
+    function GetTeammates(): EntityID[];
+
+    /**
+     * Returns an array with all enemies in the server.
+     */
+    function GetEnemies(): EntityID[];
+
+    /**
+     * Returns an array with all players in the server.
+     */
+    function GetPlayers(): EntityID[];
+
+    /**
+     * Returns an array with all entities in the server.
+     */
+    function GetEntities(): EntityID[];
+
+    /**
+     * Returns an array of player entity indexes.
+     */
+    function GetPlayers(): EntityID[];
+}
+
+declare namespace Render {}
+
+declare namespace Convar {}
+
+declare namespace Event {}
+
+declare namespace Trace {}
+
+declare namespace UserCMD {}
+
+declare namespace Sound {}
+
+declare namespace Local {}
+
+declare namespace Cheat {}
+
+declare namespace Input {}
+
+declare namespace World {}
+
+declare namespace AntiAim {}
+
+declare namespace Exploit {}
+
+declare namespace RageBot {}
+
+declare namespace Material {}
