@@ -5,12 +5,17 @@
  * @version 1.0.0
  */
 
-/**
- * @type {string} path Massive of string, example: ("Rage", "GENERAL", "Exploits")
- * 
- * Massive of string, example: ("Rage", "GENERAL", "Exploits")
- */
-type path = string;
+type LengthArray <T, N extends number, R extends T[] = []> = number extends N ? T[] : R['length'] extends N ? R : LengthArray<T, N, [T, ...R]>;
+
+type Subtabs = {
+    "Rage": "GENERAL" | "PISTOL" | "RIFLE" | "SNIPER" | "SMG";
+    "Legit": "GENERAL" | "PISTOL" | "HEAVE PISTOL" | "SCOUT" | "AWP" | "AUTOSNIPER";
+    "Anti-Aim": string;
+    "Visual": "SELF" | "ENEMIES" | "FRIENDLIES" | "WORLD"; 
+    "Misc": "GENERAL" | "PERFORMANCE & INFORMATION" | "SKINS" | "JAVASCRIPT";
+}
+
+type Color = LengthArray<number, 4>
 
 declare namespace Globals {
     /**
@@ -63,16 +68,15 @@ declare namespace UI {
      * 
      * @param text Text of label
      */
-    function AddLabel(text: string): void;
+    function AddLabel <T extends string> (text: T): void;
 
     /**
      * Can be used to toggle a hotkey or simulate key press.
      * Return Values: 1 is key is active, 0 if the key is inactive
      * 
-     * @param path path to hotkey
      * @param item name of hotkey
      */
-    function ToggleHotkey(path: path, item: string): 1 | 0;
+    function ToggleHotkey <T extends keyof Subtabs, S extends Subtabs[T]> (Tab: T, Subtab: S, item: string): 1 | 0;
 
     /**
      * Adds a textbox in which you can input text and read it later on.
@@ -80,5 +84,35 @@ declare namespace UI {
      * 
      * @param name name of text
      */
-    function AddTextbox(name: string): string[];
+    function AddTextbox <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): ["Misc", "JAVASCRIPT", "Script items", N];
+
+    function SetColor <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N, color: Color): void;
+
+    function AddColorPicker <T extends string> (name: T): void;
+
+    function AddMultiDropdown <T extends string, E extends string[]> (name: T, elements: E): void;
+
+    function IsMenuOpen(): boolean;
+
+    function AddDropdown <T extends string, E extends string[]> (name: T, elements: E): void;
+
+    function AddHotkey <T extends string> (name: T): void;
+
+    function AddSliderFloat <T extends string, F extends number, S extends number> (name: T, min: F, max: S): void;
+
+    function AddSliderInt <T extends string, F extends number, S extends number> (name: T, min: F, max: S): void;
+
+    function AddCheckbox <T extends string> (name: T): void;
+
+    function IsHotkeyActive <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): 1 | 0;
+
+    function GetColor <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): Color;
+
+    function GetString <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): string;
+
+    function SetEnabled <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N, value: boolean): void;
+
+    function SetValue <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N, value: boolean | number): void;
+
+    function GetValue <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): boolean | number;
 }
