@@ -2,7 +2,7 @@
  * Сниппет для Onetap V3
  * 
  * @author Mased
- * @version 1.2.0
+ * @version 1.2.5
  * 
  * Полезные материалы:
  * @link https://github.com/ZaUserA/OneTap-v3-Js
@@ -39,10 +39,38 @@ type EntityID = number;
 type UserID = Number;
 
 /**
+ * Adds a texture.
+ * 
+ * Path is relative to CSGO folder, so you don't need full path.
+ * Supports the following formats:
+ * .bmp
+ * .dds
+ * .dib
+ * .hdr
+ * .jpg
+ * .pfm
+ * .png
+ * .ppm
+ * .tga
+ */
+type Texture = string;
+
+/**
+ * Windows font
+ * Default path: C:\Windows\Fonts
+ */
+type Font = string;
+
+/**
  * An array containing three number corresponding to the X, Y and Z positions of a 3D point.
  * Or, alternatively, an array containing the pitch, yaw and roll of an Euler angle.
  */
 type Vector = number[];
+
+/**
+ * Width, height size
+ */
+type Size = LengthArray<number, 2>;
 
 declare namespace Globals {
     /**
@@ -478,7 +506,121 @@ declare namespace Entity {
     function GetPlayers(): EntityID[];
 }
 
-declare namespace Render {}
+declare namespace Render {
+    /**
+     * Draws a filled circle with the given position, radius, and RGBA color.
+     * 
+     * @param x The X position
+     * @param y The Y position
+     * @param radius The circle's radius
+     * @param color The circle's color
+     */
+    function FilledCircle(x: number, y: number, radius: number, color: Color): void;
+
+    /**
+     * Draws a textured rectangle with the given position, size, and texture.
+     * @param x The X position
+     * @param y The Y position
+     * @param w The rectangle's width
+     * @param h The rectangle's height
+     * @param texture The rectangle's texture index
+     */
+    function TexturedRect(x: number, y: number, w: number, h: number, texture: Texture): void;
+
+    /**
+     * Adds a texture.
+     * Returns texture identifier.
+     * 
+     * @param path The file's path relative to CSGO's folder. Supported files are .bmp, .dds, .dib, .hdr, .jpg, .pfm, .png, .ppm and .tga.
+     */
+    function AddTexture(path: string): Texture;
+
+    /**
+     * Finds the text width size of the given string with custom font.
+     * 
+     * @param text The actual string
+     * @param font The string's font
+     */
+    function TextSizeCustom(text: string, font: Font): Size;
+
+    /**
+     * Finds the text width size of the given string with font.
+     * 
+     * @param text The actual string
+     * @param font The string's font. 0 - default, 1 - bold, 2 - small, 3 - small bold, 4 - large, 5 - icon, 6 - small icon, 8 to 48 regular
+     */
+    function TextSize(text: string, font?: number): Size;
+
+    /**
+     * Draws a string with custom font.
+     * 
+     * @param x The X position
+     * @param y The Y position
+     * @param centered Whether or not it should be centered.
+     * @param text The actual string
+     * @param color The string's color
+     * @param font The string's font.
+     */
+    function StringCustom(x: number, y: number, centered: 1 | 0, text: string, color: Color, font: number): void;
+
+    /**
+     * Draws a string with custom font.
+     * 
+     * @param x The X position
+     * @param y The Y position
+     * @param centered Whether or not it should be centered.
+     * @param text The actual string
+     * @param color The string's color
+     * @param font The string's font. 0 - default, 1 - bold, 2 - small, 3 - small bold, 4 - large, 5 - icon, 6 - small icon, 8 to 48 regular
+     */
+    function String(x: number, y: number, centered: 1 | 0, text: string, color: Color, font: number): void;
+
+    /**
+     * Finds an already existing font by its parameters.
+     * 
+     * @param font The font's name
+     * @param size The font's size
+     * @param weight The font's weight.
+     */
+    function FindFont(font: Font, size: number, weight: number): number;
+
+    /**
+     * Creates a new font and returns its index.
+     * 
+     * @param font The font's name
+     * @param size The font's size
+     * @param weight The font's weight. Deprecated.
+     * 
+     * Argument weight defines from thickness. 
+     * 100 Lightest. 
+     * 200 Bolder than 100, 
+     * lighter than 300. 
+     * 300 Bolder than 200, 
+     * lighter than 400. 
+     * 400 Bolder than 300, 
+     * lighter than 500. 
+     * Equivalent of normal. 
+     * 500 Bolder than 400, 
+     * lighter than 600. 
+     * 600 Bolder than 500, 
+     * lighter than 700.
+     * 700 Bolder than 600, 
+     * lighter than 800. 
+     * Equivalent of bold. 
+     * 800 Bolder than 700, 
+     * lighter than 900. 
+     * 900 Boldest.
+     */
+    function AddFont(name: Font, size: number, weight: number): number;
+
+    /**
+     * Renders a polygon.
+     * 
+     * @param points A matrix of all 3 points of the polygon.
+     * @param color The polygon's color.
+     */
+    function Polygon(points: [Size, Size, Size], color: Color): void;
+}
 
 declare namespace Convar {}
 
