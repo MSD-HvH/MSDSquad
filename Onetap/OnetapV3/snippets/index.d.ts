@@ -2,7 +2,7 @@
  * Сниппет для Onetap V3
  * 
  * @author Mased
- * @version 1.2.5
+ * @version 1.5.0
  * 
  * Полезные материалы:
  * @link https://github.com/ZaUserA/OneTap-v3-Js
@@ -36,7 +36,7 @@ type EntityID = number;
 /**
  * The index of a user in an event.
  */
-type UserID = Number;
+type UserID = number;
 
 /**
  * Adds a texture.
@@ -78,43 +78,43 @@ declare namespace Globals {
      * 
      * @deprecated Doesn't work in onetap V3
      */
-    function ChokedCommands(): Number;
+    function ChokedCommands(): number;
 
     /**
      * Returns the time, in seconds, since the game started.
      */
-    function Realtime(): Number;
+    function Realtime(): number;
 
     /**
      * Returns the time, in seconds, between the last and current frame.
      */
-    function Frametime(): Number;
+    function Frametime(): number;
 
     /**
      * Returns the time, in seconds, since the server started.
      */
-    function Curtime(): Number;
+    function Curtime(): number;
 
     /**
      * Returns the interval, in seconds, between each tick.
      */
-    function TickInterval(): Number;
+    function TickInterval(): number;
 
     /**
      * Returns the server's amount of ticks/second.
      */
-    function Tickrate(): Number;
+    function Tickrate(): number;
 
     /**
      * Returns the time, in ticks, since the server started.
      */
-    function Tickcount(): Number;
+    function Tickcount(): number;
 
     /**
      * Returns the current FrameStageNotify stage.
      * @deprecated
      */
-    function FrameStage(): Number;
+    function FrameStage(): number;
 }
 
 declare namespace UI {
@@ -141,7 +141,7 @@ declare namespace UI {
      * UI.ToggleHotkey("Rage", "GENERAL", "Exploits", "Doubletap");
      * ```
      */
-    function ToggleHotkey <T extends keyof Subtabs, S extends Subtabs[T]> (Tab: T, Subtab: S, item: string): 1 | 0;
+    function ToggleHotkey <T extends keyof Subtabs, S extends Subtabs[T]> (Tab: T, Subtab: S, Area: string, item: string): 1 | 0;
 
     /**
      * Adds a textbox in which you can input text and read it later on.
@@ -282,12 +282,12 @@ declare namespace UI {
 
     /**
      * Returns a string representation of an item's current value.
-     * UI item searches are not explicit: the search will return the first found item. This means that UI.GetValue("Legit","Triggerbot", "Enabled") will return the same value as UI.GetValue( "Legit", "GENERAL", "Triggerbot", "Enabled" ).
+     * UI item searches are not explicit: the search will return the first found item. This means that UI.GetValue("Legit","Triggerbot", "Enabled") will return the same value as UI.GetValue("Legit", "GENERAL", "Triggerbot", "Enabled").
      * All script-added items are located in a groupbox within the misc tab, under javascript group called "Script items". Searching for ("Script Items", item name) is certain to return a script control.
      * 
      * @param name name of text box
      */
-    function GetString <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): string;
+    function Getstring <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): string;
 
     /**
      * Changes menu item(s) visibility.
@@ -313,7 +313,7 @@ declare namespace UI {
 
     /**
      * Returns the value of UI item's setting.
-     * UI item searches are not explicit: the search will return the first found item. This means that UI.GetValue("Legit", "Triggerbot", "Enabled") will return the same value as UI.GetValue( "Legit", "GENERAL", "Triggerbot", "Enabled" ).
+     * UI item searches are not explicit: the search will return the first found item. This means that UI.GetValue("Legit", "Triggerbot", "Enabled") will return the same value as UI.GetValue("Legit", "GENERAL", "Triggerbot", "Enabled").
      * All script-added items are located in a groupbox within the misc tab, under javascript group called "Script items". Searching for ("Script Items", item name) is certain to return a script control.
      * UI.SetEnabled does not work on tabs/subtabs.
      * 
@@ -620,30 +620,524 @@ declare namespace Render {
      * @param color The polygon's color.
      */
     function Polygon(points: [Size, Size, Size], color: Color): void;
+
+    /**
+     * Renders a gradient.
+     * @param x The X position
+     * @param y The Y position
+     * @param w The gradient's width
+     * @param h The gradient's height
+     * @param is_horizontal The gradient's direction. Use '0' for vertical and '1' for horizontal.
+     * @param color1 The gradient's first color
+     * @param color2 The gradient's second color
+     */
+    function GradientRect(x: number, y: number, w: number, h: number, is_horizontal: 1 | 0, color1: Color, color2: Color): void;
+
+    /**
+     * Returns the width and height of your screen.
+     */
+    function GetScreenSize(): Size;
+
+    /**
+     * Convers a 3D point into a 2D point on your screen and returns its X and Y positions, and whether or not the point is behind you.
+     * @param point The 3D point
+     */
+    function WorldToScreen(point: Vector): Size;
+
+    /**
+     * Renders a ring.
+     * @param x The X position
+     * @param y The Y position
+     * @param radius The circle's radius
+     * @param color The circle's color
+     */
+    function Circle(x: number, y: number, radius: number, color: Color): void;
+
+    /**
+     * Renders a rectangle.
+     * @param x The X position
+     * @param y The Y position
+     * @param w The rectangle's width
+     * @param h The rectangle's height
+     * @param color The rectangle's color
+     */
+    function FilledRect(x: number, y: number, w: number, h: number, color: Color): void;
+
+    /**
+     * Renders a rectangle outline.
+     * @param x The X position
+     * @param y The Y position
+     * @param w The rectangle's width
+     * @param h The rectangle's height
+     * @param color The rectangle's color
+     */
+    function Rect(x: number, y: number, w: number, h: number, color: Color): void;
+
+    /**
+     * Renders a line.
+     * @param x1 The first X position
+     * @param y1 The first Y position
+     * @param x2 The second X position
+     * @param y2 The second Y position
+     * @param color The line's color
+     */
+    function Line(x1: number, y1: number, x2: number, y2: number, color: Color): void;
 }
 
-declare namespace Convar {}
+declare namespace Convar {
+    /**
+     * Gets a CVar's value in integer form.
+     * @param cvar The CVar.
+     */
+    function GetInt(cvar: string): number;
 
-declare namespace Event {}
+    /**
+     * Gets a CVar's value in float form.
+     * @param cvar The CVar.
+     */
+    function GetFloat(cvar: string): number;
 
-declare namespace Trace {}
+    /**
+     * Gets a CVar's value in string form.
+     * @param cvar The CVar.
+     */
+    function GetString(cvar: string): string;
 
-declare namespace UserCMD {}
+    /**
+     * Overrides a CVar's value to a specified integer.
+     * @param cvar The CVar.
+     */
+    function SetInt(cvar: string, value: number): void;
 
-declare namespace Sound {}
+    /**
+     * Overrides a CVar's value to a specified float.
+     * @param cvar The CVar.
+     */
+    function SetFloat(cvar: string, value: number): void;
 
-declare namespace Local {}
+    /**
+     * Overrides a CVar's value to a specified string.
+     * @param cvar The CVar.
+     */
+    function SetString(cvar: string, value: string): void;
+}
 
-declare namespace Cheat {}
+declare namespace Event {
+    /**
+     * Gets a field's value in integer form.
+     * @param field_name The field.
+     */
+    function GetInt(field_name: string): number;
 
-declare namespace Input {}
+    /**
+     * Gets a field's value in float form.
+     * @param field_name The field.
+     */
+    function GetFloat(field_name: string): number;
 
-declare namespace World {}
+    /**
+     * Gets a field's value in string form.
+     * @param field_name The field.
+     */
+    function GetString(field_name: string): string;
+}
 
-declare namespace AntiAim {}
+declare namespace Trace {
+    /**
+     * Traces a line from a point to another and returns its data.
+     * @param skip_entity The entity to be ignored
+     * @param from The initial position
+     * @param to The ending position
+     * @returns The entity index of a hit entity or undefined, the fraction of the trace ('0' means it hit immediately, '1' means it went fully through).
+     */
+    function Line(skip_entity: EntityID, from: Vector, to: Vector): number[];
 
-declare namespace Exploit {}
+    /**
+     * Traces a bullet from a point to another and returns its data.
+     * @param attacker The entity who attacked
+     * @param victim The enttiy who should be hit
+     * @param from The initial position
+     * @param to The ending position
+     * @returns The entity index of a hit entity or undefined, the damage dealt, whether or not the ending position is visible and the hitbox that was hit. 
+     */
+    function Bullet(attacker: EntityID, victim: EntityID, from: Vector, to: Vector): number[];
 
-declare namespace RageBot {}
+    /**
+     * Traces a line from a point to another with a custom mask and returns its data. For advanced users only.
+     * @param skip_entity The entity to be ignored
+     * @param from The initial position
+     * @param to The ending position
+     * @param mask The custom mask
+     * @param type The type. '0' will trace everything, '1' will trace only the world and '2' will trace only the entities.
+     * @returns The entity index of a hit entity or undefined, the fraction of the trace ('0' means it hit immediately, '1' means it went fully through).
+     */
+    function RawLine(skip_entity: EntityID, from: Vector, to: Vector, mask: number, type: number): number[];
 
-declare namespace Material {}
+    /**
+     * Returns whether or not a line goes through a smoke. Breaks if smoke is removed.
+     * @param from The initial position
+     * @param to The ending position
+     * 
+     * @deprecated doesn't work in OTV3
+     */
+    function Smoke(from: Vector, to: Vector): number;
+}
+
+declare namespace UserCMD {
+    /**
+     * Returns an array containing forward, sideways and up movement.
+     */
+    function GetMovement(): LengthArray<number, 3>;
+
+    /**
+     * Returns a bit-mask of all buttons.
+     */
+    function GetButtons(): number;
+
+    /**
+     * Overrides the UserCMD's movement.
+     * @param values 
+     */
+    function SetMovement(values: LengthArray<number, 3>): void;
+
+    /**
+     * Overrides the UserCMD's buttons.
+     * @param buttons 
+     */
+    function SetButtons(buttons: number): void;
+
+    /**
+     * Overrides your UserCMD's angles.
+     * @param angles The new angles
+     * @param silent Whether or not you should visualize those angles.
+     */
+    function SetViewAngles(angles: Vector, silent: boolean): void;
+
+    /**
+     * Overrides the mouse's X position.
+     * @param x The new position.
+     * @deprecated
+     */
+    function SetMouseX(x: number): void;
+
+    /**
+     * Overrides the mouse's Y position.
+     * @param y The new position.
+     * @deprecated
+     */
+    function SetMouseY(y: number): void;
+
+    /**
+     * Forces the cheat to choke a tick.
+     */
+    function Choke(): void;
+
+    /**
+     * Forces the cheat to send a tick. 
+     */
+    function Send(): void;
+}
+
+declare namespace Sound {
+    /**
+     * Plays a sound.
+     * @param path The path to the sound file.
+     */
+    function Play(path: string): void;
+
+    /**
+     * Plays a sound on your in-game microphone.
+     * @param path The path to the sound file.
+     */
+    function PlayMicrophone(path: string): void;
+
+    /**
+     * Stops playing a sound on your microphone.
+     */
+    function StopMicrophone(): void;
+}
+
+declare namespace Local {
+    /**
+     * Returns your latency/ping in seconds.
+     */
+    function Latency(): number;
+
+    /**
+     * Returns a vector containing your pitch, yaw and roll.
+     */
+    function GetViewAngles(): Vector;
+
+    /**
+     * Overrides your engine's view angles.
+     * @param angles The new angles
+     */
+    function SetViewAngles(angles: Vector): void;
+
+    /**
+     * Overrides your clan-tag.
+     * @param tag The new clan-tag.
+     */
+    function SetClanTag(tag: string): void;
+
+    /**
+     * Returns your real anti-aim yaw.
+     */
+    function GetRealYaw(): number;
+
+    /**
+     * Returns your fake anti-aim yaw.
+     */
+    function GetFakeYaw(): number;
+
+    /**
+     * Gets your weapon's spread.
+     */
+    function GetSpread(): number;
+
+    /**
+     * Gets your weapon's inaccuracy.
+     */
+    function GetInaccuracy(): number;
+}
+
+declare namespace Cheat {
+    /**
+     * Prints a message to the console.
+     * @param msg The message
+     */
+    function Print(msg: string): void;
+
+    /**
+     * Prints a colored message to the console.
+     * @param color The color
+     * @param msg The message
+     */
+    function PrintColor(color: Color, msg: string): void;
+
+    /**
+     * Prints a message to the in-game chat. Client-sided.
+     * @param msg The message
+     */
+    function PrintChat(msg: string): void;
+
+    /**
+     * Executes a console command.
+     * @param cmd The command
+     */
+    function ExecuteCommand(cmd: string): void;
+
+    /**
+     * Register a new callback
+     * @param callback The callback's name
+     * @param func The function's name
+     */
+    function RegisterCallback(callback: string, func: string): void;
+
+    /**
+     * Returns the user's name.
+     */
+    function GetUsername(): string;
+}
+
+declare namespace Input {
+    /**
+     * Returns whether or not a key is being held.
+     * @param vkey_code The virtual-key code.
+     * @link https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+     */
+    function IsKeyPressed(vkey_code: number): boolean;
+
+    /**
+     * Returns the X and Y positions of the cursor.
+     */
+    function GetCursorPosition(): Size;
+}
+
+declare namespace World {
+    /**
+     * Returns the server's IP.
+     */
+    function GetServerString(): string;
+
+    /**
+     * Returns the current map's name.
+     */
+    function GetMapName(): string;
+}
+
+declare namespace AntiAim {
+    /**
+     * Returns whether or not the anti-aim is being overriden.
+     */
+    function GetOverride(): boolean;
+
+    /**
+     * Starts/stops overriding the anti-aim.
+     * @param active Whether or not the override is active.
+     */
+    function SetOverride(active: number): void;
+
+    /**
+     * Overrides your real (body) offset.
+     * @param offset The new offset.
+     */
+    function SetRealOffset(offset: number): void;
+
+    /**
+     * Overrides your fake (yaw) offset.
+     * @param offset The new offset.
+     */
+    function SetFakeOffset(offset: number): void;
+
+    /**
+     * Overrides your LBY (desync) offset.
+     * @param offset The new offset.
+     */
+    function SetLBYOffset(offset: number): void;
+}
+
+declare namespace Exploit {
+    /**
+     * Returns a fraction representing how much of the exploit is charged. '0' means it's completely uncharged and '1' means it's fully charged.
+     */
+    function GetCharge(): 1 | 0;
+
+    /**
+     * Forces the cheat to recharge.
+     */
+    function Recharge(): void;
+
+    /**
+     * Enables the cheat's automatic recharging.
+     */
+    function EnableRecharge(): void;
+
+    /**
+     * Disables the cheat's automatic recharging.
+     */
+    function DisableRecharge(): void;
+
+    /**
+     * Overrides the exploit's shift amount.
+     * @param amount The new amount. The maximum recommended amount is 15.
+     * 
+     * @deprecated doesn't work in OTV3
+     */
+    function OverrideShift(amount: number): void;
+
+    /**
+     * Overrides the exploit's tolerance amount.
+     * @param amount The new amount. The minimum amount is 1.
+     * 
+     * @deprecated doesn't work in OTV3
+     */
+    function OverrideTolerance(amount: number): void;
+}
+
+declare namespace RageBot {
+    /**
+     * Returns the current ragebot target. This only returns an entity right before shooting, so most of the
+     * time it'll just return undefined.
+     */
+    function GetTarget(): EntityID;
+
+    /**
+     * Returns an array containing all possible ragebot targets.
+     * 
+     * @deprecated doesn't work in OTV3
+     */
+    function GetTargets(): EntityID[];
+
+    /**
+     * Returns the hitchance of the ragebot's target.
+     * 
+     * @deprecated doesn't work in OTV3
+     */
+    function GetTargetHitchance(): number;
+
+    /**
+     * Forces the ragebot to prioritize a certain player.
+     * @param index The entity's index
+     */
+    function ForceTarget(index: EntityID): void;
+    
+    /**
+     * Forces the ragebot to ignore a player.
+     * @param index The entity's index
+     */
+    function IgnoreTarget(index: EntityID): void;
+
+    /**
+     * Forces the ragebot to ignore a hitbox on a specific player.
+     * @param index The entity's index
+     * @param hitbox The hitbox's index
+     */
+    function IgnoreTargetHitbox(index: EntityID, hitbox: number): void;
+
+    /**
+     * Forces the ragebot to target only safe points on a player.
+     * @param index The entity's index
+     */
+    function ForceTargetSafety(index: EntityID): void;
+
+    /**
+     * Forces the ragebot to target a player for a certain hitchance.
+     * @param index The entity's index
+     * @param hitchance The new hitchance
+     */
+    function ForceTargetHitchance(index: EntityID, hitchance: number): void;
+
+    /**
+     * Forces the ragebot to target a player for a certain min. damage.
+     * @param index The entity's index
+     * @param dmg The new min. damage
+     */
+    function ForceTargetMinimumDamage(index: EntityID, dmg: number): void;
+
+    /**
+     * Forces the ragebot to target only safe points for a specific hitbox.
+     * @param hitbox The hitbox's index
+     */
+    function ForceHitboxSafety(hitbox: number): void;
+}
+
+declare namespace Material {
+    /**
+     * Creates a new material and returns true on success.
+     * @param name The material's name
+     */
+    function Create(name: string): boolean;
+
+    /**
+     * Deletes an existing material and returns true on success.
+     * @param name The material's name
+     */
+    function Destroy(name: string): boolean;
+
+    /**
+     * Gets an existing material by the name and returns its index.
+     * @param name The material's name
+     */
+    function Get(name: string): number;
+
+    /**
+     * Overrides a material shader's value and returns true on success. Can only be called in 'Material' callback.
+     * @param index The material's index
+     * @param shader The shader's name
+     * @param value The shader's value
+     * 
+     * @link https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters
+     * @link https://developer.valvesoftware.com/wiki/VertexLitGeneric
+     */
+    function SetKeyValue(index: number, shader: string, value: string): boolean;
+
+    /**
+     * Applies changes to a material and returns true on success. Can only be called in 'Material' callback.
+     * @param index The material's index
+     * 
+     * @link https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters
+     * @link https://developer.valvesoftware.com/wiki/VertexLitGeneric
+     */
+    function Refresh(index: number): boolean;
+}
