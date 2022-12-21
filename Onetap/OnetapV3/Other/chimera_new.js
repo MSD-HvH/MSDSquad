@@ -465,11 +465,11 @@ menu.begin = function() {
     var CURSOR_POSITION = Input.GetCursorPosition()
     var HELD_CURSOR_POSITION = input_system.get_cursor_position() // короче эта хуйня обновляет позицию мышки только тогда, когда отжата кнопка 0x01 - ЛКМ, это для всяких слайдеров дергалок колорпикеров и тд, короче где надо мышкой водить
 
-    var SCRIPT_NAME_TEXT_SECOND_FONT = Render.AddFont('Segoeui.ttf', 11 * menu.dpi_scale, 400)
-    var TAB_TEXT_MAIN_FONT = Render.AddFont('Segoeuib.ttf', 18 * menu.dpi_scale, 400)
-    var SHORT_TAB_NAME_FONT = Render.AddFont('Segoeuib.ttf', 11 * menu.dpi_scale, 400)
-    var ITEM_NAME = Render.AddFont('Segoeui.ttf', 9 * menu.dpi_scale, 400)
-    var SLIDER_VALUE = Render.AddFont('Segoeui.ttf', 9 * menu.dpi_scale, 400)
+    var SCRIPT_NAME_TEXT_SECOND_FONT = Render.AddFont('Segoeui.ttf', 10 * menu.dpi_scale, 300)
+    var TAB_TEXT_MAIN_FONT = Render.AddFont('Segoeuib.ttf', 17 * menu.dpi_scale, 300)
+    var SHORT_TAB_NAME_FONT = Render.AddFont('Segoeuib.ttf', 10 * menu.dpi_scale, 300)
+    var ITEM_NAME = Render.AddFont('Segoeui.ttf', 8 * menu.dpi_scale, 300)
+    var SLIDER_VALUE = Render.AddFont('Segoeui.ttf', 8 * menu.dpi_scale, 300)
 
     //var MENU_SIDEBAR = [50 * menu.dpi_scale, 350 * menu.dpi_scale]
     //var MENU_MAIN = [200 * menu.dpi_scale, 350 * menu.dpi_scale]
@@ -519,7 +519,7 @@ menu.begin = function() {
     Render.FilledRect(menu.position[0] + MENU_SIDEBAR[0], menu.position[1], MENU_MAIN[0], MENU_MAIN[1], menu.colors.MENU_MAIN)
 
     var SCRIPT_NAME_TEXT_SECOND_SIZE = Render.TextSizeCustom(script.name, SCRIPT_NAME_TEXT_SECOND_FONT)
-    Render.StringCustom(menu.position[0] + MENU_SIDEBAR[0] + MENU_MAIN_INDENT, menu.position[1] + MENU_MAIN_INDENT - 2, 0, script.name, menu.colors.TEXT_SECOND, SCRIPT_NAME_TEXT_SECOND_FONT)
+    Render.StringCustom(menu.position[0] + MENU_SIDEBAR[0] + MENU_MAIN_INDENT, menu.position[1] + MENU_MAIN_INDENT + 2, 0, script.name, menu.colors.TEXT_SECOND, SCRIPT_NAME_TEXT_SECOND_FONT)
 
     var DROPDOWNS = []
     var COLORPICKERS = []
