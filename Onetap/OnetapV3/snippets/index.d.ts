@@ -791,6 +791,8 @@ declare namespace UserCMD {
 
     /**
      * Returns a bit-mask of all buttons.
+     * 
+     * @deprecated doesn't work in OTV3
      */
     function GetButtons(): number;
 
@@ -803,6 +805,8 @@ declare namespace UserCMD {
     /**
      * Overrides the UserCMD's buttons.
      * @param buttons 
+     *
+     * @deprecated doesn't work in OTV3
      */
     function SetButtons(buttons: number): void;
 
@@ -810,30 +814,38 @@ declare namespace UserCMD {
      * Overrides your UserCMD's angles.
      * @param angles The new angles
      * @param silent Whether or not you should visualize those angles.
+     *
+     * @deprecated doesn't work in OTV3
      */
     function SetViewAngles(angles: Vector, silent: boolean): void;
 
     /**
      * Overrides the mouse's X position.
      * @param x The new position.
-     * @deprecated
+     *
+     * @deprecated doesn't work in OTV3
      */
     function SetMouseX(x: number): void;
 
     /**
      * Overrides the mouse's Y position.
      * @param y The new position.
-     * @deprecated
+     *
+     * @deprecated doesn't work in OTV3
      */
     function SetMouseY(y: number): void;
 
     /**
      * Forces the cheat to choke a tick.
+     *
+     * @deprecated doesn't work in OTV3
      */
     function Choke(): void;
 
     /**
      * Forces the cheat to send a tick. 
+     *
+     * @deprecated doesn't work in OTV3
      */
     function Send(): void;
 }
@@ -1035,10 +1047,9 @@ declare namespace Exploit {
     function OverrideTolerance(amount: number): void;
 }
 
-declare namespace RageBot {
+declare namespace Ragebot {
     /**
-     * Returns the current ragebot target. This only returns an entity right before shooting, so most of the
-     * time it'll just return undefined.
+     * Returns the current ragebot target. Otherwise returns zero.
      */
     function GetTarget(): EntityID;
 
