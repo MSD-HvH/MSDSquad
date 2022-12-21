@@ -2,7 +2,7 @@
  * Сниппет для Onetap V3
  * 
  * @author Mased
- * @version 1.5.0
+ * @version 1.5.2
  * 
  * Полезные материалы:
  * @link https://github.com/ZaUserA/OneTap-v3-Js
@@ -228,7 +228,7 @@ declare namespace UI {
      * Create a floating point slider under Misc - JAVASCRIPT - Script items.
      * 
      * @param name name of slider
-     * @param min mimimum value of slider
+     * @param min minimum value of slider
      * @param max maximum value of slider
      * 
      * @example
@@ -242,7 +242,7 @@ declare namespace UI {
      * Create a integer slider under Misc - JAVASCRIPT - Script items.
      * 
      * @param name name of slider
-     * @param min mimimum value of slider
+     * @param min minimum value of slider
      * @param max maximum value of slider
      * 
      * @example
@@ -296,7 +296,7 @@ declare namespace UI {
      * UI.SetEnabled does not work on tabs/subtabs.
      * 
      * @param name name of element
-     * @param value value which should be setted
+     * @param value value which should be set
      */
     function SetEnabled <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N, value: boolean): void;
 
@@ -307,7 +307,7 @@ declare namespace UI {
      * All script-added items are located in a groupbox within the misc tab, under javascript group called "Script items". Searching for ("Script Items", item name) is certain to return a script control.
      * 
      * @param name name of element
-     * @param value value which should be setted
+     * @param value value which should be set
      */
     function SetValue <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N, value: boolean | 1 | 0): void;
 
@@ -639,7 +639,7 @@ declare namespace Render {
     function GetScreenSize(): Size;
 
     /**
-     * Convers a 3D point into a 2D point on your screen and returns its X and Y positions, and whether or not the point is behind you.
+     * Converts a 3D point into a 2D point on your screen and returns its X and Y positions, and whether or not the point is behind you.
      * @param point The 3D point
      */
     function WorldToScreen(point: Vector): Size;
@@ -755,7 +755,7 @@ declare namespace Trace {
     /**
      * Traces a bullet from a point to another and returns its data.
      * @param attacker The entity who attacked
-     * @param victim The enttiy who should be hit
+     * @param victim The entity who should be hit
      * @param from The initial position
      * @param to The ending position
      * @returns The entity index of a hit entity or undefined, the damage dealt, whether or not the ending position is visible and the hitbox that was hit. 
