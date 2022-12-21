@@ -287,7 +287,7 @@ declare namespace UI {
      * 
      * @param name name of text box
      */
-    function Getstring <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): string;
+    function GetString <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): string;
 
     /**
      * Changes menu item(s) visibility.
