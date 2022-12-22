@@ -1,6 +1,12 @@
+interface Interval {
+    old_time: number;
+    func: Function;
+    timeout: number;
+}
+
 const intervals = {};
 
-const CreateTimeout = function(name, cb, time) {
+const CreateTimeout = function(name: string, cb: () => void, time: number) {
     if(intervals[name]) throw new Error("Timeout already exists!");
 
     const Curtime = Globals.Curtime();
@@ -13,7 +19,7 @@ const CheckTimeouts = function() {
     const Curtime = Globals.Curtime();
 
     keys.forEach(function(key) {
-        const timeout = intervals[key];
+        const timeout: Interval = intervals[key];
 
         if(timeout.old_time < Curtime) {
             timeout.func();
@@ -23,4 +29,4 @@ const CheckTimeouts = function() {
     });
 };
 
-module.exports = { intervals, CreateTimeout, CheckTimeouts };
+export { Interval, intervals, CreateTimeout, CheckTimeouts };
