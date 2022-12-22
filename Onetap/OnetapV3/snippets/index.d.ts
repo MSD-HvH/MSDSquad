@@ -18,7 +18,7 @@ type LengthArray <T, N extends number, R extends T[] = []> = number extends N ? 
 type Subtabs = {
     'Rage': 'GENERAL' | 'PISTOL' | 'RIFLE' | 'SNIPER' | 'SMG';
     'Legit': 'GENERAL' | 'PISTOL' | 'HEAVY PISTOL' | 'SCOUT' | 'AWP' | 'AUTOSNIPER';
-    'Anti-Aim': 'Rage Anti-Aim' | 'Legit Anti-Aim' | 'Fake-Lag' | '';
+    'Anti-Aim': string;
     'Visual': 'SELF' | 'ENEMIES' | 'FRIENDLIES' | 'WORLD'; 
     'Misc': 'GENERAL' | 'PERFORMANCE & INFORMATION' | 'SKINS' | 'JAVASCRIPT';
 }
