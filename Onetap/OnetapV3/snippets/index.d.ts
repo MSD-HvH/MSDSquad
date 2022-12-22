@@ -2,7 +2,7 @@
  * Сниппет для Onetap V3
  * 
  * @author Mased
- * @version 1.5.5
+ * @version 1.5.2
  * 
  * Полезные материалы:
  * @link https://github.com/ZaUserA/OneTap-v3-Js
@@ -491,7 +491,7 @@ declare namespace UI {
      * @param value value which should be set
      */
     function SetEnabled <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N, value: boolean): void;
-    function SetEnabled <T extends keyof Subtabs, N extends string> (Area: string, name: N, value: boolean): void;
+    function SetEnabled <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, name: N, value: boolean): void;
     function SetEnabled <N extends string> (Area: string, name: N, value: boolean): void;
 
     /**
