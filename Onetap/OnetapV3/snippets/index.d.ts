@@ -16,15 +16,15 @@
 type LengthArray <T, N extends number, R extends T[] = []> = number extends N ? T[] : R['length'] extends N ? R : LengthArray<T, N, [T, ...R]>;
 
 type Subtabs = {
-    "Rage": "GENERAL" | "PISTOL" | "RIFLE" | "SNIPER" | "SMG";
-    "Legit": "GENERAL" | "PISTOL" | "HEAVE PISTOL" | "SCOUT" | "AWP" | "AUTOSNIPER";
-    "Anti-Aim": string;
-    "Visual": "SELF" | "ENEMIES" | "FRIENDLIES" | "WORLD"; 
-    "Misc": "GENERAL" | "PERFORMANCE & INFORMATION" | "SKINS" | "JAVASCRIPT";
+    'Rage': 'GENERAL' | 'PISTOL' | 'RIFLE' | 'SNIPER' | 'SMG';
+    'Legit': 'GENERAL' | 'PISTOL' | 'HEAVY PISTOL' | 'SCOUT' | 'AWP' | 'AUTOSNIPER';
+    'Anti-Aim': string;
+    'Visual': 'SELF' | 'ENEMIES' | 'FRIENDLIES' | 'WORLD'; 
+    'Misc': 'GENERAL' | 'PERFORMANCE & INFORMATION' | 'SKINS' | 'JAVASCRIPT';
 }
 
 /**
- * An array of numbers (RGBA color)
+ * An array of numbers (RGBA color).
  */
 type Color = LengthArray<number, 4>
 
@@ -56,7 +56,8 @@ type UserID = number;
 type Texture = string;
 
 /**
- * Windows font
+ * Windows font.
+ * 
  * Default path: C:\Windows\Fonts
  */
 type Font = string;
@@ -68,7 +69,7 @@ type Font = string;
 type Vector = number[];
 
 /**
- * Width, height size
+ * Width, height size.
  */
 type Size = LengthArray<number, 2>;
 
@@ -76,7 +77,7 @@ declare namespace Globals {
     /**
      * Returns the amount of choked ticks.
      * 
-     * @deprecated Doesn't work in onetap V3
+     * @deprecated Doesn't work in onetap V3.
      */
     function ChokedCommands(): number;
 
@@ -112,14 +113,13 @@ declare namespace Globals {
 
     /**
      * Returns the current FrameStageNotify stage.
-     * @deprecated
      */
     function FrameStage(): number;
 }
 
 declare namespace UI {
     /**
-     * Creates a new label
+     * Creates a new label.
      * 
      * @param text Text of label
      * 
@@ -132,7 +132,7 @@ declare namespace UI {
 
     /**
      * Can be used to toggle a hotkey or simulate key press.
-     * Return Values: 1 is key is active, 0 if the key is inactive
+     * Return Values: 1 is key is active, 0 if the key is inactive.
      * 
      * @param item name of hotkey
      * 
@@ -154,7 +154,7 @@ declare namespace UI {
      * UI.AddTextbox("Test Textbox");
      * ```
      */
-    function AddTextbox <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): ["Misc", "JAVASCRIPT", "Script items", N];
+    function AddTextbox <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): ['Misc', 'JAVASCRIPT', 'Script items', N];
 
     /**
      * Used to set precise RGBA color codes in color picker.
@@ -179,7 +179,7 @@ declare namespace UI {
      * UI.AddColorPicker("Test Colorpicker")
      * ```
      */
-    function AddColorPicker <N extends string> (name: N): ["Misc", "JAVASCRIPT", "Script items", N];
+    function AddColorPicker <N extends string> (name: N): ['Misc', 'JAVASCRIPT', 'Script items', N];
 
     /**
      * Will create a dropdown in which you can select more items under Misc - JAVASCRIPT - Script items.
@@ -192,7 +192,7 @@ declare namespace UI {
      * UI.AddMultiDropdown("Test multidropdown", ["one", "two", "three", "four"]);
      * ```
      */
-    function AddMultiDropdown <N extends string, E extends string[]> (name: N, elements: E): ["Misc", "JAVASCRIPT", "Script items", N];
+    function AddMultiDropdown <N extends string, E extends string[]> (name: N, elements: E): ['Misc', 'JAVASCRIPT', 'Script items', N];
 
     /**
      * Returns true if the menu is open, false otherwise.
@@ -210,7 +210,7 @@ declare namespace UI {
      * UI.AddMultiDropdown("Test dropdown", ["one", "two", "three", "four"]);
      * ```
      */
-    function AddDropdown <N extends string, E extends string[]> (name: N, elements: E): ["Misc", "JAVASCRIPT", "Script items", N];
+    function AddDropdown <N extends string, E extends string[]> (name: N, elements: E): ['Misc', 'JAVASCRIPT', 'Script items', N];
 
     /**
      * Create a label with a key picker control under Misc - JAVASCRIPT - Script items.
@@ -222,7 +222,7 @@ declare namespace UI {
      * UI.AddHotkey("Test hotkey");
      * ```
      */
-    function AddHotkey <N extends string> (name: N): ["Misc", "JAVASCRIPT", "Script items", N];
+    function AddHotkey <N extends string> (name: N): ['Misc', 'JAVASCRIPT', 'Script items', N];
 
     /**
      * Create a floating point slider under Misc - JAVASCRIPT - Script items.
@@ -236,7 +236,7 @@ declare namespace UI {
      * UI.AddSliderFloat("Test float slider", 1.0, 10.0);
      * ```
      */
-    function AddSliderFloat <N extends string, F extends number, S extends number> (name: N, min: F, max: S): ["Misc", "JAVASCRIPT", "Script items", N];
+    function AddSliderFloat <N extends string, F extends number, S extends number> (name: N, min: F, max: S): ['Misc', 'JAVASCRIPT', 'Script items', N];
 
     /**
      * Create a integer slider under Misc - JAVASCRIPT - Script items.
@@ -250,7 +250,7 @@ declare namespace UI {
      * UI.AddSliderInt("Test", 0, 100);
      * ```
      */
-    function AddSliderInt <N extends string, F extends number, S extends number> (name: N, min: F, max: S): ["Misc", "JAVASCRIPT", "Script items", N];
+    function AddSliderInt <N extends string, F extends number, S extends number> (name: N, min: F, max: S): ['Misc', 'JAVASCRIPT', 'Script items', N];
 
     /**
      * Create a checkbox control under Misc - JAVASCRIPT - Script items.
@@ -262,7 +262,7 @@ declare namespace UI {
      * UI.AddCheckbox("Test checkbox");
      * ```
      */
-    function AddCheckbox <N extends string> (name: N): ["Misc", "JAVASCRIPT", "Script items", N];
+    function AddCheckbox <N extends string> (name: N): ['Misc', 'JAVASCRIPT', 'Script items', N];
 
     /**
      * Can be used to determine whether or not hotkey is active.
@@ -274,7 +274,7 @@ declare namespace UI {
 
     /**
      * Can be used to get precise RGBA color codes from color picker.
-     * Return values undefined if an item could not be found, or if the item doesn't contain a color picker
+     * Return values undefined if an item could not be found, or if the item doesn't contain a color picker.
      * 
      * @param name name of color picker
      */
@@ -326,26 +326,29 @@ declare namespace Entity {
     /**
      * Returns an array containing the data of a entity's bounding box: whether or not the box is valid, the box's top left corner X position,
      * the box's top left Y position, the box's bottom right X position and the box's bottom right Y position.
+     * 
      * @param index The entity's index
      */
     function GetRenderBox(index: EntityID): number[];
 
     /**
      * Returns an array containing all of the weapon's entity indexes of a player.
+     * 
      * @param index 
      */
     function GetWeapons(index: EntityID): EntityID[];
 
     /**
      * Returns an array containing all entities of a certain class.
-     * @param class_index The class' index.
+     * @param class_index The class' index
      */
     function GetEntitiesByClassID(class_index: number): EntityID[];
 
     /**
      * Returns the hitbox's position of an entity.
+     * 
      * @param index The entity's index
-     * @param hitbox_index The hitbox's index. Ranges from 0 to 18.
+     * @param hitbox_index The hitbox's index. Ranges from 0 to 18
      * 
      * HITBOX_HEAD = 0
      * HITBOX_NECK = 1
@@ -371,6 +374,7 @@ declare namespace Entity {
 
     /**
      * Returns the entity's eye position.
+     * 
      * @param index The entity's index
      */
     function GetEyePosition(index: EntityID): Vector;
@@ -382,18 +386,21 @@ declare namespace Entity {
 
     /**
      * Returns whether or not the specified entity is a bot.
+     * 
      * @param index The entity's index
      */
     function IsBot(index: EntityID): boolean;
 
     /**
      * Returns the weapon's entity index of a player.
+     * 
      * @param index The player's index
      */
     function GetWeapon(index: EntityID): EntityID;
 
     /**
      * Overrides a property of an entity. Cannot be used on players.
+     * 
      * @param index The entity's index
      * @param table The property's table
      * @param prop The property's name
@@ -403,6 +410,7 @@ declare namespace Entity {
 
     /**
      * Gets a property from an entity. Returns property's name on failure.
+     * 
      * @param index The entity's index
      * @param table The property's table
      * @param prop The property's name
@@ -411,67 +419,78 @@ declare namespace Entity {
 
     /**
      * Returns the entity's origin position.
+     * 
      * @param index The entity's index
      */
     function GetRenderOrigin(index: EntityID): Vector;
 
     /**
      * Returns the entity's name.
+     * 
      * @param index The entity's index
      */
     function GetName(index: EntityID): string;
 
     /**
      * Returns the entity's class name.
+     * 
      * @param index The entity's index
      */
     function GetClassName(index: EntityID): string;
 
     /**
      * Returns the entity's class identifier.
+     * 
      * @param index The entity's index
      */
     function GetClassID(index: EntityID): number;
 
     /**
      * Returns whether or not the specified entity is dormant.
-     * @param index The entity's index.
+     * 
+     * @param index The entity's index
      */
     function IsDormant(index: EntityID): boolean;
 
     /**
      * Returns whether or not the specified entity is alive.
-     * @param index The entity's index.
+     * 
+     * @param index The entity's index
      */
     function IsAlive(index: EntityID): boolean;
 
     /**
      * Returns whether or not the specified entity is valid.
-     * @param index The entity's index.
+     * 
+     * @param index The entity's index
      */
     function IsValid(index: EntityID): boolean;
 
     /**
      * Returns whether or not the specified entity is ourselves.
-     * @param index The entity's index.
+     * 
+     * @param index The entity's index
      */
     function IsLocalPlayer(index: EntityID): boolean;
 
     /**
      * Returns whether or not the specified entity is an enemy.
-     * @param index The entity's index.
+     * 
+     * @param index The entity's index
      */
     function IsEnemy(index: EntityID): boolean;
 
     /**
      * Returns whether or not the specified entity is a teammate.
-     * @param index The entity's index.
+     * 
+     * @param index The entity's index
      */
     function IsTeammate(index: EntityID): boolean;
 
     /**
      * Returns the entity index of the entity equivalent to the specified user index.
-     * @param index The user's index.
+     * 
+     * @param index The user's index
      */
     function GetEntityFromUserID(index: UserID): EntityID;
 
@@ -499,11 +518,6 @@ declare namespace Entity {
      * Returns an array with all entities in the server.
      */
     function GetEntities(): EntityID[];
-
-    /**
-     * Returns an array of player entity indexes.
-     */
-    function GetPlayers(): EntityID[];
 }
 
 declare namespace Render {
@@ -519,6 +533,7 @@ declare namespace Render {
 
     /**
      * Draws a textured rectangle with the given position, size, and texture.
+     * 
      * @param x The X position
      * @param y The Y position
      * @param w The rectangle's width
@@ -531,7 +546,7 @@ declare namespace Render {
      * Adds a texture.
      * Returns texture identifier.
      * 
-     * @param path The file's path relative to CSGO's folder. Supported files are .bmp, .dds, .dib, .hdr, .jpg, .pfm, .png, .ppm and .tga.
+     * @param path The file's path relative to CSGO's folder. Supported files are .bmp, .dds, .dib, .hdr, .jpg, .pfm, .png, .ppm and .tga
      */
     function AddTexture(path: string): Texture;
 
@@ -556,10 +571,10 @@ declare namespace Render {
      * 
      * @param x The X position
      * @param y The Y position
-     * @param centered Whether or not it should be centered.
+     * @param centered Whether or not it should be centered
      * @param text The actual string
      * @param color The string's color
-     * @param font The string's font.
+     * @param font The string's font
      */
     function StringCustom(x: number, y: number, centered: 1 | 0, text: string, color: Color, font: number): void;
 
@@ -568,7 +583,7 @@ declare namespace Render {
      * 
      * @param x The X position
      * @param y The Y position
-     * @param centered Whether or not it should be centered.
+     * @param centered Whether or not it should be centered
      * @param text The actual string
      * @param color The string's color
      * @param font The string's font. 0 - default, 1 - bold, 2 - small, 3 - small bold, 4 - large, 5 - icon, 6 - small icon, 8 to 48 regular
@@ -580,7 +595,7 @@ declare namespace Render {
      * 
      * @param font The font's name
      * @param size The font's size
-     * @param weight The font's weight.
+     * @param weight The font's weight
      */
     function FindFont(font: Font, size: number, weight: number): number;
 
@@ -589,7 +604,7 @@ declare namespace Render {
      * 
      * @param font The font's name
      * @param size The font's size
-     * @param weight The font's weight. Deprecated.
+     * @param weight The font's weight. Deprecated
      * 
      * Argument weight defines from thickness. 
      * 100 Lightest. 
@@ -616,18 +631,19 @@ declare namespace Render {
     /**
      * Renders a polygon.
      * 
-     * @param points A matrix of all 3 points of the polygon.
-     * @param color The polygon's color.
+     * @param points A matrix of all 3 points of the polygon
+     * @param color The polygon's color
      */
     function Polygon(points: [Size, Size, Size], color: Color): void;
 
     /**
      * Renders a gradient.
+     * 
      * @param x The X position
      * @param y The Y position
      * @param w The gradient's width
      * @param h The gradient's height
-     * @param is_horizontal The gradient's direction. Use '0' for vertical and '1' for horizontal.
+     * @param is_horizontal The gradient's direction. Use '0' for vertical and '1' for horizontal
      * @param color1 The gradient's first color
      * @param color2 The gradient's second color
      */
@@ -640,12 +656,14 @@ declare namespace Render {
 
     /**
      * Converts a 3D point into a 2D point on your screen and returns its X and Y positions, and whether or not the point is behind you.
+     * 
      * @param point The 3D point
      */
     function WorldToScreen(point: Vector): Size;
 
     /**
      * Renders a ring.
+     * 
      * @param x The X position
      * @param y The Y position
      * @param radius The circle's radius
@@ -655,6 +673,7 @@ declare namespace Render {
 
     /**
      * Renders a rectangle.
+     * 
      * @param x The X position
      * @param y The Y position
      * @param w The rectangle's width
@@ -665,6 +684,7 @@ declare namespace Render {
 
     /**
      * Renders a rectangle outline.
+     * 
      * @param x The X position
      * @param y The Y position
      * @param w The rectangle's width
@@ -675,6 +695,7 @@ declare namespace Render {
 
     /**
      * Renders a line.
+     * 
      * @param x1 The first X position
      * @param y1 The first Y position
      * @param x2 The second X position
@@ -687,37 +708,43 @@ declare namespace Render {
 declare namespace Convar {
     /**
      * Gets a CVar's value in integer form.
-     * @param cvar The CVar.
+     * 
+     * @param cvar The CVar
      */
     function GetInt(cvar: string): number;
 
     /**
      * Gets a CVar's value in float form.
-     * @param cvar The CVar.
+     * 
+     * @param cvar The CVar
      */
     function GetFloat(cvar: string): number;
 
     /**
      * Gets a CVar's value in string form.
-     * @param cvar The CVar.
+     * 
+     * @param cvar The CVar
      */
     function GetString(cvar: string): string;
 
     /**
      * Overrides a CVar's value to a specified integer.
-     * @param cvar The CVar.
+     * 
+     * @param cvar The CVar
      */
     function SetInt(cvar: string, value: number): void;
 
     /**
      * Overrides a CVar's value to a specified float.
-     * @param cvar The CVar.
+     * 
+     * @param cvar The CVar
      */
     function SetFloat(cvar: string, value: number): void;
 
     /**
      * Overrides a CVar's value to a specified string.
-     * @param cvar The CVar.
+     * 
+     * @param cvar The CVar
      */
     function SetString(cvar: string, value: string): void;
 }
@@ -725,19 +752,22 @@ declare namespace Convar {
 declare namespace Event {
     /**
      * Gets a field's value in integer form.
-     * @param field_name The field.
+     * 
+     * @param field_name The field
      */
     function GetInt(field_name: string): number;
 
     /**
      * Gets a field's value in float form.
-     * @param field_name The field.
+     * 
+     * @param field_name The field
      */
     function GetFloat(field_name: string): number;
 
     /**
      * Gets a field's value in string form.
-     * @param field_name The field.
+     * 
+     * @param field_name The field
      */
     function GetString(field_name: string): string;
 }
@@ -745,6 +775,7 @@ declare namespace Event {
 declare namespace Trace {
     /**
      * Traces a line from a point to another and returns its data.
+     * 
      * @param skip_entity The entity to be ignored
      * @param from The initial position
      * @param to The ending position
@@ -754,6 +785,7 @@ declare namespace Trace {
 
     /**
      * Traces a bullet from a point to another and returns its data.
+     * 
      * @param attacker The entity who attacked
      * @param victim The entity who should be hit
      * @param from The initial position
@@ -764,21 +796,25 @@ declare namespace Trace {
 
     /**
      * Traces a line from a point to another with a custom mask and returns its data. For advanced users only.
+     * 
      * @param skip_entity The entity to be ignored
      * @param from The initial position
      * @param to The ending position
      * @param mask The custom mask
-     * @param type The type. '0' will trace everything, '1' will trace only the world and '2' will trace only the entities.
+     * @param type The type. '0' will trace everything, '1' will trace only the world and '2' will trace only the entities
      * @returns The entity index of a hit entity or undefined, the fraction of the trace ('0' means it hit immediately, '1' means it went fully through).
+     * 
+     * @deprecated doesn't work in OTV3.
      */
     function RawLine(skip_entity: EntityID, from: Vector, to: Vector, mask: number, type: number): number[];
 
     /**
      * Returns whether or not a line goes through a smoke. Breaks if smoke is removed.
+     * 
      * @param from The initial position
      * @param to The ending position
      * 
-     * @deprecated doesn't work in OTV3
+     * @deprecated doesn't work in OTV3.
      */
     function Smoke(from: Vector, to: Vector): number;
 }
@@ -792,60 +828,65 @@ declare namespace UserCMD {
     /**
      * Returns a bit-mask of all buttons.
      * 
-     * @deprecated doesn't work in OTV3
+     * @deprecated doesn't work in OTV3.
      */
     function GetButtons(): number;
 
     /**
      * Overrides the UserCMD's movement.
+     * 
      * @param values 
      */
     function SetMovement(values: LengthArray<number, 3>): void;
 
     /**
      * Overrides the UserCMD's buttons.
+     * 
      * @param buttons 
      *
-     * @deprecated doesn't work in OTV3
+     * @deprecated doesn't work in OTV3.
      */
     function SetButtons(buttons: number): void;
 
     /**
      * Overrides your UserCMD's angles.
+     * 
      * @param angles The new angles
-     * @param silent Whether or not you should visualize those angles.
+     * @param silent Whether or not you should visualize those angles
      *
-     * @deprecated doesn't work in OTV3
+     * @deprecated doesn't work in OTV3.
      */
     function SetViewAngles(angles: Vector, silent: boolean): void;
 
     /**
      * Overrides the mouse's X position.
+     * 
      * @param x The new position.
      *
-     * @deprecated doesn't work in OTV3
+     * @deprecated doesn't work in OTV3.
      */
     function SetMouseX(x: number): void;
 
     /**
      * Overrides the mouse's Y position.
+     * 
      * @param y The new position.
      *
-     * @deprecated doesn't work in OTV3
+     * @deprecated doesn't work in OTV3.
      */
     function SetMouseY(y: number): void;
 
     /**
      * Forces the cheat to choke a tick.
      *
-     * @deprecated doesn't work in OTV3
+     * @deprecated doesn't work in OTV3.
      */
     function Choke(): void;
 
     /**
      * Forces the cheat to send a tick. 
      *
-     * @deprecated doesn't work in OTV3
+     * @deprecated doesn't work in OTV3.
      */
     function Send(): void;
 }
@@ -853,13 +894,15 @@ declare namespace UserCMD {
 declare namespace Sound {
     /**
      * Plays a sound.
-     * @param path The path to the sound file.
+     * 
+     * @param path The path to the sound file
      */
     function Play(path: string): void;
 
     /**
      * Plays a sound on your in-game microphone.
-     * @param path The path to the sound file.
+     * 
+     * @param path The path to the sound file
      */
     function PlayMicrophone(path: string): void;
 
@@ -882,13 +925,15 @@ declare namespace Local {
 
     /**
      * Overrides your engine's view angles.
+     * 
      * @param angles The new angles
      */
     function SetViewAngles(angles: Vector): void;
 
     /**
      * Overrides your clan-tag.
-     * @param tag The new clan-tag.
+     * 
+     * @param tag The new clan-tag
      */
     function SetClanTag(tag: string): void;
 
@@ -916,12 +961,14 @@ declare namespace Local {
 declare namespace Cheat {
     /**
      * Prints a message to the console.
+     * 
      * @param msg The message
      */
     function Print(msg: string): void;
 
     /**
      * Prints a colored message to the console.
+     * 
      * @param color The color
      * @param msg The message
      */
@@ -929,18 +976,21 @@ declare namespace Cheat {
 
     /**
      * Prints a message to the in-game chat. Client-sided.
+     * 
      * @param msg The message
      */
     function PrintChat(msg: string): void;
 
     /**
      * Executes a console command.
+     * 
      * @param cmd The command
      */
     function ExecuteCommand(cmd: string): void;
 
     /**
-     * Register a new callback
+     * Registers a new callback.
+     * 
      * @param callback The callback's name
      * @param func The function's name
      */
@@ -955,7 +1005,8 @@ declare namespace Cheat {
 declare namespace Input {
     /**
      * Returns whether or not a key is being held.
-     * @param vkey_code The virtual-key code.
+     * 
+     * @param vkey_code The virtual-key code
      * @link https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
      */
     function IsKeyPressed(vkey_code: number): boolean;
@@ -986,25 +1037,29 @@ declare namespace AntiAim {
 
     /**
      * Starts/stops overriding the anti-aim.
-     * @param active Whether or not the override is active.
+     * 
+     * @param active Whether or not the override is active
      */
     function SetOverride(active: number): void;
 
     /**
      * Overrides your real (body) offset.
-     * @param offset The new offset.
+     * 
+     * @param offset The new offset
      */
     function SetRealOffset(offset: number): void;
 
     /**
      * Overrides your fake (yaw) offset.
-     * @param offset The new offset.
+     * 
+     * @param offset The new offset
      */
     function SetFakeOffset(offset: number): void;
 
     /**
      * Overrides your LBY (desync) offset.
-     * @param offset The new offset.
+     * 
+     * @param offset The new offset
      */
     function SetLBYOffset(offset: number): void;
 }
@@ -1032,17 +1087,19 @@ declare namespace Exploit {
 
     /**
      * Overrides the exploit's shift amount.
-     * @param amount The new amount. The maximum recommended amount is 15.
      * 
-     * @deprecated doesn't work in OTV3
+     * @param amount The new amount. The maximum recommended amount is 15
+     * 
+     * @deprecated doesn't work in OTV3.
      */
     function OverrideShift(amount: number): void;
 
     /**
      * Overrides the exploit's tolerance amount.
-     * @param amount The new amount. The minimum amount is 1.
      * 
-     * @deprecated doesn't work in OTV3
+     * @param amount The new amount. The minimum amount is 1
+     * 
+     * @deprecated doesn't work in OTV3.
      */
     function OverrideTolerance(amount: number): void;
 }
@@ -1056,31 +1113,34 @@ declare namespace Ragebot {
     /**
      * Returns an array containing all possible ragebot targets.
      * 
-     * @deprecated doesn't work in OTV3
+     * @deprecated doesn't work in OTV3.
      */
     function GetTargets(): EntityID[];
 
     /**
      * Returns the hitchance of the ragebot's target.
      * 
-     * @deprecated doesn't work in OTV3
+     * @deprecated doesn't work in OTV3.
      */
     function GetTargetHitchance(): number;
 
     /**
      * Forces the ragebot to prioritize a certain player.
+     * 
      * @param index The entity's index
      */
     function ForceTarget(index: EntityID): void;
     
     /**
      * Forces the ragebot to ignore a player.
+     * 
      * @param index The entity's index
      */
     function IgnoreTarget(index: EntityID): void;
 
     /**
      * Forces the ragebot to ignore a hitbox on a specific player.
+     * 
      * @param index The entity's index
      * @param hitbox The hitbox's index
      */
@@ -1088,12 +1148,14 @@ declare namespace Ragebot {
 
     /**
      * Forces the ragebot to target only safe points on a player.
+     * 
      * @param index The entity's index
      */
     function ForceTargetSafety(index: EntityID): void;
 
     /**
      * Forces the ragebot to target a player for a certain hitchance.
+     * 
      * @param index The entity's index
      * @param hitchance The new hitchance
      */
@@ -1101,6 +1163,7 @@ declare namespace Ragebot {
 
     /**
      * Forces the ragebot to target a player for a certain min. damage.
+     * 
      * @param index The entity's index
      * @param dmg The new min. damage
      */
@@ -1108,6 +1171,7 @@ declare namespace Ragebot {
 
     /**
      * Forces the ragebot to target only safe points for a specific hitbox.
+     * 
      * @param hitbox The hitbox's index
      */
     function ForceHitboxSafety(hitbox: number): void;
@@ -1116,24 +1180,28 @@ declare namespace Ragebot {
 declare namespace Material {
     /**
      * Creates a new material and returns true on success.
+     * 
      * @param name The material's name
      */
     function Create(name: string): boolean;
 
     /**
      * Deletes an existing material and returns true on success.
+     * 
      * @param name The material's name
      */
     function Destroy(name: string): boolean;
 
     /**
      * Gets an existing material by the name and returns its index.
+     * 
      * @param name The material's name
      */
     function Get(name: string): number;
 
     /**
      * Overrides a material shader's value and returns true on success. Can only be called in 'Material' callback.
+     * 
      * @param index The material's index
      * @param shader The shader's name
      * @param value The shader's value
@@ -1145,6 +1213,7 @@ declare namespace Material {
 
     /**
      * Applies changes to a material and returns true on success. Can only be called in 'Material' callback.
+     * 
      * @param index The material's index
      * 
      * @link https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters
