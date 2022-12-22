@@ -18,10 +18,187 @@ type LengthArray <T, N extends number, R extends T[] = []> = number extends N ? 
 type Subtabs = {
     'Rage': 'GENERAL' | 'PISTOL' | 'RIFLE' | 'SNIPER' | 'SMG';
     'Legit': 'GENERAL' | 'PISTOL' | 'HEAVY PISTOL' | 'SCOUT' | 'AWP' | 'AUTOSNIPER';
-    'Anti-Aim': string;
+    'Anti-Aim': 'Rage Anti-Aim' | 'Legit Anti-Aim' | 'Fake-Lag' | '';
     'Visual': 'SELF' | 'ENEMIES' | 'FRIENDLIES' | 'WORLD'; 
     'Misc': 'GENERAL' | 'PERFORMANCE & INFORMATION' | 'SKINS' | 'JAVASCRIPT';
 }
+
+/**
+ * https://wiki.alliedmods.net/Counter-Strike:_Global_Offensive_Events
+ */
+type CallbackName = 
+    'Draw' |
+    'CreateMove' |
+    'FrameStageNotify' |
+    'player_death' |
+    'other_death' |
+    'player_hurt' |
+    'item_purchase' |
+    'bomb_beginplant' |
+    'bomb_abortplant' |
+    'bomb_planted' |
+    'bomb_defused' |
+    'bomb_exploded' |
+    'bomb_dropped' |
+    'bomb_pickup' |
+    'defuser_dropped' |
+    'defuser_pickup' |
+    'announce_phase_end' |
+    'cs_intermission' |
+    'bomb_begindefuse' |
+    'bomb_abortdefuse' |
+    'hostage_follows' |
+    'hostage_hurt' |
+    'hostage_killed' |
+    'hostage_rescued' |
+    'hostage_stops_following' |
+    'hostage_rescued_all' |
+    'hostage_call_for_help' |
+    'vip_escaped' |
+    'vip_killed' |
+    'player_radio' |
+    'bomb_beep' |
+    'weapon_fire' |
+    'weapon_fire_on_empty' |
+    'grenade_thrown' |
+    'weapon_outofammo' |
+    'weapon_reload' |
+    'weapon_zoom' |
+    'silencer_detach' |
+    'inspect_weapon' |
+    'weapon_zoom_rifle' |
+    'player_spawned' |
+    'item_pickup' |
+    'item_pickup_slerp' |
+    'item_pickup_failed' |
+    'item_remove' |
+    'ammo_pickup' |
+    'item_equip' |
+    'enter_buyzone' |
+    'exit_buyzone' |
+    'buytime_ended' |
+    'enter_bombzone' |
+    'exit_bombzone' |
+    'enter_rescue_zone' |
+    'exit_rescue_zone' |
+    'silencer_off' |
+    'silencer_on' |
+    'buymenu_open' |
+    'buymenu_close' |
+    'round_prestart' |
+    'round_poststart' |
+    'round_start' |
+    'round_end' |
+    'grenade_bounce' |
+    'hegrenade_detonate' |
+    'flashbang_detonate' |
+    'smokegrenade_detonate' |
+    'smokegrenade_expired' |
+    'molotov_detonate' |
+    'decoy_detonate' |
+    'decoy_started' |
+    'tagrenade_detonate' |
+    'inferno_startburn' |
+    'inferno_expire' |
+    'inferno_extinguish' |
+    'decoy_firing' |
+    'bullet_impact' |
+    'player_footstep' |
+    'player_jump' |
+    'player_blind' |
+    'player_falldamage' |
+    'door_moving' |
+    'round_freeze_end' |
+    'mb_input_lock_success' |
+    'mb_input_lock_cancel' |
+    'nav_blocked' |
+    'nav_generate' |
+    'player_stats_updated' |
+    'achievement_info_loaded' |
+    'spec_target_updated' |
+    'spec_mode_updated' |
+    'hltv_changed_mode' |
+    'cs_game_disconnected' |
+    'cs_win_panel_round' |
+    'cs_win_panel_match' |
+    'cs_match_end_restart' |
+    'cs_pre_restart' |
+    'show_freezepanel' |
+    'hide_freezepanel' |
+    'freezecam_started' |
+    'player_avenged_teammate' |
+    'achievement_earned' |
+    'achievement_earned_local' |
+    'item_found' |
+    'items_gifted' |
+    'repost_xbox_achievements' |
+    'match_end_conditions' |
+    'round_mvp' |
+    'player_decal' |
+    'teamplay_round_start' |
+    'show_survival_respawn_status' |
+    'client_disconnect' |
+    'gg_player_levelup' |
+    'ggtr_player_levelup' |
+    'assassination_target_killed' |
+    'ggprogressive_player_levelup' |
+    'gg_killed_enemy' |
+    'gg_final_weapon_achieved' |
+    'gg_bonus_grenade_achieved' |
+    'switch_team' |
+    'gg_leader' |
+    'gg_team_leader' |
+    'gg_player_impending_upgrade' |
+    'write_profile_data' |
+    'trial_time_expired' |
+    'update_matchmaking_stats' |
+    'player_reset_vote' |
+    'enable_restart_voting' |
+    'sfuievent' |
+    'start_vote' |
+    'player_given_c4' |
+    'player_become_ghost' |
+    'gg_reset_round_start_sounds' |
+    'tr_player_flashbanged' |
+    'tr_mark_complete' |
+    'tr_mark_best_time' |
+    'tr_exit_hint_trigger' |
+    'bot_takeover' |
+    'tr_show_finish_msgbox' |
+    'tr_show_exit_msgbox' |
+    'reset_player_controls' |
+    'jointeam_failed' |
+    'teamchange_pending' |
+    'material_default_complete' |
+    'cs_prev_next_spectator' |
+    'cs_handle_ime_event' |
+    'nextlevel_changed' |
+    'seasoncoin_levelup' |
+    'tournament_reward' |
+    'start_halftime' |
+    'ammo_refill' |
+    'parachute_pickup' |
+    'parachute_deploy' |
+    'dronegun_attack' |
+    'drone_dispatched' |
+    'loot_crate_visible' |
+    'loot_crate_opened' |
+    'open_crate_instr' |
+    'smoke_beacon_paradrop' |
+    'survival_paradrop_spawn' |
+    'survival_paradrop_break' |
+    'drone_cargo_detached' |
+    'drone_above_roof' |
+    'choppers_incoming_warning' |
+    'firstbombs_incoming_warning' |
+    'dz_item_interaction' |
+    'snowball_hit_player_face' |
+    'survival_teammate_respawn' |
+    'survival_no_respawns_warning' |
+    'survival_no_respawns_final' |
+    'player_ping' |
+    'player_ping_stop' |
+    'guardian_wave_restart';
 
 /**
  * An array of numbers (RGBA color).
@@ -37,6 +214,11 @@ type EntityID = number;
  * The index of a user in an event.
  */
 type UserID = number;
+
+/**
+ * The value of a prop.
+ */
+type PropValue = number | number[] | boolean | boolean[] | string | string[];
 
 /**
  * Adds a texture.
@@ -406,7 +588,7 @@ declare namespace Entity {
      * @param prop The property's name
      * @param value The new value
      */
-    function SetProp(index: EntityID, table: string, prop: string, value: any): any;
+    function SetProp(index: EntityID, table: string, prop: string, value: PropValue): PropValue;
 
     /**
      * Gets a property from an entity. Returns property's name on failure.
@@ -415,7 +597,7 @@ declare namespace Entity {
      * @param table The property's table
      * @param prop The property's name
      */
-    function GetProp(index: EntityID, table: string, prop: string): any;
+    function GetProp(index: EntityID, table: string, prop: string): PropValue;
 
     /**
      * Returns the entity's origin position.
@@ -790,7 +972,7 @@ declare namespace Trace {
      * @param victim The entity who should be hit
      * @param from The initial position
      * @param to The ending position
-     * @returns The entity index of a hit entity or undefined, the damage dealt, whether or not the ending position is visible and the hitbox that was hit. 
+     * @returns The entity index of a hit entity or undefined, the damage dealt, whether or not the ending position is visible and the hitbox that was hit.
      */
     function Bullet(attacker: EntityID, victim: EntityID, from: Vector, to: Vector): number[];
 
@@ -835,14 +1017,14 @@ declare namespace UserCMD {
     /**
      * Overrides the UserCMD's movement.
      * 
-     * @param values 
+     * @param values
      */
     function SetMovement(values: LengthArray<number, 3>): void;
 
     /**
      * Overrides the UserCMD's buttons.
      * 
-     * @param buttons 
+     * @param buttons
      *
      * @deprecated doesn't work in OTV3.
      */
@@ -884,7 +1066,7 @@ declare namespace UserCMD {
     function Choke(): void;
 
     /**
-     * Forces the cheat to send a tick. 
+     * Forces the cheat to send a tick.
      *
      * @deprecated doesn't work in OTV3.
      */
@@ -994,7 +1176,7 @@ declare namespace Cheat {
      * @param callback The callback's name
      * @param func The function's name
      */
-    function RegisterCallback(callback: string, func: string): void;
+    function RegisterCallback<T extends CallbackName>(callback: T, func: string): void;
 
     /**
      * Returns the user's name.
