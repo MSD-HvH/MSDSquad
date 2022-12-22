@@ -2,7 +2,7 @@
  * Сниппет для Onetap V3
  * 
  * @author Mased
- * @version 1.5.2
+ * @version 1.5.5
  * 
  * Полезные материалы:
  * @link https://github.com/ZaUserA/OneTap-v3-Js
@@ -13,192 +13,192 @@
  * @link https://github.com/aprxl/scripting
  */
 
-type LengthArray <T, N extends number, R extends T[] = []> = number extends N ? T[] : R['length'] extends N ? R : LengthArray<T, N, [T, ...R]>;
+type LengthArray <T, N extends number, R extends T[] = []> = number extends N ? T[] : R["length"] extends N ? R : LengthArray<T, N, [T, ...R]>;
 
 type Subtabs = {
-    'Rage': 'GENERAL' | 'PISTOL' | 'RIFLE' | 'SNIPER' | 'SMG';
-    'Legit': 'GENERAL' | 'PISTOL' | 'HEAVY PISTOL' | 'SCOUT' | 'AWP' | 'AUTOSNIPER';
-    'Anti-Aim': string;
-    'Visual': 'SELF' | 'ENEMIES' | 'FRIENDLIES' | 'WORLD'; 
-    'Misc': 'GENERAL' | 'PERFORMANCE & INFORMATION' | 'SKINS' | 'JAVASCRIPT';
+    "Rage": "GENERAL" | "PISTOL" | "RIFLE" | "SNIPER" | "SMG";
+    "Legit": "GENERAL" | "PISTOL" | "HEAVY PISTOL" | "SCOUT" | "AWP" | "AUTOSNIPER";
+    "Anti-Aim": string;
+    "Visual": "SELF" | "ENEMIES" | "FRIENDLIES" | "WORLD"; 
+    "Misc": "GENERAL" | "PERFORMANCE & INFORMATION" | "SKINS" | "JAVASCRIPT";
 }
 
 /**
  * https://wiki.alliedmods.net/Counter-Strike:_Global_Offensive_Events
  */
 type CallbackName = 
-    'Draw' |
-    'CreateMove' |
-    'FrameStageNotify' |
-    'player_death' |
-    'other_death' |
-    'player_hurt' |
-    'item_purchase' |
-    'bomb_beginplant' |
-    'bomb_abortplant' |
-    'bomb_planted' |
-    'bomb_defused' |
-    'bomb_exploded' |
-    'bomb_dropped' |
-    'bomb_pickup' |
-    'defuser_dropped' |
-    'defuser_pickup' |
-    'announce_phase_end' |
-    'cs_intermission' |
-    'bomb_begindefuse' |
-    'bomb_abortdefuse' |
-    'hostage_follows' |
-    'hostage_hurt' |
-    'hostage_killed' |
-    'hostage_rescued' |
-    'hostage_stops_following' |
-    'hostage_rescued_all' |
-    'hostage_call_for_help' |
-    'vip_escaped' |
-    'vip_killed' |
-    'player_radio' |
-    'bomb_beep' |
-    'weapon_fire' |
-    'weapon_fire_on_empty' |
-    'grenade_thrown' |
-    'weapon_outofammo' |
-    'weapon_reload' |
-    'weapon_zoom' |
-    'silencer_detach' |
-    'inspect_weapon' |
-    'weapon_zoom_rifle' |
-    'player_spawned' |
-    'item_pickup' |
-    'item_pickup_slerp' |
-    'item_pickup_failed' |
-    'item_remove' |
-    'ammo_pickup' |
-    'item_equip' |
-    'enter_buyzone' |
-    'exit_buyzone' |
-    'buytime_ended' |
-    'enter_bombzone' |
-    'exit_bombzone' |
-    'enter_rescue_zone' |
-    'exit_rescue_zone' |
-    'silencer_off' |
-    'silencer_on' |
-    'buymenu_open' |
-    'buymenu_close' |
-    'round_prestart' |
-    'round_poststart' |
-    'round_start' |
-    'round_end' |
-    'grenade_bounce' |
-    'hegrenade_detonate' |
-    'flashbang_detonate' |
-    'smokegrenade_detonate' |
-    'smokegrenade_expired' |
-    'molotov_detonate' |
-    'decoy_detonate' |
-    'decoy_started' |
-    'tagrenade_detonate' |
-    'inferno_startburn' |
-    'inferno_expire' |
-    'inferno_extinguish' |
-    'decoy_firing' |
-    'bullet_impact' |
-    'player_footstep' |
-    'player_jump' |
-    'player_blind' |
-    'player_falldamage' |
-    'door_moving' |
-    'round_freeze_end' |
-    'mb_input_lock_success' |
-    'mb_input_lock_cancel' |
-    'nav_blocked' |
-    'nav_generate' |
-    'player_stats_updated' |
-    'achievement_info_loaded' |
-    'spec_target_updated' |
-    'spec_mode_updated' |
-    'hltv_changed_mode' |
-    'cs_game_disconnected' |
-    'cs_win_panel_round' |
-    'cs_win_panel_match' |
-    'cs_match_end_restart' |
-    'cs_pre_restart' |
-    'show_freezepanel' |
-    'hide_freezepanel' |
-    'freezecam_started' |
-    'player_avenged_teammate' |
-    'achievement_earned' |
-    'achievement_earned_local' |
-    'item_found' |
-    'items_gifted' |
-    'repost_xbox_achievements' |
-    'match_end_conditions' |
-    'round_mvp' |
-    'player_decal' |
-    'teamplay_round_start' |
-    'show_survival_respawn_status' |
-    'client_disconnect' |
-    'gg_player_levelup' |
-    'ggtr_player_levelup' |
-    'assassination_target_killed' |
-    'ggprogressive_player_levelup' |
-    'gg_killed_enemy' |
-    'gg_final_weapon_achieved' |
-    'gg_bonus_grenade_achieved' |
-    'switch_team' |
-    'gg_leader' |
-    'gg_team_leader' |
-    'gg_player_impending_upgrade' |
-    'write_profile_data' |
-    'trial_time_expired' |
-    'update_matchmaking_stats' |
-    'player_reset_vote' |
-    'enable_restart_voting' |
-    'sfuievent' |
-    'start_vote' |
-    'player_given_c4' |
-    'player_become_ghost' |
-    'gg_reset_round_start_sounds' |
-    'tr_player_flashbanged' |
-    'tr_mark_complete' |
-    'tr_mark_best_time' |
-    'tr_exit_hint_trigger' |
-    'bot_takeover' |
-    'tr_show_finish_msgbox' |
-    'tr_show_exit_msgbox' |
-    'reset_player_controls' |
-    'jointeam_failed' |
-    'teamchange_pending' |
-    'material_default_complete' |
-    'cs_prev_next_spectator' |
-    'cs_handle_ime_event' |
-    'nextlevel_changed' |
-    'seasoncoin_levelup' |
-    'tournament_reward' |
-    'start_halftime' |
-    'ammo_refill' |
-    'parachute_pickup' |
-    'parachute_deploy' |
-    'dronegun_attack' |
-    'drone_dispatched' |
-    'loot_crate_visible' |
-    'loot_crate_opened' |
-    'open_crate_instr' |
-    'smoke_beacon_paradrop' |
-    'survival_paradrop_spawn' |
-    'survival_paradrop_break' |
-    'drone_cargo_detached' |
-    'drone_above_roof' |
-    'choppers_incoming_warning' |
-    'firstbombs_incoming_warning' |
-    'dz_item_interaction' |
-    'snowball_hit_player_face' |
-    'survival_teammate_respawn' |
-    'survival_no_respawns_warning' |
-    'survival_no_respawns_final' |
-    'player_ping' |
-    'player_ping_stop' |
-    'guardian_wave_restart';
+    "Draw" |
+    "CreateMove" |
+    "FrameStageNotify" |
+    "player_death" |
+    "other_death" |
+    "player_hurt" |
+    "item_purchase" |
+    "bomb_beginplant" |
+    "bomb_abortplant" |
+    "bomb_planted" |
+    "bomb_defused" |
+    "bomb_exploded" |
+    "bomb_dropped" |
+    "bomb_pickup" |
+    "defuser_dropped" |
+    "defuser_pickup" |
+    "announce_phase_end" |
+    "cs_intermission" |
+    "bomb_begindefuse" |
+    "bomb_abortdefuse" |
+    "hostage_follows" |
+    "hostage_hurt" |
+    "hostage_killed" |
+    "hostage_rescued" |
+    "hostage_stops_following" |
+    "hostage_rescued_all" |
+    "hostage_call_for_help" |
+    "vip_escaped" |
+    "vip_killed" |
+    "player_radio" |
+    "bomb_beep" |
+    "weapon_fire" |
+    "weapon_fire_on_empty" |
+    "grenade_thrown" |
+    "weapon_outofammo" |
+    "weapon_reload" |
+    "weapon_zoom" |
+    "silencer_detach" |
+    "inspect_weapon" |
+    "weapon_zoom_rifle" |
+    "player_spawned" |
+    "item_pickup" |
+    "item_pickup_slerp" |
+    "item_pickup_failed" |
+    "item_remove" |
+    "ammo_pickup" |
+    "item_equip" |
+    "enter_buyzone" |
+    "exit_buyzone" |
+    "buytime_ended" |
+    "enter_bombzone" |
+    "exit_bombzone" |
+    "enter_rescue_zone" |
+    "exit_rescue_zone" |
+    "silencer_off" |
+    "silencer_on" |
+    "buymenu_open" |
+    "buymenu_close" |
+    "round_prestart" |
+    "round_poststart" |
+    "round_start" |
+    "round_end" |
+    "grenade_bounce" |
+    "hegrenade_detonate" |
+    "flashbang_detonate" |
+    "smokegrenade_detonate" |
+    "smokegrenade_expired" |
+    "molotov_detonate" |
+    "decoy_detonate" |
+    "decoy_started" |
+    "tagrenade_detonate" |
+    "inferno_startburn" |
+    "inferno_expire" |
+    "inferno_extinguish" |
+    "decoy_firing" |
+    "bullet_impact" |
+    "player_footstep" |
+    "player_jump" |
+    "player_blind" |
+    "player_falldamage" |
+    "door_moving" |
+    "round_freeze_end" |
+    "mb_input_lock_success" |
+    "mb_input_lock_cancel" |
+    "nav_blocked" |
+    "nav_generate" |
+    "player_stats_updated" |
+    "achievement_info_loaded" |
+    "spec_target_updated" |
+    "spec_mode_updated" |
+    "hltv_changed_mode" |
+    "cs_game_disconnected" |
+    "cs_win_panel_round" |
+    "cs_win_panel_match" |
+    "cs_match_end_restart" |
+    "cs_pre_restart" |
+    "show_freezepanel" |
+    "hide_freezepanel" |
+    "freezecam_started" |
+    "player_avenged_teammate" |
+    "achievement_earned" |
+    "achievement_earned_local" |
+    "item_found" |
+    "items_gifted" |
+    "repost_xbox_achievements" |
+    "match_end_conditions" |
+    "round_mvp" |
+    "player_decal" |
+    "teamplay_round_start" |
+    "show_survival_respawn_status" |
+    "client_disconnect" |
+    "gg_player_levelup" |
+    "ggtr_player_levelup" |
+    "assassination_target_killed" |
+    "ggprogressive_player_levelup" |
+    "gg_killed_enemy" |
+    "gg_final_weapon_achieved" |
+    "gg_bonus_grenade_achieved" |
+    "switch_team" |
+    "gg_leader" |
+    "gg_team_leader" |
+    "gg_player_impending_upgrade" |
+    "write_profile_data" |
+    "trial_time_expired" |
+    "update_matchmaking_stats" |
+    "player_reset_vote" |
+    "enable_restart_voting" |
+    "sfuievent" |
+    "start_vote" |
+    "player_given_c4" |
+    "player_become_ghost" |
+    "gg_reset_round_start_sounds" |
+    "tr_player_flashbanged" |
+    "tr_mark_complete" |
+    "tr_mark_best_time" |
+    "tr_exit_hint_trigger" |
+    "bot_takeover" |
+    "tr_show_finish_msgbox" |
+    "tr_show_exit_msgbox" |
+    "reset_player_controls" |
+    "jointeam_failed" |
+    "teamchange_pending" |
+    "material_default_complete" |
+    "cs_prev_next_spectator" |
+    "cs_handle_ime_event" |
+    "nextlevel_changed" |
+    "seasoncoin_levelup" |
+    "tournament_reward" |
+    "start_halftime" |
+    "ammo_refill" |
+    "parachute_pickup" |
+    "parachute_deploy" |
+    "dronegun_attack" |
+    "drone_dispatched" |
+    "loot_crate_visible" |
+    "loot_crate_opened" |
+    "open_crate_instr" |
+    "smoke_beacon_paradrop" |
+    "survival_paradrop_spawn" |
+    "survival_paradrop_break" |
+    "drone_cargo_detached" |
+    "drone_above_roof" |
+    "choppers_incoming_warning" |
+    "firstbombs_incoming_warning" |
+    "dz_item_interaction" |
+    "snowball_hit_player_face" |
+    "survival_teammate_respawn" |
+    "survival_no_respawns_warning" |
+    "survival_no_respawns_final" |
+    "player_ping" |
+    "player_ping_stop" |
+    "guardian_wave_restart";
 
 /**
  * An array of numbers (RGBA color).
@@ -323,7 +323,9 @@ declare namespace UI {
      * UI.ToggleHotkey("Rage", "GENERAL", "Exploits", "Doubletap");
      * ```
      */
-    function ToggleHotkey <T extends keyof Subtabs, S extends Subtabs[T]> (Tab: T, Subtab: S, Area: string, item: string): 1 | 0;
+    function ToggleHotkey <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, item: N): 1 | 0;
+    function ToggleHotkey <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, item: N): 1 | 0;
+    function ToggleHotkey <N extends string> (Area: string, item: N): 1 | 0;
 
     /**
      * Adds a textbox in which you can input text and read it later on.
@@ -336,7 +338,7 @@ declare namespace UI {
      * UI.AddTextbox("Test Textbox");
      * ```
      */
-    function AddTextbox <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): ['Misc', 'JAVASCRIPT', 'Script items', N];
+    function AddTextbox <N extends string> (name: N): ["Misc", "JAVASCRIPT", "Script items", N];
 
     /**
      * Used to set precise RGBA color codes in color picker.
@@ -350,6 +352,8 @@ declare namespace UI {
      * ```
      */
     function SetColor <T extends keyof Subtabs, S extends Subtabs[T], N extends string, C extends Color> (Tab: T, Subtab: S, Area: string, name: N, color: C): C;
+    function SetColor <T extends keyof Subtabs, N extends string, C extends Color> (Tab: T, Area: string, name: N, color: C): C;
+    function SetColor <N extends string, C extends Color> (Area: string, name: N, color: C): C;
 
     /**
      * Adds a color picker.
@@ -361,7 +365,7 @@ declare namespace UI {
      * UI.AddColorPicker("Test Colorpicker")
      * ```
      */
-    function AddColorPicker <N extends string> (name: N): ['Misc', 'JAVASCRIPT', 'Script items', N];
+    function AddColorPicker <N extends string> (name: N): ["Misc", "JAVASCRIPT", "Script items", N];
 
     /**
      * Will create a dropdown in which you can select more items under Misc - JAVASCRIPT - Script items.
@@ -374,7 +378,7 @@ declare namespace UI {
      * UI.AddMultiDropdown("Test multidropdown", ["one", "two", "three", "four"]);
      * ```
      */
-    function AddMultiDropdown <N extends string, E extends string[]> (name: N, elements: E): ['Misc', 'JAVASCRIPT', 'Script items', N];
+    function AddMultiDropdown <N extends string, E extends string[]> (name: N, elements: E): ["Misc", "JAVASCRIPT", "Script items", N];
 
     /**
      * Returns true if the menu is open, false otherwise.
@@ -392,7 +396,7 @@ declare namespace UI {
      * UI.AddMultiDropdown("Test dropdown", ["one", "two", "three", "four"]);
      * ```
      */
-    function AddDropdown <N extends string, E extends string[]> (name: N, elements: E): ['Misc', 'JAVASCRIPT', 'Script items', N];
+    function AddDropdown <N extends string, E extends string[]> (name: N, elements: E): ["Misc", "JAVASCRIPT", "Script items", N];
 
     /**
      * Create a label with a key picker control under Misc - JAVASCRIPT - Script items.
@@ -404,7 +408,7 @@ declare namespace UI {
      * UI.AddHotkey("Test hotkey");
      * ```
      */
-    function AddHotkey <N extends string> (name: N): ['Misc', 'JAVASCRIPT', 'Script items', N];
+    function AddHotkey <N extends string> (name: N): ["Misc", "JAVASCRIPT", "Script items", N];
 
     /**
      * Create a floating point slider under Misc - JAVASCRIPT - Script items.
@@ -418,7 +422,7 @@ declare namespace UI {
      * UI.AddSliderFloat("Test float slider", 1.0, 10.0);
      * ```
      */
-    function AddSliderFloat <N extends string, F extends number, S extends number> (name: N, min: F, max: S): ['Misc', 'JAVASCRIPT', 'Script items', N];
+    function AddSliderFloat <N extends string, F extends number, S extends number> (name: N, min: F, max: S): ["Misc", "JAVASCRIPT", "Script items", N];
 
     /**
      * Create a integer slider under Misc - JAVASCRIPT - Script items.
@@ -432,7 +436,7 @@ declare namespace UI {
      * UI.AddSliderInt("Test", 0, 100);
      * ```
      */
-    function AddSliderInt <N extends string, F extends number, S extends number> (name: N, min: F, max: S): ['Misc', 'JAVASCRIPT', 'Script items', N];
+    function AddSliderInt <N extends string, F extends number, S extends number> (name: N, min: F, max: S): ["Misc", "JAVASCRIPT", "Script items", N];
 
     /**
      * Create a checkbox control under Misc - JAVASCRIPT - Script items.
@@ -444,7 +448,7 @@ declare namespace UI {
      * UI.AddCheckbox("Test checkbox");
      * ```
      */
-    function AddCheckbox <N extends string> (name: N): ['Misc', 'JAVASCRIPT', 'Script items', N];
+    function AddCheckbox <N extends string> (name: N): ["Misc", "JAVASCRIPT", "Script items", N];
 
     /**
      * Can be used to determine whether or not hotkey is active.
@@ -453,6 +457,8 @@ declare namespace UI {
      * @param name name of hotkey
      */
     function IsHotkeyActive <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): 1 | 0;
+    function IsHotkeyActive <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, name: N): 1 | 0;
+    function IsHotkeyActive <N extends string> (Area: string, name: N): 1 | 0;
 
     /**
      * Can be used to get precise RGBA color codes from color picker.
@@ -461,6 +467,8 @@ declare namespace UI {
      * @param name name of color picker
      */
     function GetColor <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): Color;
+    function GetColor <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, name: N): Color;
+    function GetColor <N extends string> (Area: string, name: N): Color;
 
     /**
      * Returns a string representation of an item's current value.
@@ -470,6 +478,8 @@ declare namespace UI {
      * @param name name of text box
      */
     function GetString <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): string;
+    function GetString <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, name: N): string;
+    function GetString <N extends string> (Area: string, name: N): string;
 
     /**
      * Changes menu item(s) visibility.
@@ -481,6 +491,8 @@ declare namespace UI {
      * @param value value which should be set
      */
     function SetEnabled <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N, value: boolean): void;
+    function SetEnabled <T extends keyof Subtabs, N extends string> (Area: string, name: N, value: boolean): void;
+    function SetEnabled <N extends string> (Area: string, name: N, value: boolean): void;
 
     /**
      * Sets the value of an UI item's setting.
@@ -492,6 +504,8 @@ declare namespace UI {
      * @param value value which should be set
      */
     function SetValue <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N, value: boolean | 1 | 0): void;
+    function SetValue <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, name: N, value: boolean | 1 | 0): void;
+    function SetValue <N extends string> (Area: string, name: N, value: boolean | 1 | 0): void;
 
     /**
      * Returns the value of UI item's setting.
@@ -502,6 +516,8 @@ declare namespace UI {
      * @param name name of element
      */
     function GetValue <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): boolean | 1 | 0;
+    function GetValue <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, name: N): boolean | 1 | 0
+    function GetValue <N extends string> (Area: string, name: N): boolean | 1 | 0;
 }
 
 declare namespace Entity {
@@ -929,6 +945,53 @@ declare namespace Convar {
      * @param cvar The CVar
      */
     function SetString(cvar: string, value: string): void;
+}
+
+declare namespace Trace {
+    /**
+     * Traces a line from a point to another and returns its data.
+     * 
+     * @param skip_entity The entity to be ignored
+     * @param from The initial position
+     * @param to The ending position
+     * @returns The entity index of a hit entity or undefined, the fraction of the trace ('0' means it hit immediately, '1' means it went fully through).
+     */
+    function Line(skip_entity: EntityID, from: Vector, to: Vector): number[];
+
+    /**
+     * Traces a bullet from a point to another and returns its data.
+     * 
+     * @param attacker The entity who attacked
+     * @param victim The entity who should be hit
+     * @param from The initial position
+     * @param to The ending position
+     * @returns The entity index of a hit entity or undefined, the damage dealt, whether or not the ending position is visible and the hitbox that was hit.
+     */
+    function Bullet(attacker: EntityID, victim: EntityID, from: Vector, to: Vector): number[];
+
+    /**
+     * Traces a line from a point to another with a custom mask and returns its data. For advanced users only.
+     * 
+     * @param skip_entity The entity to be ignored
+     * @param from The initial position
+     * @param to The ending position
+     * @param mask The custom mask
+     * @param type The type. '0' will trace everything, '1' will trace only the world and '2' will trace only the entities
+     * @returns The entity index of a hit entity or undefined, the fraction of the trace ('0' means it hit immediately, '1' means it went fully through).
+     * 
+     * @deprecated doesn't work in OTV3.
+     */
+    function RawLine(skip_entity: EntityID, from: Vector, to: Vector, mask: number, type: number): number[];
+
+    /**
+     * Returns whether or not a line goes through a smoke. Breaks if smoke is removed.
+     * 
+     * @param from The initial position
+     * @param to The ending position
+     * 
+     * @deprecated doesn't work in OTV3.
+     */
+    function Smoke(from: Vector, to: Vector): number;
 }
 
 declare namespace Event {
