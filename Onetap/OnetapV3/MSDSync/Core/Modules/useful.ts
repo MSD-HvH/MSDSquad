@@ -1,7 +1,10 @@
 /** @author Mased | @version 1.0.9 */
 
+type Vec2D = { x: number, y: number };
+type Vec3D = { x: number, y: number, z: number };
+
 /** @author dermagister | @link https://yougame.biz/magister | @link https://yougame.biz/threads/221305 */
-const throw_error = function(method, string) {
+const throw_error = function(method: string, string: string): void {
     Cheat.PrintChat("\x0E" + "\x02 Whoops, looks like something went wrong. Please check your console.\n");
     Cheat.ExecuteCommand("playvol resource/warning.wav 100");
     return Cheat.PrintColor([255, 0, 0, 255], "\nuseful.js \n - " + method + ": " + string + "\n");
@@ -18,7 +21,6 @@ export const CheatLIB = {
      * Полезна встроенным JSON.stringify, разделение на строки, а так-же typeof элемента.
      * @param {*} text Текст для вывода в консоль.
      * @param {Boolean=} dev Выводит typeof элемента.
-     * @returns {String} Возвращает элемент в виде строки
      * @example
      * ```
      * const other = require("./useful.js");
@@ -27,9 +29,9 @@ export const CheatLIB = {
      * other.Cheat.Print("Hello", true); // Output: Hello: string
      * ```
      */
-    Print: function(text, dev) {
-        if(text == undefined) return throw_error("Cheat.Print()", "To use this method, you must have the text to print");
-        if(typeof text == "object") return Cheat.Print(JSON.stringify(text, null, 2) + (dev ? ": " + typeof text + "\n" : "\n"));
+    Print: function(text: string, dev?: boolean): void {
+        if (text == undefined) return throw_error("Cheat.Print()", "To use this method, you must have the text to print");
+        if (typeof text == "object") return Cheat.Print(JSON.stringify(text, null, 2) + (dev ? ": " + typeof text + "\n" : "\n"));
 
         return Cheat.Print(text + (dev ? ": " + typeof text + "\n" : "\n"));
     },
@@ -42,7 +44,6 @@ export const CheatLIB = {
      * @param {*} text Текст для вывода в консоль.
      * @param {[red: Number, green: Number, blue: Number, alpha: Number]} color Цвет элемента в консоли
      * @param {Boolean=} dev Выводит typeof элемента.
-     * @returns {String} Возвращает элемент в виде строки
      * @example
      * ```
      * const other = require("./useful.js");
@@ -51,11 +52,11 @@ export const CheatLIB = {
      * other.Cheat.PrintColor("Hello", [255, 255, 255, 255], true); // Output: Hello: string
      * ```
      */
-    PrintColor: function(text, color, dev) {
-        if(text == undefined) return throw_error("Cheat.PrintColor()", "To use this method, you must have the text to print");
-        if(!color || typeof color != "object" || color.length < 4 || color.length > 4) return throw_error("Cheat.PrintColor()", "To use this method, your color must be an Array with 4 elements: Red, Green, Blue, Alpha");
+    PrintColor: function(text: string, color: Color, dev?: boolean): void {
+        if (text == undefined) return throw_error("Cheat.PrintColor()", "To use this method, you must have the text to print");
+        if (!color || typeof color != "object" || color.length < 4 || color.length > 4) return throw_error("Cheat.PrintColor()", "To use this method, your color must be an Array with 4 elements: Red, Green, Blue, Alpha");
 
-        if(typeof text == "object") return Cheat.PrintColor(color, JSON.stringify(text, null, 2) + (dev ? ": " + typeof text + "\n" : "\n"));
+        if (typeof text == "object") return Cheat.PrintColor(color, JSON.stringify(text, null, 2) + (dev ? ": " + typeof text + "\n" : "\n"));
 
         return Cheat.PrintColor(color, text + (dev ? ": " + typeof text + "\n" : "\n"));
     },
@@ -67,7 +68,6 @@ export const CheatLIB = {
      * Полезна встроенным JSON.stringify, разделение на строки, а так-же typeof элемента.
      * @param {*} text Текст для вывода в чат.
      * @param {Boolean=} dev Выводит typeof элемента.
-     * @returns {String} Возвращает элемент в виде строки
      * 
      * @example
      * ```
@@ -77,10 +77,10 @@ export const CheatLIB = {
      * other.Cheat.PrintChat("Hello", true); // Output: Hello: string
      * ```
      */
-    PrintChat: function(text, dev) {
-        if(text == undefined) return throw_error("Cheat.PrintChat()", "To use this method, you must have the text to print");
+    PrintChat: function(text: string, dev?: boolean): void {
+        if (text == undefined) return throw_error("Cheat.PrintChat()", "To use this method, you must have the text to print");
 
-        if(typeof text == "object") return Cheat.PrintChat(JSON.stringify(text, null, 2) + (dev ? ": " + typeof text + "\n" : "\n"));
+        if (typeof text == "object") return Cheat.PrintChat(JSON.stringify(text, null, 2) + (dev ? ": " + typeof text + "\n" : "\n"));
 
         return Cheat.PrintChat(text + (dev ? ": " + typeof text + "\n" : "\n"));
     },
@@ -98,130 +98,164 @@ export const CheatLIB = {
      * other.Cheat.ExecuteCmd("r_aspectration 0.9"); // Now your aspectratio is 0.9
      * ```
      */
-    ExecuteCmd: function(cmd) {
-        if(!cmd || typeof cmd != "string") return throw_error("Cheat.ExecuteCmd", "To use this method, you must have the command");
+    ExecuteCmd: function(cmd: string): void {
+        if (!cmd || typeof cmd != "string") return throw_error("Cheat.ExecuteCmd", "To use this method, you must have the command");
 
         return Cheat.ExecuteCommand(cmd);
     }
 };
 
 export const MathLIB = {
-    Lerp: function(a, b, percentage) { 
+    Lerp: function(a: number, b: number, percentage: number): number { 
         return a + (b - a) * percentage 
     },
 
-    Clamp: function(val, min, max) {
+    Clamp: function(val: number, min: number, max: number): number {
         if (val > max) return max
         if (min > val) return min
         return val  
     },
 
-    Random: function(min, max, maxIncluded) {
-        if(maxIncluded) return Math.floor(Math.random() * (max - min) + 1) + min
+    Random: function(min: number, max: number, maxIncluded: boolean): number {
+        if (maxIncluded) return Math.floor(Math.random() * (max - min) + 1) + min
         
         return Math.floor(Math.random() * (max - min)) + min
     },
 
     /** @author Lenin | @link https://yougame.biz/l | @link */
-    Vec2D: function(xx, yy){
-        this.x = xx;
-        this.y = yy;
-        this.length = function() {
-            return Math.sqrt(this.x * this.x + this.y * this.y);
+    Vec2D: function(xx: number, yy: number) {
+        return {
+            x: xx,
+            y: yy,
+            Length() {
+                return Math.sqrt(this.x * this.x + this.y * this.y);
+            },
+            ToArray() {
+                return [this.x, this.y];
+            },
+            DistTo(other: Vec2D) {
+                return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2))  
+            },
+            Mul(other: Vec2D) {
+                return MathLIB.Vec2D(this.x * other.x, this.y * other.y);
+            },
+            Div(other: Vec2D) {
+                return MathLIB.Vec2D(this.x / other.x, this.y / other.y);
+            },
+            Add(other: Vec2D) {
+                return MathLIB.Vec2D(this.x + other.x, this.y + other.y);
+            },
+            Sub(other: Vec2D) {
+                return MathLIB.Vec2D(this.x - other.x, this.y - other.y);
+            },
         }
-        this.toArray = function() {
-            return [this.x, this.y];
-        }
-        return this;
     },
 
-    Vec3D: function(xx, yy, zz) {
-        this.x = xx;
-        this.y = yy;
-        this.z = zz;
-        this.length2d = function() {
-            return Math.sqrt(this.x * this.x + this.y * this.y);
+    Vec3D: function(xx: number, yy: number, zz: number) {
+        return {
+            x: xx,
+            y: yy,
+            z: zz,
+            Length2D() {
+                return Math.sqrt(this.x * this.x + this.y * this.y);
+            },
+            Length() {
+                return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+            },
+            DistTo(other: Vec3D) {
+                return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2) + Math.pow(this.z - other.z, 2))  
+            },
+            DistTo2D(other: Vec3D) {
+                return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2) + Math.pow(this.z - other.z, 2))  
+            },
+            ToArray() {
+                return [this.x, this.y, this.z];
+            },
+            ToAngle() {
+                const angles = MathLIB.Vec3D(0, 0, 0);
+                if (this.y == 0.0 && this.x == 0.0) {
+                    angles.x = (this.z > 0.0) ? 270.0 : 90.0;
+                    angles.y = 0.0;
+                }
+                else {
+                    angles.x = Math.atan2(-this.z, this.Length2D()) * -180 / Math.PI;
+                    angles.y = Math.atan2(this.y, this.x) * 180 / Math.PI;
+                    if (angles.y > 90) angles.y -= 180;
+                    else if (angles.y < 90) angles.y += 180;
+                    else if (angles.y == 90) angles.y = 0;
+                }
+                angles.z = 0.0;
+                return angles;
+            },
+            Clamp() {
+                if (this.x < -89.0) this.x = -89.0;
+                if (this.x > 89.0) this.x = 89.0;
+                while (this.y < -180.0) this.y += 360.0;
+                while (this.y > 180.0) this.y -= 360.0;
+                this.z = 0.0;
+                return this;
+            },
+            Mul(other: Vec3D) {
+                return MathLIB.Vec3D(this.x * other.x, this.y * other.y, this.z * other.z);
+            },
+            Div(other: Vec3D) {
+                return MathLIB.Vec3D(this.x / other.x, this.y / other.y, this.z / other.z);
+            },
+            Add(other: Vec3D) {
+                return MathLIB.Vec3D(this.x + other.x, this.y + other.y, this.z + other.z);
+            },
+            Sub(other: Vec3D) {
+                return MathLIB.Vec3D(this.x - other.x, this.y - other.y, this.z - other.z);
+            },
         }
-        this.length = function() {
-            return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-        }
-        this.toArray = function(){
-            return [this.x, this.y, this.z];
-        }
-        this.clamp = function(){
-            if (this.x < -89.0) this.x = -89.0;
-            if (this.x > 89.0) this.x = 89.0;
-            while (this.y < -180.0) this.y += 360.0;
-            while (this.y > 180.0)
-            this.y -= 360.0;
-    
-            this.z = 0.0;
-            return this;
-        }
-        return this;
-    },
-
-    VectorAngles: function(forward, angles) {
-        if (forward.y == 0.0 && forward.x == 0.0) {
-            angles.x = (forward.z > 0.0) ? 270.0 : 90.0;
-            angles.y = 0.0;
-        }
-        else {
-            angles.x = Math.atan2(-forward.z, forward.length2d()) * -180 / Math.PI;
-            angles.y = Math.atan2(forward.y, forward.x) * 180 / Math.PI;
-            if (angles.y > 90) angles.y -= 180;
-            else if (angles.y < 90) angles.y += 180;
-            else if (angles.y == 90) angles.y = 0;
-        }
-        angles.z = 0.0;
     },
 
     /** @author TIEPCUK | @link https://yougame.biz/members/183696 | @link https://yougame.biz/threads/239797 */
-    VectorSubstract: function(Vector_1, Vector_2) {
+    VectorSubtract: function(Vector_1: Vector, Vector_2: Vector): Vector {
         return([Vector_1[0] - Vector_2[0], Vector_1[1] - Vector_2[1], Vector_1[2] - Vector_2[2]]);
     },
 
-    VectorDistance: function(Vector_1, Vector_2) {
-        var Vector_X = Vector_1[0] - Vector_2[0]
-        var Vector_Y = Vector_1[1] - Vector_2[1]
-        var Vector_Z = Vector_1[2] - Vector_2[2]
+    VectorDistance: function(Vector_1: Vector, Vector_2: Vector): number {
+        const Vector_X = Vector_1[0] - Vector_2[0]
+        const Vector_Y = Vector_1[1] - Vector_2[1]
+        const Vector_Z = Vector_1[2] - Vector_2[2]
         return Math.sqrt(Vector_X * Vector_X + Vector_Y * Vector_Y + Vector_Z * Vector_Z) 
     },
 
-    VectorDistance2D: function(Vector_1, Vector_2) {
-        var Vector_X = Vector_1[0] - Vector_2[0]
-        var Vector_Y = Vector_1[1] - Vector_2[1]
+    VectorDistance2D: function(Vector_1: Vector, Vector_2: Vector): number {
+        const Vector_X = Vector_1[0] - Vector_2[0]
+        const Vector_Y = Vector_1[1] - Vector_2[1]
         return Math.sqrt(Vector_X * Vector_X + Vector_Y * Vector_Y)
     },
 
-    VectorLength: function(Forward) {
+    VectorLength: function(Forward: Vector): number {
         return Math.sqrt(Forward[0] * Forward[0] + Forward[1] * Forward[1] + Forward[2] * Forward[2]);
     },
 
-    VectorLength2D: function(Forward) {
+    VectorLength2D: function(Forward: Vector): number {
         return Math.sqrt(Forward[0] * Forward[0] + Forward[1] * Forward[1]);
     },
 
-    CrossProduct: function(a,b) {
-        return new this.Vec3D(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+    CrossProduct: function(a: Vec3D, b: Vec3D) {
+        return this.Vec3D(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
     },
 
-    DotProduct: function(a, b) {
+    DotProduct: function(a: Vec3D, b: Vec3D) {
         return(a.x * b.x + a.y * b.y, a.z * b.z);
     },
 
-    Deg2Rad: function(Degrees) {
+    Deg2Rad: function(Degrees: number): number {
         return Degrees * (Math.PI / 180.0);
     },
 
-    Rad2Deg(Radians) {
+    Rad2Deg(Radians: number): number {
         return Radians * (180 / Math.PI);
     },
 
-    CalcAngle: function(vec1, vec2) {
-        var qAngles = new this.Vec3D;
-        var delta = new this.Vec3D((vec1.x - vec2.x), (vec1.y - vec2.y), (vec1.z - vec2.z));
-        var hyp = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
+    CalcAngle: function(vec1: Vec3D, vec2: Vec3D) {
+        const qAngles = this.Vec3D(0, 0, 0);
+        const delta = this.Vec3D((vec1.x - vec2.x), (vec1.y - vec2.y), (vec1.z - vec2.z));
+        const hyp = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
         qAngles.x = (Math.atan(delta.z / hyp) * (180.0 / Math.PI));
         qAngles.y = (Math.atan(delta.y / delta.x) * (180.0 / Math.PI));
         qAngles.z = 0;
@@ -229,41 +263,35 @@ export const MathLIB = {
         return qAngles;
     },
 
-    ClampAngles: function(angles) {
-        if (angles.x > 89.0)
-            angles.x = 89.0;
-        else if (angles.x < -89.0)
-            angles.x = -89.0;
-        if (angles.y > 180.0)
-            angles.y = 180.0;
-        else if (angles.y < -180.0)
-            angles.y = -180.0;
+    ClampAngles: function(angles: Vec3D) {
+        if (angles.x > 89.0) angles.x = 89.0;
+        else if (angles.x < -89.0) angles.x = -89.0;
+        if (angles.y > 180.0) angles.y = 180.0;
+        else if (angles.y < -180.0) angles.y = -180.0;
         angles.z = 0;
+        return angles;
     },
 
-    NormalizeAngles: function(angles) {
-        while (angles.x > 89.0)
-            angles.x -= 180.0;
-        while (angles.x < -89.0)
-            angles.x += 180.0;
-        while (angles.y < -180.0)
-            angles.y += 360.0;
-        while (angles.y > 180.0)
-            angles.y -= 360.0;
-            
-        if(angles.z > 0)
-            angles.zangles.z = 0.0;
+    NormalizeAngles: function(angles: Vec3D) {
+        while (angles.x > 89.0) angles.x -= 180.0;
+        while (angles.x < -89.0) angles.x += 180.0;
+        while (angles.y < -180.0) angles.y += 360.0;
+        while (angles.y > 180.0) angles.y -= 360.0;
+        if (angles.z != 0) angles.z = 0.0;
+        return angles;
     }
 };
+
 /** Библиотека основанная на Render @link https://docs.onecrack.shop/onecrack-api/render */
-const RenderLIB = {
-    HSVtoRGB: function(h, s, v) {
-        var r, g, b, i, f, p, q, t, a;
-        i = Math.floor(h * 6);
-        f = h * 6 - i;
-        p = v * (1 - s);
-        q = v * (1 - f * s);
-        t = v * (1 - (1 - f) * s);
+export const RenderLIB = {
+    HSVtoRGB: function(h: number, s: number, v: number): { r: number, g: number, b: number } {
+        let r = 0, g = 0, b = 0;
+
+        const i = Math.floor(h * 6);
+        const f = h * 6 - i;
+        const p = v * (1 - s);
+        const q = v * (1 - f * s);
+        const t = v * (1 - (1 - f) * s);
 
         switch (i % 6) {
             case 0: r = v, g = t, b = p; break;
@@ -281,18 +309,22 @@ const RenderLIB = {
         };
     },
 
-    RGBtoHSV: function(r, g, b) {
+    RGBtoHSV: function(r: any, g: number, b: number): { h: number, s: number, v: number } {
         if (arguments.length === 1) {
             g = r.g, b = r.b, r = r.r;
         }
-        var max = Math.max(r, g, b) 
-        var min = Math.min(r, g, b)
-        var d = max - min, h, s = (max === 0 ? 0 : d / max),
-        v = max / 255
+        
+        const max = Math.max(r, g, b) 
+        const min = Math.min(r, g, b)
+        const d = max - min, s = (max === 0 ? 0 : d / max),
+        v = max / 255;
+        
+        let h = 0;
+        
         switch (max) {
             case min: h = 0; break;
             case r: 
-                h = (g - b) + d * (g < b ? 6: 0); 
+                h = (g - b) + d * (g < b ? 6 : 0); 
                 h /= 6 * d; 
             break;
             case g: 
@@ -303,7 +335,7 @@ const RenderLIB = {
                 h = (r - g) + d * 4; 
                 h /= 6 * d; 
             break;
-        };
+        }
         
         return {
             h: h,
@@ -322,18 +354,18 @@ const RenderLIB = {
      * @param {Number} thickness 
      * @param {[red: Number, green: Number, blue: Number, alpha: Number]} color Цвет круга
      */
-    Arc: function(x, y, radius, start_angle: number, percent, thickness, color) {
-        var precision = (2 * Math.PI) / 30;
-        var step = Math.PI / 180;
-        var inner = radius - thickness;
-        var end_angle = (start_angle + percent) * step;
-        var start_angle = (start_angle * Math.PI) / 180;
+    Arc: function(x: number, y: number, radius: number, start_angle: number, percent: number, thickness: number, color: Color): void {
+        const precision = (2 * Math.PI) / 30;
+        const step = Math.PI / 180;
+        const inner = radius - thickness;
+        const end_angle = (start_angle + percent) * step;
+        start_angle = (start_angle * Math.PI) / 180;
         for (; radius > inner; --radius) {
-            for (var angle = start_angle; angle < end_angle; angle += precision) {
-                var cx = Math.round(x + radius * Math.cos(angle));
-                var cy = Math.round(y + radius * Math.sin(angle));
-                var cx2 = Math.round(x + radius * Math.cos(angle + precision));
-                var cy2 = Math.round(y + radius * Math.sin(angle + precision));
+            for (let angle = start_angle; angle < end_angle; angle += precision) {
+                const cx = Math.round(x + radius * Math.cos(angle));
+                const cy = Math.round(y + radius * Math.sin(angle));
+                const cx2 = Math.round(x + radius * Math.cos(angle + precision));
+                const cy2 = Math.round(y + radius * Math.sin(angle + precision));
                 Render.Line(cx, cy, cx2, cy2, color);
             }
         }
@@ -361,7 +393,7 @@ const RenderLIB = {
      * Cheat.RegisterCallback("Draw", "on_draw")
      * ```
      */
-    StringShadow: function(x, y, centered, text, color, font) {
+    StringShadow: function(x: number, y: number, centered: 1 | 0, text: string, color: Color, font: number): void {
         Render.StringCustom(x - 1, y - 1, centered, text, [0, 0, 0, color[3]], font)
         Render.StringCustom(x + 1, y - 1, centered, text, [0, 0, 0, color[3]], font)
         Render.StringCustom(x - 1, y + 1, centered, text, [0, 0, 0, color[3]], font)
@@ -373,7 +405,7 @@ const RenderLIB = {
      * @param {Number} x Позиция по горизонтали (x)
      * @param {Number} y Позиция по вертикали (y)
      * @param {Number=} centered Должен ли текст быть центрирован
-     * @param {[text: String, color: Array(red: Number, green: Number, blue: Number, alpha: number)][]} text Масив масивов с текстом и цветом
+     * @param {[text: String, color: Array(red: Number, green: Number, blue: Number, alpha: number)][]} text Массив массивов с текстом и цветом
      * @param {Render.GetFont} font https://docs.onecrack.shop/onecrack-api/render#getfont
      * @param {Number} slice Пробелы между словами
      * @param {Boolean=} shadow Должен ли текст иметь тень справа снизу
@@ -398,18 +430,18 @@ const RenderLIB = {
      *  Cheat.RegisterCallback("Draw", "on_draw")
      *  ```
      */
-    MultiColoredText: function(x, y, centered, text, font, slice, shadow) {
-        text.forEach(function(string, i) {
-            if(string[0].startsWith("\n")) y += Render.TextSizeCustom(string[0], font)[1] + slice
+    MultiColoredText: function(x: number, y: number, centered: 1 | 0, text: [string, Color][], font: number, slice: number, shadow: boolean): void {
+        text.forEach(function(string: [string, Color]) {
+            if (string[0].startsWith("\n")) y += Render.TextSizeCustom(string[0], font)[1] + slice
     
-            if(shadow) Render.StringCustom(x + 1, y + 1, centered || 0, string[0], [0, 0, 0, string[1][3]], font)
+            if (shadow) Render.StringCustom(x + 1, y + 1, centered || 0, string[0], [0, 0, 0, string[1][3]], font)
             Render.StringCustom(x, y, centered || 0, string[0], string[1], font)
     
             x += Render.TextSizeCustom(string[0], font)[0] + slice
         })
     },
 
-    OutLineCorner: function(x, y, w, h, size1, size2, color) {
+    OutLineCorner: function(x: number, y: number, w: number, h: number, size1: number, size2: number, color: Color): void {
         Render.Line(x - 2, y - 2, x + w - 2, y - 2, color)
         Render.Line(x - 2, y - 2, x - 2, y + h - 2, color)
     
@@ -423,7 +455,7 @@ const RenderLIB = {
         Render.Line(x + size1 + 1, y + size2 + 1, x + size1 + 1, y + size2 - h + 1, color)
     },
 
-    GamesenseUI: function(x, y, w, h) {
+    GamesenseUI: function(x: number, y: number, w: number, h: number): void {
         Render.FilledRect(x - 6, y - 6, w + 13, h + 14, [0, 0, 0, 255]);
         Render.FilledRect(x - 5, y - 5, w + 11, h + 12, [34, 34, 34, 255]);
         Render.FilledRect(x + 1, y, w, h + 1, [0, 0, 0, 255]);
@@ -432,20 +464,27 @@ const RenderLIB = {
     },
 
     /**
-     * Чесно говоря я хз как оно работает. Вроде все правильно, а вроде когда видишь - пишет false
      * @param {Vec3D} origin 
      */
-    IsOnScreen: function(origin) {
+    IsOnScreen: function(origin: Vector): boolean {
         const w2s = Render.WorldToScreen(origin);
         if(!w2s) return false;
-        return screen[0] + 270 > w2s[0] && screen[1] + 500 > w2s[1];
+        // return screen[0] + 270 > w2s[0] && screen[1] + 500 > w2s[1];
+        return w2s[0] > 0 && w2s[1] > 0 && w2s[0] < screen[0] && w2s[1] < screen[1];
     },
 
-    LerpColor: function(value, min, max) {
-        var r = min[0] * (1-value) + max[0] * value
-        var g = min[1] * (1-value) + max[1] * value
-        var b = min[2] * (1-value) + max[2] * value
-        var a = min[3] * (1-value) + max[3] * value
+    /**
+     * @param {Vec2D} origin 
+     */
+    IsOnScreen2D: function(origin: [number, number]): boolean {
+        return origin[0] > 0 && origin[1] > 0 && origin[0] < screen[0] && origin[1] < screen[1];
+    },
+
+    LerpColor: function(value: number, min: Color, max: Color): Color {
+        const r = min[0] * (1-value) + max[0] * value
+        const g = min[1] * (1-value) + max[1] * value
+        const b = min[2] * (1-value) + max[2] * value
+        const a = min[3] * (1-value) + max[3] * value
         return [r, g, b, a]
     },
 
@@ -458,7 +497,7 @@ const RenderLIB = {
      * @param {Number} h Размер в высоту (height)
      * @param {[red: Number, green: Number, blue: Number, alpha: Number]} top_left Градиент сверху слева
      * @param {[red: Number, green: Number, blue: Number, alpha: Number]} top_right Градиент сверху справа
-     * @param {[red: Number, green: Number, blue: Number, alpha: Number]} bottom_left Градинет снизу слева
+     * @param {[red: Number, green: Number, blue: Number, alpha: Number]} bottom_left Градиент снизу слева
      * @param {[red: Number, green: Number, blue: Number, alpha: Number]} bottom_right Градиент снизу справа
      * 
      * @example
@@ -472,14 +511,14 @@ const RenderLIB = {
      * Cheat.RegisterCallback("Draw", "on_draw")
      * ```
      */
-    Gradient: function(x, y, w, h, top_left, top_right, bottom_left, bottom_right) {
+    Gradient: function(x: number, y: number, w: number, h: number, top_left: Color, top_right: Color, bottom_left: Color, bottom_right: Color): void {
         if (h < w) {
-            for (var i = 0; i < h; i++) {
+            for (let  i = 0; i < h; i++) {
                 Render.GradientRect(x, y + i, w, 1, 1, this.LerpColor(i / h, top_left, bottom_left), this.LerpColor(i / h, top_right, bottom_right))
             }
         }
         else {
-            for (var i = 0; i < w; i++) {
+            for (let i = 0; i < w; i++) {
                 Render.GradientRect(x + i, y, 1, h, 0, this.LerpColor(i / w, top_left, top_right), this.LerpColor(i / w, bottom_left , bottom_right))
             }
         }
@@ -487,12 +526,12 @@ const RenderLIB = {
 };
 
 export const OtherLIB = {
-    CursorBox: function(mouse_pos, x, y, x2, y2) { 
+    CursorBox: function(mouse_pos: [number, number], x: number, y: number, x2: number, y2: number): boolean { 
         return (mouse_pos[0] > x) && (mouse_pos[1] > y) && (mouse_pos[0] < x2) && (mouse_pos[1] < y2) 
     },
 
-    SetDropdownValue: function(value, index, enable) {
-        var mask = 1 << index;
+    SetDropdownValue: function(value: number, index: number, enable: boolean | 1 | 0): number {
+        const mask = 1 << index;
         return enable ? (value | mask) : (value &~ mask)
     },
 
@@ -515,8 +554,8 @@ export const OtherLIB = {
         Cheat.Print(string); // Output: Hello, Mased
      *  ```
      */
-    FormatString: function(string, options) {
-        if(options) {
+    FormatString: function(string: string, options: any): string {
+        if (options) {
             Object.keys(options).forEach(function(option) {
                 string = string.replace(new RegExp("{{" + option + "}}", "g"), options[option])
             })
