@@ -1,6 +1,6 @@
 # MSDSquad
 
-![Preview](https://i.imgur.com/ufZ1mRd.png)
+![Preview](https://i.imgur.com/Ir0KLeH.png)
 
 Сделано было для Self-using
 
