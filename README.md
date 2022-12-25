@@ -1,6 +1,6 @@
 # MSDSquad
 
-[![Preview]([https://i.imgur.com/ufZ1mRd.png "Preview")](https://github.com/MasedMSD/MSDSquad "Preview")
+![Preview](https://i.imgur.com/ufZ1mRd.png)
 
 Сделано было для Self-using
 
