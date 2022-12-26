@@ -388,7 +388,7 @@ declare namespace UI {
     /**
      * Will create a dropdown with items under Misc - JAVASCRIPT - Script items.
      * 
-     * @param name name of the drop down
+     * @param name name of the dropdown
      * @param elements Array of elements
      * 
      * @example
