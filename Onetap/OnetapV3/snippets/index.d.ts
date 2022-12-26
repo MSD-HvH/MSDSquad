@@ -9,7 +9,7 @@
  * @link https://gamesensical.gitbook.io/docs/developers/netprops
  * @link https://github.com/MasedMSD/MSDSquad
  * 
- * Thanks april's github btw <3
+ * Thanks april's GitHub btw <3
  * @link https://github.com/aprxl/scripting
  */
 
@@ -223,7 +223,7 @@ type PropValue = number | number[] | boolean | boolean[] | string | string[];
 /**
  * Adds a texture.
  * 
- * Path is relative to CSGO folder, so you don't need full path.
+ * Path is relative to the CSGO folder, so you don't need the full path.
  * Supports the following formats:
  * .bmp
  * .dds
@@ -245,8 +245,8 @@ type Texture = string;
 type Font = string;
 
 /**
- * An array containing three number corresponding to the X, Y and Z positions of a 3D point.
- * Or, alternatively, an array containing the pitch, yaw and roll of an Euler angle.
+ * An array containing three numbers corresponding to the X, Y, and Z positions of a 3D point.
+ * Or an array containing the pitch, yaw, and roll of an Euler angle.
  */
 type Vector = number[];
 
@@ -257,7 +257,7 @@ type Size = LengthArray<number, 2>;
 
 declare namespace Globals {
     /**
-     * Returns the amount of choked ticks.
+     * Returns the number of choked ticks.
      * 
      * @deprecated Doesn't work in onetap V3.
      */
@@ -303,7 +303,7 @@ declare namespace UI {
     /**
      * Creates a new label.
      * 
-     * @param text Text of label
+     * @param text Text of the label
      * 
      * @example
      * ```ts
@@ -314,9 +314,9 @@ declare namespace UI {
 
     /**
      * Can be used to toggle a hotkey or simulate key press.
-     * Return Values: 1 is key is active, 0 if the key is inactive.
+     * Return Values: 1 if the key is active, 0 if the key is inactive.
      * 
-     * @param item name of hotkey
+     * @param item name of the hotkey
      * 
      * @example
      * ```ts
@@ -331,7 +331,7 @@ declare namespace UI {
      * Adds a textbox in which you can input text and read it later on.
      * Returns an path: string[].
      * 
-     * @param name name of text
+     * @param name name of the text box
      * 
      * @example
      * ```ts
@@ -341,9 +341,9 @@ declare namespace UI {
     function AddTextbox <N extends string> (name: N): ["Misc", "JAVASCRIPT", "Script items", N];
 
     /**
-     * Used to set precise RGBA color codes in color picker.
+     * Used to set precise RGBA color codes in the color picker.
      * 
-     * @param name name of element
+     * @param name name of the element
      * @param color RGBA color
      * 
      * @example
@@ -370,12 +370,12 @@ declare namespace UI {
     /**
      * Will create a dropdown in which you can select more items under Misc - JAVASCRIPT - Script items.
      * 
-     * @param name name of multi drop down
+     * @param name name of the multi dropdown
      * @param elements Array of elements
      * 
      * @example
      * ```ts
-     * UI.AddMultiDropdown("Test multidropdown", ["one", "two", "three", "four"]);
+     * UI.AddMultiDropdown("Test multi dropdown", ["one", "two", "three", "four"]);
      * ```
      */
     function AddMultiDropdown <N extends string, E extends string[]> (name: N, elements: E): ["Misc", "JAVASCRIPT", "Script items", N];
@@ -388,7 +388,7 @@ declare namespace UI {
     /**
      * Will create a dropdown with items under Misc - JAVASCRIPT - Script items.
      * 
-     * @param name name of drop down
+     * @param name name of the drop down
      * @param elements Array of elements
      * 
      * @example
@@ -401,7 +401,7 @@ declare namespace UI {
     /**
      * Create a label with a key picker control under Misc - JAVASCRIPT - Script items.
      * 
-     * @param name name of hotkey
+     * @param name name of the hotkey
      * 
      * @example
      * ```ts
@@ -413,9 +413,9 @@ declare namespace UI {
     /**
      * Create a floating point slider under Misc - JAVASCRIPT - Script items.
      * 
-     * @param name name of slider
-     * @param min minimum value of slider
-     * @param max maximum value of slider
+     * @param name name of the slider
+     * @param min minimum value of the slider
+     * @param max maximum value of the slider
      * 
      * @example
      * ```ts
@@ -425,11 +425,11 @@ declare namespace UI {
     function AddSliderFloat <N extends string, F extends number, S extends number> (name: N, min: F, max: S): ["Misc", "JAVASCRIPT", "Script items", N];
 
     /**
-     * Create a integer slider under Misc - JAVASCRIPT - Script items.
+     * Create an integer slider under Misc - JAVASCRIPT - Script items.
      * 
-     * @param name name of slider
-     * @param min minimum value of slider
-     * @param max maximum value of slider
+     * @param name name of the slider
+     * @param min minimum value of the slider
+     * @param max maximum value of the slider
      * 
      * @example
      * ```ts
@@ -441,7 +441,7 @@ declare namespace UI {
     /**
      * Create a checkbox control under Misc - JAVASCRIPT - Script items.
      * 
-     * @param name name of checkbox
+     * @param name name of the checkbox
      * 
      * @example
      * ```ts
@@ -451,7 +451,7 @@ declare namespace UI {
     function AddCheckbox <N extends string> (name: N): ["Misc", "JAVASCRIPT", "Script items", N];
 
     /**
-     * Can be used to determine whether or not hotkey is active.
+     * Can be used to determine whether hotkey is active.
      * Return values undefined if an item could not be found, or if the item doesn't contain a key picker; otherwise 1 if the key is active, 0 if the key is inactive.
      * 
      * @param name name of hotkey
@@ -461,10 +461,10 @@ declare namespace UI {
     function IsHotkeyActive <N extends string> (Area: string, name: N): 1 | 0;
 
     /**
-     * Can be used to get precise RGBA color codes from color picker.
-     * Return values undefined if an item could not be found, or if the item doesn't contain a color picker.
+     * Can be used to get precise RGBA color codes from a color picker.
+     * Return values are undefined if an item could not be found, or if the item doesn't contain a color picker.
      * 
-     * @param name name of color picker
+     * @param name name of the color picker
      */
     function GetColor <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): Color;
     function GetColor <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, name: N): Color;
@@ -472,10 +472,10 @@ declare namespace UI {
 
     /**
      * Returns a string representation of an item's current value.
-     * UI item searches are not explicit: the search will return the first found item. This means that UI.GetValue("Legit","Triggerbot", "Enabled") will return the same value as UI.GetValue("Legit", "GENERAL", "Triggerbot", "Enabled").
-     * All script-added items are located in a groupbox within the misc tab, under javascript group called "Script items". Searching for ("Script Items", item name) is certain to return a script control.
+     * UI item searches are not explicit: the search will return the first found item. This means that UI.GetValue("Legit", "Triggerbot", "Enabled") will return the same value as UI.GetValue("Legit", "GENERAL", "Triggerbot", "Enabled").
+     * All script-added items are located in a group box within the misc tab, under the javascript group called "Script items". Searching for ("Script Items", an item name) is certain to return a script control.
      * 
-     * @param name name of text box
+     * @param name name of the text box
      */
     function GetString <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): string;
     function GetString <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, name: N): string;
@@ -484,10 +484,10 @@ declare namespace UI {
     /**
      * Changes menu item(s) visibility.
      * UI item searches are not explicit: the search will return the first found item. This means that UI.GetValue("Legit", "Triggerbot", "Enabled") will return the same value as UI.GetValue("Legit", "GENERAL", "Triggerbot", "Enabled").
-     * All script-added items are located in a groupbox within the misc tab, under javascript group called "Script items". Searching for ("Script Items", item name) is certain to return a script control.
+     * All script-added items are located in a group box within the misc tab, under the javascript group called "Script items". Searching for ("Script Items", an item name) is certain to return a script control.
      * UI.SetEnabled does not work on tabs/subtabs.
      * 
-     * @param name name of element
+     * @param name name of the element
      * @param value value which should be set
      */
     function SetEnabled <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N, value: boolean): void;
@@ -495,12 +495,12 @@ declare namespace UI {
     function SetEnabled <N extends string> (Area: string, name: N, value: boolean): void;
 
     /**
-     * Sets the value of an UI item's setting.
+     * Sets the value of a UI item's setting.
      * UI item searches are not explicit: the search will return the first found item. This means that
      * UI.SetValue("Legit", "Triggerbot", "Enabled", true) will return the same value as UI.SetValue("Legit", "GENERAL", "Triggerbot", "Enabled", true).
-     * All script-added items are located in a groupbox within the misc tab, under javascript group called "Script items". Searching for ("Script Items", item name) is certain to return a script control.
+     * All script-added items are located in a group box within the misc tab, under the javascript group called "Script items". Searching for ("Script Items", an item name) is certain to return a script control.
      * 
-     * @param name name of element
+     * @param name name of the element
      * @param value value which should be set
      */
     function SetValue <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N, value: boolean | 1 | 0): void;
@@ -508,12 +508,12 @@ declare namespace UI {
     function SetValue <N extends string> (Area: string, name: N, value: boolean | 1 | 0): void;
 
     /**
-     * Returns the value of UI item's setting.
+     * Returns the value of the UI item's setting.
      * UI item searches are not explicit: the search will return the first found item. This means that UI.GetValue("Legit", "Triggerbot", "Enabled") will return the same value as UI.GetValue("Legit", "GENERAL", "Triggerbot", "Enabled").
-     * All script-added items are located in a groupbox within the misc tab, under javascript group called "Script items". Searching for ("Script Items", item name) is certain to return a script control.
+     * All script-added items are located in a group box within the misc tab, under the javascript group called "Script items". Searching for ("Script Items", an item name) is certain to return a script control.
      * UI.SetEnabled does not work on tabs/subtabs.
      * 
-     * @param name name of element
+     * @param name name of the element
      */
     function GetValue <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): boolean | 1 | 0;
     function GetValue <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, name: N): boolean | 1 | 0
@@ -522,8 +522,8 @@ declare namespace UI {
 
 declare namespace Entity {
     /**
-     * Returns an array containing the data of a entity's bounding box: whether or not the box is valid, the box's top left corner X position,
-     * the box's top left Y position, the box's bottom right X position and the box's bottom right Y position.
+     * Returns an array containing the data of an entity's bounding box: whether the box is valid, the box's top left corner X position,
+     * the box's top left Y position, the box's bottom right X position, and the box's bottom right Y position.
      * 
      * @param index The entity's index
      */
@@ -583,7 +583,7 @@ declare namespace Entity {
     function GetGameRulesProxy(): EntityID;
 
     /**
-     * Returns whether or not the specified entity is a bot.
+     * Returns whether the specified entity is a bot.
      * 
      * @param index The entity's index
      */
@@ -644,42 +644,42 @@ declare namespace Entity {
     function GetClassID(index: EntityID): number;
 
     /**
-     * Returns whether or not the specified entity is dormant.
+     * Returns whether the specified entity is dormant.
      * 
      * @param index The entity's index
      */
     function IsDormant(index: EntityID): boolean;
 
     /**
-     * Returns whether or not the specified entity is alive.
+     * Returns whether the specified entity is alive.
      * 
      * @param index The entity's index
      */
     function IsAlive(index: EntityID): boolean;
 
     /**
-     * Returns whether or not the specified entity is valid.
+     * Returns whether the specified entity is valid.
      * 
      * @param index The entity's index
      */
     function IsValid(index: EntityID): boolean;
 
     /**
-     * Returns whether or not the specified entity is ourselves.
+     * Returns whether the specified entity is ourselves.
      * 
      * @param index The entity's index
      */
     function IsLocalPlayer(index: EntityID): boolean;
 
     /**
-     * Returns whether or not the specified entity is an enemy.
+     * Returns whether the specified entity is an enemy.
      * 
      * @param index The entity's index
      */
     function IsEnemy(index: EntityID): boolean;
 
     /**
-     * Returns whether or not the specified entity is a teammate.
+     * Returns whether the specified entity is a teammate.
      * 
      * @param index The entity's index
      */
@@ -749,15 +749,15 @@ declare namespace Render {
     function AddTexture(path: string): Texture;
 
     /**
-     * Finds the text width size of the given string with custom font.
+     * Finds the text width size of the given string with a custom font.
      * 
      * @param text The actual string
-     * @param font The string's font
+     * @param font The font
      */
     function TextSizeCustom(text: string, font: number): Size;
 
     /**
-     * Finds the text width size of the given string with font.
+     * Finds the text width size of the given string with a font.
      * 
      * @param text The actual string
      * @param font The string's font. 0 - default, 1 - bold, 2 - small, 3 - small bold, 4 - large, 5 - icon, 6 - small icon, 8 to 48 regular
@@ -765,11 +765,11 @@ declare namespace Render {
     function TextSize(text: string, font?: number): Size;
 
     /**
-     * Draws a string with custom font.
+     * Draws a string with a custom font.
      * 
      * @param x The X position
      * @param y The Y position
-     * @param centered Whether or not it should be centered
+     * @param centered whether it should be centered
      * @param text The actual string
      * @param color The string's color
      * @param font The string's font
@@ -777,11 +777,11 @@ declare namespace Render {
     function StringCustom(x: number, y: number, centered: 1 | 0, text: string, color: Color, font: number): void;
 
     /**
-     * Draws a string with custom font.
+     * Draws a string with a custom font.
      * 
      * @param x The X position
      * @param y The Y position
-     * @param centered Whether or not it should be centered
+     * @param centered whether it should be centered
      * @param text The actual string
      * @param color The string's color
      * @param font The string's font. 0 - default, 1 - bold, 2 - small, 3 - small bold, 4 - large, 5 - icon, 6 - small icon, 8 to 48 regular
@@ -804,7 +804,7 @@ declare namespace Render {
      * @param size The font's size
      * @param weight The font's weight. Deprecated
      * 
-     * Argument weight defines from thickness. 
+     * Argument weight defines by thickness. 
      * 100 Lightest. 
      * 200 Bolder than 100, 
      * lighter than 300. 
@@ -853,7 +853,7 @@ declare namespace Render {
     function GetScreenSize(): Size;
 
     /**
-     * Converts a 3D point into a 2D point on your screen and returns its X and Y positions, and whether or not the point is behind you.
+     * Converts a 3D point into a 2D point on your screen and returns its X and Y positions, and whether the point is behind you.
      * 
      * @param point The 3D point
      */
@@ -947,53 +947,6 @@ declare namespace Convar {
     function SetString(cvar: string, value: string): void;
 }
 
-declare namespace Trace {
-    /**
-     * Traces a line from a point to another and returns its data.
-     * 
-     * @param skip_entity The entity to be ignored
-     * @param from The initial position
-     * @param to The ending position
-     * @returns The entity index of a hit entity or undefined, the fraction of the trace ('0' means it hit immediately, '1' means it went fully through).
-     */
-    function Line(skip_entity: EntityID, from: Vector, to: Vector): number[];
-
-    /**
-     * Traces a bullet from a point to another and returns its data.
-     * 
-     * @param attacker The entity who attacked
-     * @param victim The entity who should be hit
-     * @param from The initial position
-     * @param to The ending position
-     * @returns The entity index of a hit entity or undefined, the damage dealt, whether or not the ending position is visible and the hitbox that was hit.
-     */
-    function Bullet(attacker: EntityID, victim: EntityID, from: Vector, to: Vector): number[];
-
-    /**
-     * Traces a line from a point to another with a custom mask and returns its data. For advanced users only.
-     * 
-     * @param skip_entity The entity to be ignored
-     * @param from The initial position
-     * @param to The ending position
-     * @param mask The custom mask
-     * @param type The type. '0' will trace everything, '1' will trace only the world and '2' will trace only the entities
-     * @returns The entity index of a hit entity or undefined, the fraction of the trace ('0' means it hit immediately, '1' means it went fully through).
-     * 
-     * @deprecated doesn't work in OTV3.
-     */
-    function RawLine(skip_entity: EntityID, from: Vector, to: Vector, mask: number, type: number): number[];
-
-    /**
-     * Returns whether or not a line goes through a smoke. Breaks if smoke is removed.
-     * 
-     * @param from The initial position
-     * @param to The ending position
-     * 
-     * @deprecated doesn't work in OTV3.
-     */
-    function Smoke(from: Vector, to: Vector): number;
-}
-
 declare namespace Event {
     /**
      * Gets a field's value in integer form.
@@ -1019,7 +972,7 @@ declare namespace Event {
 
 declare namespace Trace {
     /**
-     * Traces a line from a point to another and returns its data.
+     * Traces a line from one point to another and returns its data.
      * 
      * @param skip_entity The entity to be ignored
      * @param from The initial position
@@ -1029,18 +982,18 @@ declare namespace Trace {
     function Line(skip_entity: EntityID, from: Vector, to: Vector): number[];
 
     /**
-     * Traces a bullet from a point to another and returns its data.
+     * Traces a bullet from one point to another and returns its data.
      * 
      * @param attacker The entity who attacked
      * @param victim The entity who should be hit
      * @param from The initial position
      * @param to The ending position
-     * @returns The entity index of a hit entity or undefined, the damage dealt, whether or not the ending position is visible and the hitbox that was hit.
+     * @returns The entity index of a hit entity or undefined, the damage dealt, whether the ending position is visible, and the hitbox that was hit.
      */
     function Bullet(attacker: EntityID, victim: EntityID, from: Vector, to: Vector): number[];
 
     /**
-     * Traces a line from a point to another with a custom mask and returns its data. For advanced users only.
+     * Traces a line from one point to another with a custom mask and returns its data. For advanced users only.
      * 
      * @param skip_entity The entity to be ignored
      * @param from The initial position
@@ -1054,7 +1007,7 @@ declare namespace Trace {
     function RawLine(skip_entity: EntityID, from: Vector, to: Vector, mask: number, type: number): number[];
 
     /**
-     * Returns whether or not a line goes through a smoke. Breaks if smoke is removed.
+     * Returns whether a line goes through a smoke. Breaks if smoke is removed.
      * 
      * @param from The initial position
      * @param to The ending position
@@ -1066,7 +1019,7 @@ declare namespace Trace {
 
 declare namespace UserCMD {
     /**
-     * Returns an array containing forward, sideways and up movement.
+     * Returns an array containing forward, sideways, and up movement.
      */
     function GetMovement(): LengthArray<number, 3>;
 
@@ -1085,7 +1038,7 @@ declare namespace UserCMD {
     function SetMovement(values: LengthArray<number, 3>): void;
 
     /**
-     * Overrides the UserCMD's buttons.
+     * Overrides the UserCMD buttons.
      * 
      * @param buttons
      *
@@ -1097,7 +1050,7 @@ declare namespace UserCMD {
      * Overrides your UserCMD's angles.
      * 
      * @param angles The new angles
-     * @param silent Whether or not you should visualize those angles
+     * @param silent Whether you should visualize those angles
      *
      * @deprecated doesn't work in OTV3.
      */
@@ -1164,7 +1117,7 @@ declare namespace Local {
     function Latency(): number;
 
     /**
-     * Returns a vector containing your pitch, yaw and roll.
+     * Returns a vector containing your pitch, yaw, and roll.
      */
     function GetViewAngles(): Vector;
 
@@ -1176,7 +1129,7 @@ declare namespace Local {
     function SetViewAngles(angles: Vector): void;
 
     /**
-     * Overrides your clan-tag.
+     * Overrides your clan tag.
      * 
      * @param tag The new clan-tag
      */
@@ -1239,7 +1192,7 @@ declare namespace Cheat {
      * @param callback The callback's name
      * @param func The function's name
      */
-    function RegisterCallback <T extends CallbackName, F extends string> (callback: T, func: F): void;
+    function RegisterCallback<T extends CallbackName, F extends string>(callback: T, func: F): void;
 
     /**
      * Returns the user's name.
@@ -1249,7 +1202,7 @@ declare namespace Cheat {
 
 declare namespace Input {
     /**
-     * Returns whether or not a key is being held.
+     * Returns whether a key is being held.
      * 
      * @param vkey_code The virtual-key code
      * @link https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
@@ -1276,14 +1229,14 @@ declare namespace World {
 
 declare namespace AntiAim {
     /**
-     * Returns whether or not the anti-aim is being overriden.
+     * Returns whether the anti-aim is being overridden.
      */
     function GetOverride(): boolean;
 
     /**
      * Starts/stops overriding the anti-aim.
      * 
-     * @param active Whether or not the override is active
+     * @param active whether the override is active
      */
     function SetOverride(active: number): void;
 
@@ -1445,7 +1398,7 @@ declare namespace Material {
     function Get(name: string): number;
 
     /**
-     * Overrides a material shader's value and returns true on success. Can only be called in 'Material' callback.
+     * Overrides a material shader's value and returns true on success. Can only be called in the 'Material' callback.
      * 
      * @param index The material's index
      * @param shader The shader's name
@@ -1457,7 +1410,7 @@ declare namespace Material {
     function SetKeyValue(index: number, shader: string, value: string): boolean;
 
     /**
-     * Applies changes to a material and returns true on success. Can only be called in 'Material' callback.
+     * Applies changes to a material and returns true on success. Can only be called in the 'Material' callback.
      * 
      * @param index The material's index
      * 
