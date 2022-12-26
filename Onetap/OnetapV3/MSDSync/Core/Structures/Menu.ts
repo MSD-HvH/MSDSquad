@@ -25,7 +25,7 @@ export class Menu {
     public readonly ThrowError: typeof ThrowError;
 
     constructor (name: string) {
-        if(!name) return ThrowError("CreateMenu", "Menu should have name as first argument");
+        if(!name) return ThrowError("CreateMenu", "Menu should have a name as the first argument");
 
         this.name = name;
         this.build = build;
