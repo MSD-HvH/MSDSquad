@@ -754,7 +754,7 @@ declare namespace Render {
      * @param text The actual string
      * @param font The string's font
      */
-    function TextSizeCustom(text: string, font: Font): Size;
+    function TextSizeCustom(text: string, font: number): Size;
 
     /**
      * Finds the text width size of the given string with font.
@@ -1239,7 +1239,7 @@ declare namespace Cheat {
      * @param callback The callback's name
      * @param func The function's name
      */
-    function RegisterCallback<T extends CallbackName>(callback: T, func: string): void;
+    function RegisterCallback <T extends CallbackName, F extends string> (callback: T, func: F): void;
 
     /**
      * Returns the user's name.
