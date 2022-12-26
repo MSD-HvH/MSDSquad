@@ -30,8 +30,8 @@ export const CheatLIB = {
      * ```
      */
     Print: function(text: string, dev?: boolean): void {
-        if (text == undefined) return throw_error("Cheat.Print()", "To use this method, you must have the text to print");
-        if (typeof text == "object") return Cheat.Print(JSON.stringify(text, null, 2) + (dev ? ": " + typeof text + "\n" : "\n"));
+        if(text == undefined) return throw_error("Cheat.Print()", "To use this method, you must have the text to print");
+        if(typeof text == "object") return Cheat.Print(JSON.stringify(text, null, 2) + (dev ? ": " + typeof text + "\n" : "\n"));
 
         return Cheat.Print(text + (dev ? ": " + typeof text + "\n" : "\n"));
     },
@@ -53,10 +53,10 @@ export const CheatLIB = {
      * ```
      */
     PrintColor: function(text: string, color: Color, dev?: boolean): void {
-        if (text == undefined) return throw_error("Cheat.PrintColor()", "To use this method, you must have the text to print");
-        if (!color || typeof color != "object" || color.length < 4 || color.length > 4) return throw_error("Cheat.PrintColor()", "To use this method, your color must be an Array with 4 elements: Red, Green, Blue, Alpha");
-
-        if (typeof text == "object") return Cheat.PrintColor(color, JSON.stringify(text, null, 2) + (dev ? ": " + typeof text + "\n" : "\n"));
+        if(text == undefined) return throw_error("Cheat.PrintColor()", "To use this method, you must have the text to print");
+        if(!color || typeof color != "object" || color.length < 4 || color.length > 4) return throw_error("Cheat.PrintColor()", "To use this method, your color must be an Array with 4 elements: Red, Green, Blue, Alpha");
+        
+        if(typeof text == "object") return Cheat.PrintColor(color, JSON.stringify(text, null, 2) + (dev ? ": " + typeof text + "\n" : "\n"));
 
         return Cheat.PrintColor(color, text + (dev ? ": " + typeof text + "\n" : "\n"));
     },
@@ -78,9 +78,9 @@ export const CheatLIB = {
      * ```
      */
     PrintChat: function(text: string, dev?: boolean): void {
-        if (text == undefined) return throw_error("Cheat.PrintChat()", "To use this method, you must have the text to print");
-
-        if (typeof text == "object") return Cheat.PrintChat(JSON.stringify(text, null, 2) + (dev ? ": " + typeof text + "\n" : "\n"));
+        if(text == undefined) return throw_error("Cheat.PrintChat()", "To use this method, you must have the text to print");
+        
+        if(typeof text == "object") return Cheat.PrintChat(JSON.stringify(text, null, 2) + (dev ? ": " + typeof text + "\n" : "\n"));
 
         return Cheat.PrintChat(text + (dev ? ": " + typeof text + "\n" : "\n"));
     },
@@ -99,7 +99,7 @@ export const CheatLIB = {
      * ```
      */
     ExecuteCmd: function(cmd: string): void {
-        if (!cmd || typeof cmd != "string") return throw_error("Cheat.ExecuteCmd", "To use this method, you must have the command");
+        if(!cmd || typeof cmd != "string") return throw_error("Cheat.ExecuteCmd", "To use this method, you must have the command");
 
         return Cheat.ExecuteCommand(cmd);
     }
@@ -111,13 +111,13 @@ export const MathLIB = {
     },
 
     Clamp: function(val: number, min: number, max: number): number {
-        if (val > max) return max
-        if (min > val) return min
+        if(val > max) return max
+        if(min > val) return min
         return val  
     },
 
     Random: function(min: number, max: number, maxIncluded: boolean): number {
-        if (maxIncluded) return Math.floor(Math.random() * (max - min) + 1) + min
+        if(maxIncluded) return Math.floor(Math.random() * (max - min) + 1) + min
         
         return Math.floor(Math.random() * (max - min)) + min
     },
@@ -259,25 +259,25 @@ export const MathLIB = {
         qAngles.x = (Math.atan(delta.z / hyp) * (180.0 / Math.PI));
         qAngles.y = (Math.atan(delta.y / delta.x) * (180.0 / Math.PI));
         qAngles.z = 0;
-        if (delta.x >= 0) qAngles.y = qAngles.y+180;
+        if(delta.x >= 0) qAngles.y = qAngles.y+180;
         return qAngles;
     },
 
     ClampAngles: function(angles: Vec3D) {
-        if (angles.x > 89.0) angles.x = 89.0;
-        else if (angles.x < -89.0) angles.x = -89.0;
-        if (angles.y > 180.0) angles.y = 180.0;
-        else if (angles.y < -180.0) angles.y = -180.0;
+        if(angles.x > 89.0) angles.x = 89.0;
+        else if(angles.x < -89.0) angles.x = -89.0;
+        if(angles.y > 180.0) angles.y = 180.0;
+        else if(angles.y < -180.0) angles.y = -180.0;
         angles.z = 0;
         return angles;
     },
 
     NormalizeAngles: function(angles: Vec3D) {
-        while (angles.x > 89.0) angles.x -= 180.0;
-        while (angles.x < -89.0) angles.x += 180.0;
-        while (angles.y < -180.0) angles.y += 360.0;
-        while (angles.y > 180.0) angles.y -= 360.0;
-        if (angles.z != 0) angles.z = 0.0;
+        while(angles.x > 89.0) angles.x -= 180.0;
+        while(angles.x < -89.0) angles.x += 180.0;
+        while(angles.y < -180.0) angles.y += 360.0;
+        while(angles.y > 180.0) angles.y -= 360.0;
+        if(angles.z != 0) angles.z = 0.0;
         return angles;
     }
 };
@@ -432,9 +432,9 @@ export const RenderLIB = {
      */
     MultiColoredText: function(x: number, y: number, centered: 1 | 0, text: [string, Color][], font: number, slice: number, shadow: boolean): void {
         text.forEach(function(string: [string, Color]) {
-            if (string[0].startsWith("\n")) y += Render.TextSizeCustom(string[0], font)[1] + slice
+            if(string[0].startsWith("\n")) y += Render.TextSizeCustom(string[0], font)[1] + slice
     
-            if (shadow) Render.StringCustom(x + 1, y + 1, centered || 0, string[0], [0, 0, 0, string[1][3]], font)
+            if(shadow) Render.StringCustom(x + 1, y + 1, centered || 0, string[0], [0, 0, 0, string[1][3]], font)
             Render.StringCustom(x, y, centered || 0, string[0], string[1], font)
     
             x += Render.TextSizeCustom(string[0], font)[0] + slice
@@ -512,7 +512,7 @@ export const RenderLIB = {
      * ```
      */
     Gradient: function(x: number, y: number, w: number, h: number, top_left: Color, top_right: Color, bottom_left: Color, bottom_right: Color): void {
-        if (h < w) {
+        if(h < w) {
             for (let  i = 0; i < h; i++) {
                 Render.GradientRect(x, y + i, w, 1, 1, this.LerpColor(i / h, top_left, bottom_left), this.LerpColor(i / h, top_right, bottom_right))
             }
@@ -555,7 +555,7 @@ export const OtherLIB = {
      *  ```
      */
     FormatString: function(string: string, options: any): string {
-        if (options) {
+        if(options) {
             Object.keys(options).forEach(function(option) {
                 string = string.replace(new RegExp("{{" + option + "}}", "g"), options[option])
             })
