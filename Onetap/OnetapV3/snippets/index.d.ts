@@ -769,7 +769,7 @@ declare namespace Render {
      * 
      * @param x The X position
      * @param y The Y position
-     * @param centered whether it should be centered
+     * @param centered Whether it should be centered
      * @param text The actual string
      * @param color The string's color
      * @param font The string's font
@@ -781,7 +781,7 @@ declare namespace Render {
      * 
      * @param x The X position
      * @param y The Y position
-     * @param centered whether it should be centered
+     * @param centered Whether it should be centered
      * @param text The actual string
      * @param color The string's color
      * @param font The string's font. 0 - default, 1 - bold, 2 - small, 3 - small bold, 4 - large, 5 - icon, 6 - small icon, 8 to 48 regular
@@ -1192,7 +1192,7 @@ declare namespace Cheat {
      * @param callback The callback's name
      * @param func The function's name
      */
-    function RegisterCallback<T extends CallbackName, F extends string>(callback: T, func: F): void;
+    function RegisterCallback <T extends CallbackName, F extends string>(callback: T, func: F): void;
 
     /**
      * Returns the user's name.
@@ -1236,7 +1236,7 @@ declare namespace AntiAim {
     /**
      * Starts/stops overriding the anti-aim.
      * 
-     * @param active whether the override is active
+     * @param active Whether the override is active
      */
     function SetOverride(active: number): void;
 
