@@ -27,7 +27,6 @@ export const CreateInterval = function(name: string, callback: (timeout?: Interv
     if(intervals[name]) throw new Error("Interval already exists!");
 
     const Curtime = Globals.Curtime();
-
     const interval = intervals[name] = { old_time: Curtime + time, func: callback, timeout: time };
 
     return interval;
@@ -44,7 +43,6 @@ export const CreateTimeout = function(name: string, callback: (timeout?: Interva
     if(timeouts[name]) throw new Error("Timeout already exists!");
 
     const Curtime = Globals.Curtime();
-
     const timeout = timeouts[name] = { old_time: Curtime + time, func: callback };
 
     return timeout;
@@ -52,22 +50,19 @@ export const CreateTimeout = function(name: string, callback: (timeout?: Interva
 
 /**
  * @example
-
-
- *
  * ```
  * // Раз в 5 секунд выводит в консоль Hello world
  * const IntervalHelloWorld = CreateInterval("HelloWorld", function() {
- *     Cheat.Print("Hello world \n");
+ *     Cheat.Print("Hello world Timeout \n");
  * }, 5);
  * 
  * // Один раз выведет в консоль Hello world
  * const TimeoutHelloWorld = CreateTimeout("HelloWorld", function() {
- *      Cheat.Print("Hello world\n");
- * }, 5);
+ *      Cheat.Print("Hello world Interval \n");
+ * }, 3);
  *
  * const onDraw = function() {
- *     CheckIntervals();
+ *     CheckTimeouts();
  * };
  *
  * Cheat.RegisterCallback("Draw", "onDraw");
