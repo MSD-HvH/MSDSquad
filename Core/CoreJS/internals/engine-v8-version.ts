@@ -1,11 +1,11 @@
-var global = require('../internals/global.js');
-var userAgent = require('../internals/engine-user-agent.js');
+import { global } from "./global";
+import { userAgent } from "./engine-user-agent";
 
-var process = global.process;
-var Deno = global.Deno;
-var versions = process && process.versions || Deno && Deno.version;
-var v8 = versions && versions.v8;
-var match, version;
+const process = global.process;
+const Deno = global.Deno;
+const versions = process && process.versions || Deno && Deno.version;
+const v8 = versions && versions.v8;
+let match, version;
 
 if (v8) {
   match = v8.split('.');
@@ -24,4 +24,4 @@ if (!version && userAgent) {
   }
 }
 
-module.exports = version;
+export const V8_VERSION = version;
