@@ -1,14 +1,14 @@
-var toIndexedObject = require('../internals/to-indexed-object.js');
-var toAbsoluteIndex = require('../internals/to-absolute-index.js');
-var lengthOfArrayLike = require('../internals/length-of-array-like.js');
+import { toIndexedObject } from "./to-indexed-object";
+import { toAbsoluteIndex } from "./to-absolute-index";
+import { lengthOfArrayLike } from "./length-of-array-like";
 
 // `Array.prototype.{ indexOf, includes }` methods implementation
-var createMethod = function (IS_INCLUDES) {
-  return function ($this, el, fromIndex) {
-    var O = toIndexedObject($this);
-    var length = lengthOfArrayLike(O);
-    var index = toAbsoluteIndex(fromIndex, length);
-    var value;
+const createMethod = (IS_INCLUDES: boolean) => {
+  return ($this, el, fromIndex) => {
+    const O = toIndexedObject($this);
+    const length = lengthOfArrayLike(O);
+    let index = toAbsoluteIndex(fromIndex, length);
+    let value;
     // Array#includes uses SameValueZero equality algorithm
     // eslint-disable-next-line no-self-compare -- NaN check
     if (IS_INCLUDES && el != el) while (length > index) {
@@ -22,7 +22,7 @@ var createMethod = function (IS_INCLUDES) {
   };
 };
 
-module.exports = {
+export const arrayIncludes = {
   // `Array.prototype.includes` method
   // https://tc39.es/ecma262/#sec-array.prototype.includes
   includes: createMethod(true),
