@@ -2,11 +2,11 @@
 // https://rwaldron.github.io/proposal-math-extensions/
 // @ts-ignore
 export const scale = Math.scale || function scale(x, inLow, inHigh, outLow, outHigh) {
-  var nx = +x;
-  var nInLow = +inLow;
-  var nInHigh = +inHigh;
-  var nOutLow = +outLow;
-  var nOutHigh = +outHigh;
+  const nx = +x;
+  const nInLow = +inLow;
+  const nInHigh = +inHigh;
+  const nOutLow = +outLow;
+  const nOutHigh = +outHigh;
   // eslint-disable-next-line no-self-compare -- NaN check
   if (nx != nx || nInLow != nInLow || nInHigh != nInHigh || nOutLow != nOutLow || nOutHigh != nOutHigh) return NaN;
   if (nx === Infinity || nx === -Infinity) return nx;
