@@ -13,11 +13,13 @@
  * @link https://github.com/aprxl/scripting
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 type LengthArray <T, N extends number, R extends T[] = []> = number extends N ? T[] : R["length"] extends N ? R : LengthArray<T, N, [T, ...R]>;
 
 type Subtabs = {
-    "Rage": "GENERAL" | "PISTOL" | "RIFLE" | "SNIPER" | "SMG";
-    "Legit": "GENERAL" | "PISTOL" | "HEAVY PISTOL" | "SCOUT" | "AWP" | "AUTOSNIPER";
+    "Legit": "GENERAL" | "PISTOL" | "RIFLE" | "SNIPER" | "SMG";
+    "Rage": "GENERAL" | "PISTOL" | "HEAVY PISTOL" | "SCOUT" | "AWP" | "AUTOSNIPER";
     "Anti-Aim": string;
     "Visual": "SELF" | "ENEMIES" | "FRIENDLIES" | "WORLD"; 
     "Misc": "GENERAL" | "PERFORMANCE & INFORMATION" | "SKINS" | "JAVASCRIPT";
@@ -214,11 +216,6 @@ type EntityID = number;
  * The index of a user in an event.
  */
 type UserID = number;
-
-/**
- * The value of a prop.
- */
-type PropValue = number | number[] | boolean | boolean[] | string | string[];
 
 /**
  * Adds a texture.
@@ -503,9 +500,9 @@ declare namespace UI {
      * @param name name of the element
      * @param value value which should be set
      */
-    function SetValue <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N, value: boolean | 1 | 0): void;
-    function SetValue <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, name: N, value: boolean | 1 | 0): void;
-    function SetValue <N extends string> (Area: string, name: N, value: boolean | 1 | 0): void;
+    function SetValue <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N, value: any): void;
+    function SetValue <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, name: N, value: any): void;
+    function SetValue <N extends string> (Area: string, name: N, value: any): void;
 
     /**
      * Returns the value of the UI item's setting.
@@ -515,9 +512,9 @@ declare namespace UI {
      * 
      * @param name name of the element
      */
-    function GetValue <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): boolean | 1 | 0;
-    function GetValue <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, name: N): boolean | 1 | 0
-    function GetValue <N extends string> (Area: string, name: N): boolean | 1 | 0;
+    function GetValue <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): any;
+    function GetValue <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, name: N): any;
+    function GetValue <N extends string> (Area: string, name: N): any;
 }
 
 declare namespace Entity {
@@ -604,7 +601,7 @@ declare namespace Entity {
      * @param prop The property's name
      * @param value The new value
      */
-    function SetProp(index: EntityID, table: string, prop: string, value: PropValue): PropValue;
+    function SetProp(index: EntityID, table: string, prop: string, value: any): any;
 
     /**
      * Gets a property from an entity. Returns property's name on failure.
@@ -613,7 +610,7 @@ declare namespace Entity {
      * @param table The property's table
      * @param prop The property's name
      */
-    function GetProp(index: EntityID, table: string, prop: string): PropValue;
+    function GetProp(index: EntityID, table: string, prop: string): any;
 
     /**
      * Returns the entity's origin position.
@@ -774,7 +771,7 @@ declare namespace Render {
      * @param color The string's color
      * @param font The string's font
      */
-    function StringCustom(x: number, y: number, centered: 1 | 0, text: string, color: Color, font: number): void;
+    function StringCustom(x: number, y: number, centered: boolean | number, text: string, color: Color, font: number): void;
 
     /**
      * Draws a string with a custom font.
@@ -786,7 +783,7 @@ declare namespace Render {
      * @param color The string's color
      * @param font The string's font. 0 - default, 1 - bold, 2 - small, 3 - small bold, 4 - large, 5 - icon, 6 - small icon, 8 to 48 regular
      */
-    function String(x: number, y: number, centered: 1 | 0, text: string, color: Color, font: number): void;
+    function String(x: number, y: number, centered: boolean | number, text: string, color: Color, font: number): void;
 
     /**
      * Finds an already existing font by its parameters.
@@ -845,7 +842,7 @@ declare namespace Render {
      * @param color1 The gradient's first color
      * @param color2 The gradient's second color
      */
-    function GradientRect(x: number, y: number, w: number, h: number, is_horizontal: 1 | 0, color1: Color, color2: Color): void;
+    function GradientRect(x: number, y: number, w: number, h: number, is_horizontal: boolean | number, color1: Color, color2: Color): void;
 
     /**
      * Returns the width and height of your screen.
@@ -947,28 +944,28 @@ declare namespace Convar {
     function SetString(cvar: string, value: string): void;
 }
 
-// declare namespace Event {
-//     /**
-//      * Gets a field's value in integer form.
-//      * 
-//      * @param field_name The field
-//      */
-//     function GetInt(field_name: string): number;
+declare namespace Event {
+    /**
+     * Gets a field's value in integer form.
+     * 
+     * @param field_name The field
+     */
+    function GetInt(field_name: string): number;
 
-//     /**
-//      * Gets a field's value in float form.
-//      * 
-//      * @param field_name The field
-//      */
-//     function GetFloat(field_name: string): number;
+    /**
+     * Gets a field's value in float form.
+     * 
+     * @param field_name The field
+     */
+    function GetFloat(field_name: string): number;
 
-//     /**
-//      * Gets a field's value in string form.
-//      * 
-//      * @param field_name The field
-//      */
-//     function GetString(field_name: string): string;
-// }
+    /**
+     * Gets a field's value in string form.
+     * 
+     * @param field_name The field
+     */
+    function GetString(field_name: string): string;
+}
 
 declare namespace Trace {
     /**
@@ -1266,7 +1263,7 @@ declare namespace Exploit {
     /**
      * Returns a fraction representing how much of the exploit is charged. '0' means it's completely uncharged and '1' means it's fully charged.
      */
-    function GetCharge(): 1 | 0;
+    function GetCharge(): number;
 
     /**
      * Forces the cheat to recharge.
