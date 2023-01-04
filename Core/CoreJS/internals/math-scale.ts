@@ -1,6 +1,7 @@
 // `Math.scale` method implementation
 // https://rwaldron.github.io/proposal-math-extensions/
-module.exports = Math.scale || function scale(x, inLow, inHigh, outLow, outHigh) {
+// @ts-ignore
+export const scale = Math.scale || function scale(x, inLow, inHigh, outLow, outHigh) {
   var nx = +x;
   var nInLow = +inLow;
   var nInHigh = +inHigh;
