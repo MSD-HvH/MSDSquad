@@ -1,5 +1,5 @@
 // IE8- don't enum bug keys
-module.exports = [
+export const enumBugKeys = [
   'constructor',
   'hasOwnProperty',
   'isPrototypeOf',
