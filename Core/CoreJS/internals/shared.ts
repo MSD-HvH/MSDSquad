@@ -1,7 +1,7 @@
-var IS_PURE = require('../internals/is-pure.js');
-var store = require('../internals/shared-store.js');
+import { IS_PURE } from "./is-pure";
+import { store } from "./shared-store";
 
-(module.exports = function (key, value) {
+export const shared = ((key, value) => {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
   version: '3.25.5',
