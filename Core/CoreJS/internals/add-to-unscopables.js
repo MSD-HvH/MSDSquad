@@ -1,13 +1,13 @@
 import wellKnownSymbol from "./well-known-symbol";
 import create from "./object-create";
-import defineProperty from "./object-define-property";
+import { f } from "./object-define-property";
 
 const UNSCOPABLES = wellKnownSymbol('unscopables');
 
 // Array.prototype[@@unscopables]
 // https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
 if (Array.prototype[UNSCOPABLES] == undefined) {
-  defineProperty(Array.prototype, UNSCOPABLES, {
+  f(Array.prototype, UNSCOPABLES, {
     configurable: true,
     value: create(null)
   });

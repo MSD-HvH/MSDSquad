@@ -1,4 +1,4 @@
-module.exports = function (bitmap, value) {
+export const createPropertyDescriptor = (bitmap, value) => {
   return {
     enumerable: !(bitmap & 1),
     configurable: !(bitmap & 2),

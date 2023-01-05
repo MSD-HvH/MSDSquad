@@ -2,7 +2,7 @@ var hasOwn = require('../internals/has-own-property.js');
 var isCallable = require('../internals/is-callable.js');
 var toObject = require('../internals/to-object.js');
 var sharedKey = require('../internals/shared-key.js');
-var CORRECT_PROTOTYPE_GETTER = require('../internals/correct-prototype-getter.js');
+var CORRECT_PROTOTYPE_GETTER = require('./correct-prototype-getter.js');
 
 var IE_PROTO = sharedKey('IE_PROTO');
 var $Object = Object;

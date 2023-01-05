@@ -1,6 +1,6 @@
 import { fails } from "./fails";
 
-module.exports = !fails(function () {
+export const CORRECT_PROTOTYPE_GETTER = !fails(() => {
   function F() { /* empty */ }
   F.prototype.constructor = null;
   // eslint-disable-next-line es/no-object-getprototypeof -- required for testing
