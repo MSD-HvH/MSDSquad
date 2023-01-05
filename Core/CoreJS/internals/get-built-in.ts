@@ -5,6 +5,6 @@ const aFunction = (argument) => {
   return isCallable(argument) ? argument : undefined;
 };
 
-export const getBuiltIn = function (namespace, method) {
+export const getBuiltIn = function (namespace, method?) {
   return arguments.length < 2 ? aFunction(global[namespace]) : global[namespace] && global[namespace][method];
 };

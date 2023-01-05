@@ -1,13 +1,12 @@
 'use strict';
-var DESCRIPTORS = require('../internals/descriptors');
-var isArray = require('../internals/is-array');
+import { DESCRIPTORS } from "./descriptors";
+import { isArray } from "./is-array";
 
-var $TypeError = TypeError;
 // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
-var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 
 // Safari < 13 does not throw an error in this case
-var SILENT_ON_NON_WRITABLE_LENGTH_SET = DESCRIPTORS && !function () {
+const SILENT_ON_NON_WRITABLE_LENGTH_SET = DESCRIPTORS && !function () {
   // makes no sense without proper strict mode support
   if (this !== undefined) return true;
   try {
@@ -18,10 +17,10 @@ var SILENT_ON_NON_WRITABLE_LENGTH_SET = DESCRIPTORS && !function () {
   }
 }();
 
-module.exports = SILENT_ON_NON_WRITABLE_LENGTH_SET ? function (O, length) {
+export const setArrayLength = SILENT_ON_NON_WRITABLE_LENGTH_SET ? (O, length) => {
   if (isArray(O) && !getOwnPropertyDescriptor(O, 'length').writable) {
-    throw $TypeError('Cannot set read only .length');
+    throw TypeError('Cannot set read only .length');
   } return O.length = length;
-} : function (O, length) {
+} : (O, length) => {
   return O.length = length;
 };
