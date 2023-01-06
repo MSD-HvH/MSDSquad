@@ -1,12 +1,12 @@
-// #region Глобальные переменные
-const screen = Render.GetScreenSize();
-// #endregion
+import { GetCursorPosition, MultiplyAlpha, NewAnimation } from "./Utilities";
+
 // #region Локальные переменные
-const name = "MSDSync";
 const build = Cheat.GetUsername() === "Mased" ? "dev" : "release";
 // #endregion
 
 interface ColorTheme {
+	NAME?: string;
+
 	MAIN: number[];
 	TAB_NOT_SELECTED: number[];
 
@@ -51,6 +51,9 @@ export class Menu {
 	public current_tab: number = 0;
 	public dpi_scale: number = 1;
 	public readonly dpi_scales: number[] = [0.5, 1, 1.5, 2];
+
+	public tab_size: number[] = [];
+	public tab_offset: number = 0;
 
 	constructor(name: string, cb?: (menu: typeof Menu.prototype) => typeof Menu.prototype) {
 		this.name = name;
@@ -98,7 +101,9 @@ export class Menu {
 	};
 
 	public readonly SetName = <N extends string>(name: N): N => {
-		return (this.name = name);
+		this.name = name;
+
+		return name;
 	};
 
 	public readonly GetPosition = () => {
@@ -107,6 +112,8 @@ export class Menu {
 
 	public readonly SetPosition = <X extends number, Y extends number>(x: X, y: Y) => {
 		this.position = [x, y];
+
+		return [x, y];
 	};
 
 	public readonly GetThemes = () => {
@@ -137,6 +144,7 @@ export class Menu {
 		} = settings;
 
 		this.color_theme[name] = {
+			NAME: name,
 			MAIN,
 			TAB_NOT_SELECTED,
 			MENU_SIDEBAR,
@@ -157,5 +165,31 @@ export class Menu {
 			BUTTON_RECT: BUTTON_RECT || MENU_SIDEBAR,
 			BUTTON_OUTLINE,
 		};
+
+		return settings;
+	};
+
+	public readonly Begin = () => {
+		const IS_MENU_OPEN = UI.IsMenuOpen();
+		const global_alpha = NewAnimation("menu_alpha", IS_MENU_OPEN ? 1 : 0);
+
+		if (global_alpha == 0) return;
+
+		for (let name in this.color_theme[this.colors.current_theme]) {
+			this.colors[name] = NewAnimation(name, MultiplyAlpha(this.color_theme[this.colors.current_theme][name], global_alpha));
+		}
+
+		const CURSOR_POSITION = Input.GetCursorPosition();
+		const HELD_CURSOR_POSITION = GetCursorPosition();
+
+		const SCRIPT_NAME_TEXT_SECOND_FONT = Render.AddFont("Segoeui.ttf", 10 * this.dpi_scale, 300);
+		const TAB_TEXT_MAIN_FONT = Render.AddFont("Segoeuib.ttf", 17 * this.dpi_scale, 300);
+		const SHORT_TAB_NAME_FONT = Render.AddFont("Segoeuib.ttf", 10 * this.dpi_scale, 300);
+		const ITEM_NAME = Render.AddFont("Segoeui.ttf", 8 * this.dpi_scale, 300);
+		const SLIDER_VALUE = Render.AddFont("Segoeui.ttf", 8 * this.dpi_scale, 300);
+
+		if (!this.tab_size[this.current_tab]) this.tab_size[this.current_tab] = 0;
+
+		const menu_size_anim = NewAnimation("menu size anim", Math.max(this.tab_size[this.current_tab], this.tab_offset));
 	};
 }
