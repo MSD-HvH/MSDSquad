@@ -1,4 +1,4 @@
-import { MathLIB } from "./index";
+import { MathLIB } from "./Useful";
 
 export interface Animation {
     color: number[];

@@ -1,4 +1,4 @@
-import { OtherLIB } from "../Modules";
+import { OtherLIB } from "../../Modules/Useful";
 
 const screen = Render.GetScreenSize();
 const build = Cheat.GetUsername() === "Mased" ? "dev" : "release";
