@@ -11,10 +11,7 @@
         "esModuleInterop": true
     },
     "include": [
-        "./",
-        "Core",
-        "snippets",
-        "MSDSync.ts"
+        "./"
     ],
     "exclude": [
         "node_modules",

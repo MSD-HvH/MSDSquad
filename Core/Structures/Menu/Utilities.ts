@@ -183,4 +183,7 @@ export const GetAnimation = (name: string): Animation => {
 // #endregion
 // #region AUX
 export const MultiplyAlpha = <C extends number[], A extends number>(color: C, alpha: A) => [color[0], color[1], color[2], color[3] * alpha];
+export const InBounds = (vec_start, size, source) => {
+	return source[0] > vec_start[0] && source[0] < vec_start[0] + size[0] && source[1] > vec_start[1] && source[1] < vec_start[1] + size[1];
+};
 // #endregion

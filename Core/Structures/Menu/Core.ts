@@ -1,4 +1,4 @@
-import { GetCursorPosition, MultiplyAlpha, NewAnimation } from "./Utilities";
+import { GetCursorPosition, InBounds, IsKeyPressed, MultiplyAlpha, NewAnimation } from "./Utilities";
 
 // #region Локальные переменные
 const build = Cheat.GetUsername() === "Mased" ? "dev" : "release";
@@ -256,7 +256,7 @@ export class Menu {
 
 		const PER_TABS_OFFSET = TAB_INDENT;
 
-		this.items.forEach((tab) => {
+		this.items.forEach((tab, i) => {
 			const SHORT_TAB_NAME_SIZE = Render.TextSizeCustom(tab.short_name, SHORT_TAB_NAME_FONT);
 
 			Render.StringCustom(
@@ -267,6 +267,38 @@ export class Menu {
 				this.current_tab == tab ? currentTheme.MAIN : currentTheme.TAB_NOT_SELECTED,
 				SHORT_TAB_NAME_FONT,
 			);
+
+			if (IsKeyPressed(0x01) && TAB_INTERACTION_PERMISSION) {
+				if (InBounds([this.position[0], this.position[1] + PER_TABS_OFFSET], TAB_SIZE, CURSOR_POSITION)) {
+					this.current_tab = tab;
+				}
+			}
+
+			const TAB_NAME_ALPHA = NewAnimation(i + " TAB NAME ALPHA", TAB_INTERACTION_PERMISSION && this.current_tab == i ? 1 : 0);
+			const TAB_NAME_TEXT = Render.TextSizeCustom(tab.name.toLowerCase(), TAB_TEXT_MAIN_FONT);
+
+			Render.StringCustom(
+				this.position[0] + MENU_SIDEBAR[0] + MENU_MAIN_INDENT,
+				this.position[1] + MENU_MAIN_INDENT + SCRIPT_NAME_TEXT_SECOND_SIZE[1] - 2,
+				0,
+				tab.name.toLowerCase(),
+				MultiplyAlpha(currentTheme.MAIN, TAB_NAME_ALPHA),
+				TAB_TEXT_MAIN_FONT,
+			);
+
+			const PER_ITEMS_OFFSET = 0;
+
+			this.items.forEach((item) => {
+				const VISIBILITY_CONDITION = item.visibility_condition();
+
+				const ITEM_INTERACTION_PERMISSION = TAB_INTERACTION_PERMISSION && item.tab == this.current_tab && VISIBILITY_CONDITION;
+				const ITEM_ALPHA = NewAnimation(i + item.name + " item alpha", ITEM_INTERACTION_PERMISSION ? 1 : 0);
+				const ITEM_VISIBILITY_ALPHA = NewAnimation(i + item.name + " item alpha visibility", VISIBILITY_CONDITION ? 1 : 0);
+
+				const is_something_open = () => {
+					return DROPDOWNS.length > 0 || COLORPICKERS.length > 0;
+				};
+			});
 		});
 	};
 }
