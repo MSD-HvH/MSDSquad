@@ -55,7 +55,7 @@ export class Menu {
 	public tab_size: number[] = [];
 	public tab_offset: number = 0;
 
-	constructor(name: string, cb?: (menu: typeof Menu.prototype) => typeof Menu.prototype) {
+	constructor(name: string, cb?: (menu: typeof Menu.prototype) => void) {
 		this.name = name;
 
 		this.CreateTheme("Default", {
@@ -87,9 +87,9 @@ export class Menu {
 			BUTTON_OUTLINE: [32, 32, 33, 255],
 		});
 
-		Cheat.Print(`[Menu] ${name} loaded!`);
+		cb(this);
 
-		return cb(this);
+		return this;
 	}
 
 	public readonly GetSource = () => {
@@ -169,6 +169,10 @@ export class Menu {
 		return settings;
 	};
 
+	public readonly GetCurrentTheme = () => {
+		return this.color_theme[this.colors.current_theme];
+	};
+
 	public readonly Begin = () => {
 		const IS_MENU_OPEN = UI.IsMenuOpen();
 		const global_alpha = NewAnimation("menu_alpha", IS_MENU_OPEN ? 1 : 0);
@@ -178,6 +182,8 @@ export class Menu {
 		for (let name in this.color_theme[this.colors.current_theme]) {
 			this.colors[name] = NewAnimation(name, MultiplyAlpha(this.color_theme[this.colors.current_theme][name], global_alpha));
 		}
+
+		const currentTheme = this.GetCurrentTheme();
 
 		const CURSOR_POSITION = Input.GetCursorPosition();
 		const HELD_CURSOR_POSITION = GetCursorPosition();
@@ -191,5 +197,76 @@ export class Menu {
 		if (!this.tab_size[this.current_tab]) this.tab_size[this.current_tab] = 0;
 
 		const menu_size_anim = NewAnimation("menu size anim", Math.max(this.tab_size[this.current_tab], this.tab_offset));
+
+		const MENU_SIDEBAR = [50 * this.dpi_scale, menu_size_anim];
+		const MENU_MAIN = [200 * this.dpi_scale, menu_size_anim];
+
+		const TAB_SIZE = [MENU_SIDEBAR[0], 25 * this.dpi_scale];
+		const TAB_INDENT = 5 * this.dpi_scale;
+
+		const MENU_MAIN_INDENT = 16 * this.dpi_scale;
+
+		const CHECKBOX_SIZE = [16 * this.dpi_scale, 16 * this.dpi_scale];
+		const CHECKBOX_NAME_INDENT = 8 * this.dpi_scale;
+		const CHECKBOX_INDENT = CHECKBOX_SIZE[1] + 8 * this.dpi_scale;
+
+		const SLIDER_SIZE = [MENU_MAIN[0] - MENU_MAIN_INDENT * 2, 8 * this.dpi_scale];
+		const SLIDER_TEXT_INDENT = 18 * this.dpi_scale;
+		const SLIDER_INDENT = SLIDER_TEXT_INDENT + SLIDER_SIZE[1] + 8 * this.dpi_scale;
+
+		const DROPDOWN_SIZE = [MENU_MAIN[0] - MENU_MAIN_INDENT * 2, 24 * this.dpi_scale];
+		const DROPDOWN_TEXT_INDENT = 18 * this.dpi_scale;
+		const DROPDOWN_INDENT = DROPDOWN_TEXT_INDENT + DROPDOWN_SIZE[1] + 8 * this.dpi_scale;
+		const DROPDOWN_VALUE_TEXT_INDENT = 8 * this.dpi_scale;
+
+		const COLORPICKER_SIZE = [16 * this.dpi_scale, 16 * this.dpi_scale];
+		const COLORPICKER_NAME_INDENT = 8 * this.dpi_scale;
+		const COLORPICKER_INDENT = COLORPICKER_SIZE[1] + 8 * this.dpi_scale;
+
+		const COLORPICKER_PICKER_COLOR_SIZE = [120 * this.dpi_scale, 120 * this.dpi_scale];
+		const COLORPICKER_PICKER_ALPHA_SIZE = [9 * this.dpi_scale, 120 * this.dpi_scale];
+		const COLORPICKER_PICKER_HUE_SIZE = [9 * this.dpi_scale, 120 * this.dpi_scale];
+		const COLORPICKER_CROSSHAIR_SIZE = 5 * this.dpi_scale;
+		const COLORPICKER_PICKER_SIZE = [
+			COLORPICKER_PICKER_COLOR_SIZE[0] + COLORPICKER_PICKER_ALPHA_SIZE[0] + COLORPICKER_PICKER_HUE_SIZE[0] + MENU_MAIN_INDENT * 4,
+			MENU_MAIN_INDENT * 2 + COLORPICKER_PICKER_COLOR_SIZE[1],
+		];
+
+		const BUTTON_SIZE = [MENU_MAIN[0] - MENU_MAIN_INDENT * 2, 24 * this.dpi_scale];
+		const BUTTON_NAME_INDENT = 8 * this.dpi_scale;
+		const BUTTON_INDENT = BUTTON_SIZE[1] + 8 * this.dpi_scale;
+
+		Render.FilledRect(this.position[0], this.position[1], MENU_SIDEBAR[0], MENU_SIDEBAR[1], currentTheme.MENU_SIDEBAR);
+		Render.FilledRect(this.position[0] + MENU_SIDEBAR[0], this.position[1], MENU_MAIN[0], MENU_MAIN[1], currentTheme.MENU_MAIN);
+
+		const SCRIPT_NAME_TEXT_SECOND_SIZE = Render.TextSizeCustom(this.name, SCRIPT_NAME_TEXT_SECOND_FONT);
+		Render.StringCustom(
+			this.position[0] + MENU_SIDEBAR[0] + MENU_MAIN_INDENT,
+			this.position[1] + MENU_MAIN_INDENT + 2,
+			0,
+			this.name,
+			currentTheme.TEXT_SECOND,
+			SCRIPT_NAME_TEXT_SECOND_FONT,
+		);
+
+		const DROPDOWNS = [];
+		const COLORPICKERS = [];
+
+		const TAB_INTERACTION_PERMISSION = global_alpha > 0.5 && IS_MENU_OPEN;
+
+		const PER_TABS_OFFSET = TAB_INDENT;
+
+		this.items.forEach((tab) => {
+			const SHORT_TAB_NAME_SIZE = Render.TextSizeCustom(tab.short_name, SHORT_TAB_NAME_FONT);
+
+			Render.StringCustom(
+				this.position[0] + TAB_SIZE[0] / 2 - SHORT_TAB_NAME_SIZE[0] / 2,
+				this.position[1] + PER_TABS_OFFSET + TAB_SIZE[1] / 2 - SHORT_TAB_NAME_SIZE[1] / 2 - 2,
+				0,
+				tab.short_name,
+				this.current_tab == tab ? currentTheme.MAIN : currentTheme.TAB_NOT_SELECTED,
+				SHORT_TAB_NAME_FONT,
+			);
+		});
 	};
 }
