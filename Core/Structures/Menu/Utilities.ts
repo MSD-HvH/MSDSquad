@@ -1,5 +1,3 @@
-import { MathLIB } from "../../Modules/Useful";
-
 // #region Функциия для работы с битами
 /**
  * Побитовое И
@@ -104,10 +102,14 @@ export interface Animation {
 
 export const AnimationItems: Animation[] = [];
 
+export const Clamp = (value: number, min: number, max: number) => {
+	return Math.min(Math.max(min, value), max);
+};
+
 export const Lerp = function (time: number, start, end_pos) {
 	if (time == undefined) time = 0.095;
 
-	time = MathLIB.Clamp(Globals.Frametime() * (time * 175), 0, 1);
+	time = Clamp(Globals.Frametime() * (time * 175), 0, 1);
 
 	if (typeof start == "object") {
 		var start_color = start;

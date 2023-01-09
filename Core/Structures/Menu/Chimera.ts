@@ -87,7 +87,7 @@ export class Menu {
 			BUTTON_OUTLINE: [32, 32, 33, 255],
 		});
 
-		cb(this);
+		if (cb) cb(this);
 
 		return this;
 	}
