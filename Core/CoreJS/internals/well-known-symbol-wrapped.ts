@@ -1,3 +1,5 @@
 import { wellKnownSymbol } from "./well-known-symbol";
 
-export const f = wellKnownSymbol;
+export const wrappedWellKnownSymbolModule = {
+	f: wellKnownSymbol,
+};

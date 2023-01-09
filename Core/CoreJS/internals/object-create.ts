@@ -1,11 +1,11 @@
 /* global ActiveXObject -- old IE, WSH */
-var anObject = require('../internals/an-object.js');
-var definePropertiesModule = require('../internals/object-define-properties.js');
-var enumBugKeys = require('../internals/enum-bug-keys.js');
-var hiddenKeys = require('../internals/hidden-keys.js');
-var html = require('../internals/html.js');
-var documentCreateElement = require('../internals/document-create-element.js');
-var sharedKey = require('../internals/shared-key.js');
+import { anObject } from "./an-object";
+import { definePropertiesModule } from "./object-define-properties";
+import { enumBugKeys } from "./enum-bug-keys";
+import { hiddenKeys } from "./hidden-keys";
+import { html } from "./html";
+import { createElement } from "./document-create-element";
+import { sharedKey }from "./shared-key";
 
 var GT = '>';
 var LT = '<';
@@ -31,7 +31,7 @@ var NullProtoObjectViaActiveX = function (activeXDocument) {
 // Create object with fake `null` prototype: use iframe Object with cleared prototype
 var NullProtoObjectViaIFrame = function () {
   // Thrash, waste and sodomy: IE GC bug
-  var iframe = documentCreateElement('iframe');
+  var iframe = createElement('iframe');
   var JS = 'java' + SCRIPT + ':';
   var iframeDocument;
   iframe.style.display = 'none';
@@ -53,6 +53,7 @@ var NullProtoObjectViaIFrame = function () {
 var activeXDocument;
 var NullProtoObject = function () {
   try {
+    // @ts-ignore
     activeXDocument = new ActiveXObject('htmlfile');
   } catch (error) { /* ignore */ }
   NullProtoObject = typeof document != 'undefined'
@@ -70,7 +71,7 @@ hiddenKeys[IE_PROTO] = true;
 // `Object.create` method
 // https://tc39.es/ecma262/#sec-object.create
 // eslint-disable-next-line es/no-object-create -- safe
-module.exports = Object.create || function create(O, Properties) {
+export const create = Object.create || function create(O, Properties?) {
   var result;
   if (O !== null) {
     EmptyConstructor[PROTOTYPE] = anObject(O);
