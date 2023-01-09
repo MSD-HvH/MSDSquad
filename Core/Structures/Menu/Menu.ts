@@ -1,17 +1,21 @@
+import { NewAnimation, GetAnimation } from "./Utilities";
+
 interface MenuOptions {
 	build?: string;
 }
 
 export class Menu<N extends string, O extends MenuOptions> {
-	public name: string;
-	public build: string;
-	public position: number[] = [150, 150];
+	// #region Переменные
+	private name: string;
+	private build: string;
+	private position: number[] = [150, 150];
 
-	public checkboxes: any[] = [];
-	public buttons: any[] = [];
-	public dropdowns: any[] = [];
-	public multi_dropdowns: any[] = [];
-	public color_pickers: any[] = [];
+	private checkboxes: any[] = [];
+	private buttons: any[] = [];
+	private dropdowns: any[] = [];
+	private multi_dropdowns: any[] = [];
+	private color_pickers: any[] = [];
+	// #endregion
 
 	constructor(name: N, options?: O) {
 		this.name = name;
@@ -63,4 +67,8 @@ export class Menu<N extends string, O extends MenuOptions> {
 			color_pickers: this.color_pickers,
 		};
 	};
+
+	public readonly CreateMenu = () => {};
 }
+
+const test = new Menu("MSDSync");

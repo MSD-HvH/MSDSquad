@@ -493,9 +493,9 @@ declare namespace UI {
 	 * @param name name of the element
 	 * @param value value which should be set
 	 */
-	function SetEnabled<T extends keyof Subtabs, S extends Subtabs[T], N extends string>(Tab: T, Subtab: S, Area: string, name: N, value: boolean): void;
-	function SetEnabled<T extends keyof Subtabs, N extends string>(Tab: T, Area: string, name: N, value: boolean): void;
-	function SetEnabled<N extends string>(Area: string, name: N, value: boolean): void;
+	function SetEnabled<T extends keyof Subtabs, S extends Subtabs[T], N extends string>(Tab: T, Subtab: S, Area: string, name: N, value: boolean | number): void;
+	function SetEnabled<T extends keyof Subtabs, N extends string>(Tab: T, Area: string, name: N, value: boolean | number): void;
+	function SetEnabled<N extends string>(Area: string, name: N, value: boolean | number): void;
 
 	/**
 	 * Sets the value of a UI item's setting.
