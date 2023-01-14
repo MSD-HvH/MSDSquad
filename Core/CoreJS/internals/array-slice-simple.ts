@@ -2,7 +2,7 @@ import { toAbsoluteIndex } from "./to-absolute-index";
 import { lengthOfArrayLike } from "./length-of-array-like";
 import { createProperty } from "./create-property";
 
-export const arraySlice = (O, start, end) => {
+export const arraySlice = (O, start, end?) => {
   const length = lengthOfArrayLike(O);
   let k = toAbsoluteIndex(start, length);
   const fin = toAbsoluteIndex(end === undefined ? length : end, length);

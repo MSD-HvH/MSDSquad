@@ -1,9 +1,9 @@
-import { fails } from "./fails";
+import { fails } from './fails';
 
-export const NATIVE_BIND = !fails(() => {
+
+export const NATIVE_BIND = !fails(function () {
   // eslint-disable-next-line es/no-function-prototype-bind -- safe
-  // @ts-ignore
-  const test = (() => { /* empty */ }).bind();
+  const test = (function () { /* empty */ }).bind();
   // eslint-disable-next-line no-prototype-builtins -- safe
   return typeof test != 'function' || test.hasOwnProperty('prototype');
 });
