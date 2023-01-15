@@ -1,12 +1,12 @@
-var classof = require('./classof.js');
-var getMethod = require('./get-method.js');
+import { classof } from './classof';
+import { getMethod } from './get-method';
 import { isNullOrUndefined } from "./is-null-or-undefined";
 import { Iterators } from "./iterators";
-var wellKnownSymbol = require('./well-known-symbol.js');
+import { wellKnownSymbol } from './well-known-symbol';
 
-var ITERATOR = wellKnownSymbol('iterator');
+const ITERATOR = wellKnownSymbol('iterator');
 
-module.exports = function (it) {
+export const getIteratorMethod = function (it) {
   if (!isNullOrUndefined(it)) return getMethod(it, ITERATOR)
     || getMethod(it, '@@iterator')
     || Iterators[classof(it)];
