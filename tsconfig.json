@@ -8,8 +8,7 @@
         "module": "NodeNext",
         "strict": false,
         "downlevelIteration": true,
-        "esModuleInterop": true,
-        "importHelpers": true
+        "esModuleInterop": true
     },
     "include": [
         "."
