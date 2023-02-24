@@ -1165,7 +1165,7 @@ declare namespace Cheat {
 	 *
 	 * @param msg The message
 	 */
-	function Print(msg: string): void;
+	function Print <M extends string> (msg: M): void;
 
 	/**
 	 * Prints a colored message to the console.
@@ -1180,14 +1180,14 @@ declare namespace Cheat {
 	 *
 	 * @param msg The message
 	 */
-	function PrintChat(msg: string): void;
+	function PrintChat <M extends string> (msg: M): void;
 
 	/**
 	 * Executes a console command.
 	 *
 	 * @param cmd The command
 	 */
-	function ExecuteCommand(cmd: string): void;
+	function ExecuteCommand <M extends string> (cmd: M): void;
 
 	/**
 	 * Registers a new callback.

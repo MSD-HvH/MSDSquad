@@ -2,17 +2,17 @@
     "compilerOptions": {
         "target": "ES5",
         "lib": [
-            "ES5",
-            "DOM"
+            "ES5"
         ],
         "outDir": "./",
         "module": "CommonJS",
         "strict": false,
         "downlevelIteration": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "importHelpers": true
     },
     "include": [
-        "./"
+        "."
     ],
     "exclude": [
         "node_modules",
