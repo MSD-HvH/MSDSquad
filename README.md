@@ -1,3 +1,1 @@
-# MSDSquad
-Пак скриптов
 # Gamesense
