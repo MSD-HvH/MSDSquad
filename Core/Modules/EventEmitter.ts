@@ -1,9 +1,3 @@
-import { CreateTimeout } from "./Timeout";
-
-const test = CreateTimeout("id", (test) => {
-    Cheat.Print("Hello world")
-}, 5);
-
 /** 
  * @link https://gist.github.com/rgrove/b619077c7a67016f89bb
  */

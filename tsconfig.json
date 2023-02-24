@@ -2,10 +2,10 @@
     "compilerOptions": {
         "target": "ES5",
         "lib": [
-            "ES5"
+            "ES5",
         ],
         "outDir": "./",
-        "module": "CommonJS",
+        "module": "NodeNext",
         "strict": false,
         "downlevelIteration": true,
         "esModuleInterop": true,
