@@ -1,3 +1,5 @@
+/// <reference no-default-lib="true"/>
+
 const global = Function('return this')();
 let Symbol = global.Symbol;
 
@@ -11,23 +13,26 @@ if (!Symbol) {
 	Symbol.iterator = Symbol('Symbol.iterator');
 };
 
-var hasOwn = Object.prototype.hasOwnProperty;
+const hasOwn = Object.prototype.hasOwnProperty;
 
-var KEY_MAP_ID = Symbol('mapId');
-var mapIdCounter = 0;
+const KEY_MAP_ID: string = Symbol('mapId');
+let mapIdCounter: number = 0;
 
-var entryStub = {
+const entryStub: { value: undefined } = {
     value: undefined
 };
 
-class Map {
-    _entries = Object.create(null);
-    _objectStamps = {};
+export class Map <K, V> {
+    private _entries = Object.create(null);
+    private _objectStamps = {};
 
-    _first = null;
-    _last = null;
+    private _first = null;
+    private _last = null;
 
-    size = 0;
+    /**
+     * @returns the number of elements in the Map.
+     */
+    public size: number = 0;
 
     constructor(entries = null) {
         if (entries) {
@@ -37,15 +42,25 @@ class Map {
 		}
     };
 
-    has = (key) => {
+    /**
+     * @returns boolean indicating whether an element with the specified key exists or not.
+     */
+    public has = (key: K): boolean => {
         return !!this._entries[this._getValueStamp(key)];
     }
 
-    get = (key) => {
+    /**
+     * Returns a specified element from the Map object. If the value that is associated to the provided key is an object, then you will get a reference to that object and any change made to that object will effectively modify it inside the Map.
+     * @returns Returns the element associated with the specified key. If no element is associated with the specified key, undefined is returned.
+     */
+    public get = (key: K): V | undefined => {
         return (this._entries[this._getValueStamp(key)] || entryStub).value;
     }
 
-    set = (key, value) => {
+    /**
+     * Adds a new element with a specified key and value to the Map. If an element with the same key already exists, the element will be updated.
+     */
+    public set = (key: K, value: V): this => {
         var entries = this._entries;
         var keyStamp = this._getValueStamp(key);
 
@@ -72,7 +87,10 @@ class Map {
         return this;
     };
 
-    delete = (key) => {
+    /**
+     * @returns true if an element in the Map existed and has been removed, or false if the element does not exist.
+     */
+    public delete = (key: K): boolean => {
         var keyStamp = this._getValueStamp(key);
         var entry = this._entries[keyStamp];
 
@@ -106,7 +124,7 @@ class Map {
         return true;
     };
 
-    clear = () => {
+    public clear = (): void => {
         var entries = this._entries;
 
         for (var stamp in entries) {
@@ -121,11 +139,14 @@ class Map {
         this.size = 0;
     };
 
-    forEach = (callback, context?) => {
+    /**
+     * Executes a provided function once per each key/value pair in the Map, in insertion order.
+     */
+    public forEach = (callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void => {
         var entry = this._first;
 
         while (entry) {
-            callback.call(context, entry.value, entry.key, this);
+            callbackfn.call(thisArg, entry.value, entry.key, this);
 
             do {
                 entry = entry.next;
@@ -133,11 +154,11 @@ class Map {
         }
     };
 
-    toString = () => {
-        return '[object Map]';
+    private toString = (): "[object Map]"  => {
+        return "[object Map]";
     }
 
-    _getValueStamp = (value) => {
+    private _getValueStamp = (value) => {
         switch (typeof value) {
             case 'undefined': {
                 return 'undefined';
@@ -163,7 +184,7 @@ class Map {
         return this._getObjectStamp(value);
     };
 
-    _getObjectStamp = (obj) => {
+    private _getObjectStamp = (obj) => {
         if (!hasOwn.call(obj, KEY_MAP_ID)) {
             if (!Object.isExtensible(obj)) {
                 var stamps = this._objectStamps;
@@ -189,12 +210,3 @@ class Map {
         return obj[KEY_MAP_ID];
     };
 };
-
-const test = new Map();
-
-test.set("hello", "world");
-test.forEach((value, key, context) => {
-    Cheat.Print("\n" + key + " " + value + "\n");
-});
-
-Cheat.Print(test.get("hello"));
