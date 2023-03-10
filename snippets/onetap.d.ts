@@ -307,7 +307,7 @@ declare namespace UI {
 	 * UI.AddLabel("Test label");
 	 * ```
 	 */
-	function AddLabel<T extends string>(text: T): void;
+	function AddLabel <T extends string> (text: T): void;
 
 	/**
 	 * Can be used to toggle a hotkey or simulate key press.
@@ -320,9 +320,9 @@ declare namespace UI {
 	 * UI.ToggleHotkey("Rage", "GENERAL", "Exploits", "Doubletap");
 	 * ```
 	 */
-	function ToggleHotkey<T extends keyof Subtabs, S extends Subtabs[T], N extends string>(Tab: T, Subtab: S, Area: string, item: N): 1 | 0;
-	function ToggleHotkey<T extends keyof Subtabs, N extends string>(Tab: T, Area: string, item: N): 1 | 0;
-	function ToggleHotkey<N extends string>(Area: string, item: N): 1 | 0;
+	function ToggleHotkey <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, item: N): 1 | 0;
+	function ToggleHotkey <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, item: N): 1 | 0;
+	function ToggleHotkey <N extends string> (Area: string, item: N): 1 | 0;
 
 	/**
 	 * Adds a textbox in which you can input text and read it later on.
@@ -335,7 +335,7 @@ declare namespace UI {
 	 * UI.AddTextbox("Test Textbox");
 	 * ```
 	 */
-	function AddTextbox<N extends string>(name: N): ["Misc", "JAVASCRIPT", "Script items", N];
+	function AddTextbox <N extends string> (name: N): ["Misc", "JAVASCRIPT", "Script items", N];
 
 	/**
 	 * Used to set precise RGBA color codes in the color picker.
@@ -348,15 +348,15 @@ declare namespace UI {
 	 * UI.SetColor("Visual", "ENEMIES", "ESP", "Glow", [255, 255, 255, 255]);
 	 * ```
 	 */
-	function SetColor<T extends keyof Subtabs, S extends Subtabs[T], N extends string, C extends Color | number[]>(
+	function SetColor <T extends keyof Subtabs, S extends Subtabs[T], N extends string, C extends Color | number[]> (
 		Tab: T,
 		Subtab: S,
 		Area: string,
 		name: N,
 		color: C,
 	): C;
-	function SetColor<T extends keyof Subtabs, N extends string, C extends Color | number[]>(Tab: T, Area: string, name: N, color: C): C;
-	function SetColor<N extends string, C extends Color | number[]>(Area: string, name: N, color: C): C;
+	function SetColor <T extends keyof Subtabs, N extends string, C extends Color | number[]> (Tab: T, Area: string, name: N, color: C): C;
+	function SetColor <N extends string, C extends Color | number[]> (Area: string, name: N, color: C): C;
 
 	/**
 	 * Adds a color picker.
@@ -368,7 +368,7 @@ declare namespace UI {
 	 * UI.AddColorPicker("Test Colorpicker")
 	 * ```
 	 */
-	function AddColorPicker<N extends string>(name: N): ["Misc", "JAVASCRIPT", "Script items", N];
+	function AddColorPicker <N extends string> (name: N): ["Misc", "JAVASCRIPT", "Script items", N];
 
 	/**
 	 * Will create a dropdown in which you can select more items under Misc - JAVASCRIPT - Script items.
@@ -381,7 +381,7 @@ declare namespace UI {
 	 * UI.AddMultiDropdown("Test multi dropdown", ["one", "two", "three", "four"]);
 	 * ```
 	 */
-	function AddMultiDropdown<N extends string, E extends string[]>(name: N, elements: E): ["Misc", "JAVASCRIPT", "Script items", N];
+	function AddMultiDropdown <N extends string, E extends string[]> (name: N, elements: E): ["Misc", "JAVASCRIPT", "Script items", N];
 
 	/**
 	 * Returns true if the menu is open, false otherwise.
@@ -399,7 +399,7 @@ declare namespace UI {
 	 * UI.AddMultiDropdown("Test dropdown", ["one", "two", "three", "four"]);
 	 * ```
 	 */
-	function AddDropdown<N extends string, E extends string[]>(name: N, elements: E): ["Misc", "JAVASCRIPT", "Script items", N];
+	function AddDropdown <N extends string, E extends string[]> (name: N, elements: E): ["Misc", "JAVASCRIPT", "Script items", N];
 
 	/**
 	 * Create a label with a key picker control under Misc - JAVASCRIPT - Script items.
@@ -411,7 +411,7 @@ declare namespace UI {
 	 * UI.AddHotkey("Test hotkey");
 	 * ```
 	 */
-	function AddHotkey<N extends string>(name: N): ["Misc", "JAVASCRIPT", "Script items", N];
+	function AddHotkey <N extends string> (name: N): ["Misc", "JAVASCRIPT", "Script items", N];
 
 	/**
 	 * Create a floating point slider under Misc - JAVASCRIPT - Script items.
@@ -425,7 +425,7 @@ declare namespace UI {
 	 * UI.AddSliderFloat("Test float slider", 1.0, 10.0);
 	 * ```
 	 */
-	function AddSliderFloat<N extends string, F extends number, S extends number>(name: N, min: F, max: S): ["Misc", "JAVASCRIPT", "Script items", N];
+	function AddSliderFloat <N extends string, F extends number, S extends number> (name: N, min: F, max: S): ["Misc", "JAVASCRIPT", "Script items", N];
 
 	/**
 	 * Create an integer slider under Misc - JAVASCRIPT - Script items.
@@ -439,7 +439,7 @@ declare namespace UI {
 	 * UI.AddSliderInt("Test", 0, 100);
 	 * ```
 	 */
-	function AddSliderInt<N extends string, F extends number, S extends number>(name: N, min: F, max: S): ["Misc", "JAVASCRIPT", "Script items", N];
+	function AddSliderInt <N extends string, F extends number, S extends number> (name: N, min: F, max: S): ["Misc", "JAVASCRIPT", "Script items", N];
 
 	/**
 	 * Create a checkbox control under Misc - JAVASCRIPT - Script items.
@@ -451,7 +451,7 @@ declare namespace UI {
 	 * UI.AddCheckbox("Test checkbox");
 	 * ```
 	 */
-	function AddCheckbox<N extends string>(name: N): ["Misc", "JAVASCRIPT", "Script items", N];
+	function AddCheckbox <N extends string> (name: N): ["Misc", "JAVASCRIPT", "Script items", N];
 
 	/**
 	 * Can be used to determine whether hotkey is active.
@@ -459,9 +459,9 @@ declare namespace UI {
 	 *
 	 * @param name name of hotkey
 	 */
-	function IsHotkeyActive<T extends keyof Subtabs, S extends Subtabs[T], N extends string>(Tab: T, Subtab: S, Area: string, name: N): 1 | 0;
-	function IsHotkeyActive<T extends keyof Subtabs, N extends string>(Tab: T, Area: string, name: N): 1 | 0;
-	function IsHotkeyActive<N extends string>(Area: string, name: N): 1 | 0;
+	function IsHotkeyActive <T extends keyof Subtabs, S extends Subtabs[T], N extends string> (Tab: T, Subtab: S, Area: string, name: N): 1 | 0;
+	function IsHotkeyActive <T extends keyof Subtabs, N extends string> (Tab: T, Area: string, name: N): 1 | 0;
+	function IsHotkeyActive <N extends string> (Area: string, name: N): 1 | 0;
 
 	/**
 	 * Can be used to get precise RGBA color codes from a color picker.
@@ -530,20 +530,20 @@ declare namespace Entity {
 	 *
 	 * @param index The entity's index
 	 */
-	function GetRenderBox(index: EntityID): number[];
+	function GetRenderBox <I extends EntityID> (index: I): number[];
 
 	/**
 	 * Returns an array containing all of the weapon's entity indexes of a player.
 	 *
 	 * @param index
 	 */
-	function GetWeapons(index: EntityID): EntityID[];
+	function GetWeapons <I extends EntityID> (index: I): EntityID[];
 
 	/**
 	 * Returns an array containing all entities of a certain class.
 	 * @param class_index The class' index
 	 */
-	function GetEntitiesByClassID(class_index: number): EntityID[];
+	function GetEntitiesByClassID <I extends number> (class_index: I): EntityID[];
 
 	/**
 	 * Returns the hitbox's position of an entity.
@@ -571,14 +571,14 @@ declare namespace Entity {
 	 * HITBOX_RIGHT_UPPER_ARM = 17
 	 * HITBOX_RIGHT_FOREARM = 18
 	 */
-	function GetHitboxPosition(index: EntityID, hitbox_index: number): Vector;
+	function GetHitboxPosition <I extends EntityID, H extends number> (index: I, hitbox_index: H): Vector;
 
 	/**
 	 * Returns the entity's eye position.
 	 *
 	 * @param index The entity's index
 	 */
-	function GetEyePosition(index: EntityID): Vector;
+	function GetEyePosition <I extends EntityID> (index: I): Vector;
 
 	/**
 	 * Returns the game's CCSGameRulesProxy entity.
@@ -590,14 +590,14 @@ declare namespace Entity {
 	 *
 	 * @param index The entity's index
 	 */
-	function IsBot(index: EntityID): boolean;
+	function IsBot <I extends EntityID> (index: I): boolean;
 
 	/**
 	 * Returns the weapon's entity index of a player.
 	 *
 	 * @param index The player's index
 	 */
-	function GetWeapon(index: EntityID): EntityID;
+	function GetWeapon <I extends EntityID> (index: I): EntityID;
 
 	/**
 	 * Overrides a property of an entity. Cannot be used on players.
