@@ -34,12 +34,16 @@ export class Map <K, V> {
      */
     public size: number = 0;
 
-    constructor(entries = null) {
-        if (entries) {
-			for (var i = 0, l = entries.length; i < l; i++) {
-				this.set(entries[i][0], entries[i][1]);
-			}
-		}
+    readonly prototype: Map<any, any>;
+
+    constructor (entries?: readonly (readonly [K, V])[] | null) {
+        if (!entries) return this;
+
+        entries.forEach((value) => {
+            this.set(value[0], value[1]);
+        });
+		
+        return this;
     };
 
     /**
