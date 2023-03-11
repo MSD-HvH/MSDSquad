@@ -39,7 +39,7 @@ class Checkbox <N extends string> {
      * 
      * @since 1.0.0
      */
-    public readonly name: N;
+    public name: N;
 
     /**
      * Текущий статус чекбокса.
@@ -126,6 +126,26 @@ class Checkbox <N extends string> {
     };
 
     /**
+     * Возвращает текущее имя чекбокса.
+     * 
+     * ---
+     * @example
+     * ```ts
+     * const test = new Checkbox("Hello world").Create();
+     * 
+     * Cheat.Print(test.GetName()); // "Hello world"
+     * ```
+     * ---
+     * 
+     * @returns {N}
+     * 
+     * @since 1.0.0
+     */
+    public readonly GetName = (): N => {
+        return this.name
+    };
+
+    /**
      * Возвращает текущее состояние чекбокса
      * 
      * ---
@@ -196,7 +216,7 @@ class Checkbox <N extends string> {
      * 
      * @since 1.0.0
      */
-    public readonly AddCallback = (callbackFn: CallbackFunction): Checkbox<N> => {
+    public readonly AddCallback = (callbackFn: CallbackFunction): Checkbox <N> => {
         this.cb = callbackFn;
 
         return this;
