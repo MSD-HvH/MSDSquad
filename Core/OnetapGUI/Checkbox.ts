@@ -30,7 +30,7 @@ class Checkbox <N extends string> {
      * 
      * @since 1.0.0
      */
-    public cb: CallbackFunction;
+    private cb: CallbackFunction;
 
     /**
      * Название чекбокса.
@@ -39,7 +39,7 @@ class Checkbox <N extends string> {
      * 
      * @since 1.0.0
      */
-    public name: N;
+    private name: N;
 
     /**
      * Текущий статус чекбокса.
@@ -48,7 +48,7 @@ class Checkbox <N extends string> {
      * 
      * @since 1.0.0
      */
-    public value: 1 | 0;
+    private value: 1 | 0;
 
     /**
      * Создаёт чекбокс с заданным названием.
@@ -139,10 +139,10 @@ class Checkbox <N extends string> {
      * 
      * @returns {N}
      * 
-     * @since 1.0.0
+     * @since 1.1.0
      */
     public readonly GetName = (): N => {
-        return this.name
+        return this.name;
     };
 
     /**
@@ -187,6 +187,8 @@ class Checkbox <N extends string> {
     public readonly SetValue = (value: 1 | 0): Checkbox <N> => {
         UI.SetValue("Misc", "JAVASCRIPT", "Script items", this.name, value);
 
+        this.value = value;
+
         return this;
     };
 
@@ -223,7 +225,7 @@ class Checkbox <N extends string> {
     };
 
     /**
-     * Функция для проверки значения чекбокса.
+     * Проверяет изменилось ли значение чекбокса для запуска callback функции
      * 
      * ---
      * @example
@@ -257,7 +259,7 @@ class Checkbox <N extends string> {
  * Более удобное создание чекбокса.
  * 
  * @author Mased
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * Discord: Mased#1854
  */
