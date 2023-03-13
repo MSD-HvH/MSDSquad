@@ -6,12 +6,12 @@
         ],
         "outDir": "./",
         "module": "NodeNext",
-        "strict": false,
-        "downlevelIteration": true,
-        "esModuleInterop": true
+        "moduleResolution": "node"
     },
     "include": [
-        "./"
+        "MSDSync",
+        "snippets",
+        "MSDSync.ts"
     ],
     "exclude": [
         "node_modules",

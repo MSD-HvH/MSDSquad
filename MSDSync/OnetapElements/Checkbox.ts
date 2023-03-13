@@ -3,7 +3,7 @@
  */
 type CallbackFunction = <N extends string> (checkbox: Checkbox <N>) => any;
 
-class Checkbox <N extends string> {
+export class Checkbox <N extends string> {
     /**
      * Каллбэк который срабатывает при изменении состояния чекбокса.
      * 
