@@ -1,5 +1,5 @@
 # *.js
-*/**/*.js
+src/**/*.js
 
 # Logs
 logs

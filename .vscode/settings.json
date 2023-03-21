@@ -6,6 +6,6 @@
         ".prettierrc": true,
         "package*.json": true,
         "README.md": true,
-        "*/**/*.js": true,
+        "src/**/*.js": true,
     }
 }

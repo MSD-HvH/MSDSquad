@@ -10,7 +10,7 @@
     },
     "include": [
         "MSDSync",
-        "snippets",
+        "src/snippets",
         "MSDSync.ts"
     ],
     "exclude": [
