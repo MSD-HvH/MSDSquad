@@ -9,9 +9,10 @@
         "moduleResolution": "node"
     },
     "include": [
-        "MSDSync",
+        "MSDSync.ts",
+        "constants.ts",
         "src/snippets",
-        "MSDSync.ts"
+        "src/MSDSync"
     ],
     "exclude": [
         "node_modules",
