@@ -15,7 +15,7 @@ interface SnakeGameStructure {
     food: {x: number, y: number};
 };
 
-class SnakeGame implements SnakeGameStructure {
+export class SnakeGame implements SnakeGameStructure {
     public readonly gameBoxSize: number = 300
 
     public lastMove: number = 0;
