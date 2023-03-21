@@ -1422,3 +1422,17 @@ declare namespace Material {
 	 */
 	function Refresh(index: number): boolean;
 }
+
+declare namespace performance {
+	/**
+	 * @returns {number}
+	 */
+	function now(): number;
+}
+
+/**
+ * Returns name of file
+ * 
+ * @type {string}
+ */
+declare const __filename: string;
