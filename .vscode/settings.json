@@ -1,7 +1,7 @@
 {
     "files.exclude": {
         "**/node_modules": true,
-        ".gitignore": true,
+        // ".gitignore": true,
         ".eslintrc": true,
         ".prettierrc": true,
         "package*.json": true,
