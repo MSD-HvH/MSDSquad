@@ -1,0 +1,10 @@
+-- prison life god mode by bloxploits
+while wait() do 
+	if game.Players.LocalPlayer.Character.Humanoid.Health < 99 then 
+		local lastPos = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").position
+		local plr = game.Players.LocalPlayer.Name
+		local gayevent = game:GetService("Workspace").Remote.loadchar
+		gayevent:InvokeServer(plr)
+		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(lastPos)
+	end
+end
