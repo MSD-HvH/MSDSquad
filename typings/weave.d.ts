@@ -1,10 +1,53 @@
+/**
+ * Цвет в палитре RGB
+ * 
+ * @type {[number, number, number]}
+ * @since 1.0.0
+ */
 type ColorRGB = [number, number, number];
+
+/**
+ * Цвет в палитре RGBA
+ * 
+ * @type {[number, number, number, number]}
+ * @since 1.0.0
+ */
 type ColorRGBA = [number, number, number, number];
+
+/**
+ * Индекс Entity
+ * 
+ * @type {number}
+ * @since 1.0.0
+ */
 type EntityID = number;
 
+/**
+ * Информация об игроке
+ * 
+ * @type {object}
+ * @since 1.0.1
+ */
+type PlayerInfo = {
+	fakeplayer: string,
+	steam_id: string,
+	name: string,
+	xuid_high: string,
+	xuid_low: string
+}
+
+/**
+ * Список каллбэков
+ * 
+ * @see https://wiki.alliedmods.net/Counter-Strike:_Global_Offensive_Events
+ * @type {string}
+ * @since 1.0.0
+ */
 type CallbackName =
-        | "render"
-        | "createmove"
+    | "render"
+    | "createmove"
+	| "ragebot_fire"
+	| "ragebot_miss"
 	| "player_death"
 	| "other_death"
 	| "player_hurt"
@@ -176,7 +219,37 @@ type CallbackName =
 	| "guardian_wave_restart";
 
 declare namespace cheat {
+	/**
+	 * Функция для вывовда текста в консоль
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * cheat.log("Hello world! \n"); // Hello world
+	 * ```
+	 * ---
+	 * 
+	 * @param {stirng} text Текст для вывода в консоль
+	 * @returns {void}
+	 * @since 1.0.0
+	 */
     function log <M extends string> (text: M): void;
+
+	/**
+	 * Функция которая возвращает имя в чите
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * const name = cheat.get_username();
+	 * 
+	 * cheat.log(name + "\n");
+	 * ```
+	 * ---
+	 * 
+	 * @returns {string}
+	 * @since 1.0.0
+	 */
     function get_username(): string;
     function get_choked_commands(): number;
     function get_desync_amount(): number;
@@ -200,7 +273,7 @@ declare namespace render {
     function disable_aa(): void;
     function line(x: number, y: number, x2: number, y2: number, color: ColorRGBA, thickness: number): void;
     function circle(x: number, y: number, radius: number, color: ColorRGBA, segments: number): void;
-    function filled_circle(x: number, y: number, radius: number, color: array[4], segments: number): void;
+    function filled_circle(x: number, y: number, radius: number, color: ColorRGBA, segments: number): void;
     function get_screen_size(): [number, number];
     function world_to_screen(x: number, y: number, z: number): [number, number];
     function picture(path: string, x: number, y: number, w: number, h: number, thickness: number): void;
@@ -231,13 +304,13 @@ declare namespace entity {
     function get_local_player(): EntityID;
     function get_valid_players(): EntityID[];
     function get_velocity(index: EntityID): number;
-    function get_flags(index: EntityID): any;
+    function get_flags(index: EntityID): number;
     function get_origin(index: EntityID): [number, number, number];
-    function get_player_for_user_id(index: EntityID): any;
+    function get_player_for_user_id(index: EntityID): EntityID;
     function get_weapon_id(index: EntityID): number;
     function get_enemies(): EntityID[];
     function get_teammates(): EntityID[];
-    function get_player_info(index: EntityID): any;
+    function get_player_info(index: EntityID): PlayerInfo;
 }
 
 declare namespace vars {
@@ -265,13 +338,17 @@ declare namespace antiaim {
     function override_body_lean(value: number): void;
 }
 
+declare namespace http {
+	function get(url: string): unknown;
+}
+
 declare namespace utils {
     function play_sound(path: string): void;
     function to_clipboard(data: string): void;
     function from_clipboard(): string;
 }
 
-declare function register_callback(type: Callback, callableFn: Function): void;
+declare function register_callback(type: CallbackName, callableFn: Function): void;
 
 declare namespace ui {
     function add_checkbox(name: string, varname: string): void;
@@ -283,3 +360,13 @@ declare namespace ui {
     function get_cursor_position(): [number, number];
     function is_mouse_down(): boolean;
 }
+
+/**
+ * API Weave.su
+ * 
+ * @author Mased
+ * @author undef013
+ * @version 1.0.0
+ * 
+ * @see https://api.weave.su/weave-api
+ */
