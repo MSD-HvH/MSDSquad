@@ -3,8 +3,8 @@ type ColorRGBA = [number, number, number, number];
 type EntityID = number;
 
 type CallbackName =
-    | "render"
-    | "createmove"
+        | "render"
+        | "createmove"
 	| "player_death"
 	| "other_death"
 	| "player_hurt"
