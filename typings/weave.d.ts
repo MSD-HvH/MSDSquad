@@ -44,8 +44,8 @@ type PlayerInfo = {
  * @since 1.0.0
  */
 type CallbackName =
-    | "render"
-    | "createmove"
+	| "render"
+	| "createmove"
 	| "ragebot_fire"
 	| "ragebot_miss"
 	| "player_death"
@@ -220,7 +220,7 @@ type CallbackName =
 
 declare namespace cheat {
 	/**
-	 * Функция для вывовда текста в консоль
+	 * Функция для вывода текста в консоль
 	 * 
 	 * ---
 	 * @example
@@ -229,7 +229,7 @@ declare namespace cheat {
 	 * ```
 	 * ---
 	 * 
-	 * @param {stirng} text Текст для вывода в консоль
+	 * @param {string} text Текст для вывода в консоль
 	 * @returns {void}
 	 * @since 1.0.0
 	 */
@@ -243,7 +243,7 @@ declare namespace cheat {
 	 * ```ts
 	 * const name = cheat.get_username();
 	 * 
-	 * cheat.log(name + "\n");
+	 * cheat.log(name + "\n"); // user
 	 * ```
 	 * ---
 	 * 
@@ -251,41 +251,234 @@ declare namespace cheat {
 	 * @since 1.0.0
 	 */
     function get_username(): string;
+
+	/**
+	 * Функция для получения количества задержанных команд.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * const choked_commands = cheat.get_choked_commands();
+	 * 
+	 * cheat.log(choked_commands + "\n"); // 0
+	 * ```
+	 * ---
+	 * 
+	 * @returns {number}
+	 */
     function get_choked_commands(): number;
+
+	/**
+	 * Функция для выполнения консольных команд.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * cheat.execute_command("say Hello World!"); // Hello World!
+	 * ```
+	 * ---
+	 * 
+	 * @param {string} command Выполняемая команда
+	 * @returns {void}
+	 * @since 1.0.0
+	 */
+	function execute_command <C extends string> (command: C): void;
+    
+	/**
+	 * Функция для получения угла десинка.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * const desync_amount = cheat.get_desync_amount();
+	 * 
+	 * cheat.log(desync_amount + "\n"); // 0
+	 * ```
+	 * ---
+	 * 
+	 * @returns {number}
+	 */
     function get_desync_amount(): number;
+
+
+	/**
+	 * Функция для вывода цветного текста в консоль.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * cheat.log("Hello world! \n", [100, 100, 100]); // Hello world
+	 * ```
+	 * ---
+	 * 
+	 * @param {string} text Текст для вывода в консоль
+	 * @param {ColorRGB} color Цвет выводимого в консоль текста
+	 * @returns {void}
+	 */
     function print_to_console <M extends string, C extends ColorRGB> (text: M, color: C): void;
+    
+	
+	/**
+	 * Функция для изменения клантега.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * cheat.set_clantag("Hello world!");
+	 * ```
+	 * ---
+	 * 
+	 * @param {string} clantag Новый клантег
+	 * @returns {void}
+	 */
     function set_clantag <C extends string> (clantag: C): void;
 }
 
 declare namespace math {
+	/**
+	 * Функция для получения случайного целого числа в указанных рамках.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * const random_num = math.random_int(0, 255);
+	 * 
+	 * cheat.log(random_num + "\n"); // 83
+	 * ```
+	 * ---
+	 * 
+	 * @param {number} min Минимальное значение
+	 * @param {number} max Максимальное значение
+	 * @returns {number}
+	 */
     function random_int <F extends number, S extends number> (min: F, max: S): number;
+
+	/**
+	 * Функция для получения случайного плавающего числа в указанных рамках.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * const random_num = math.random_float(0, 255);
+	 * 
+	 * cheat.log(random_num + "\n"); // 224.0639863376611
+	 * ```
+	 * ---
+	 * 
+	 * @param {number} min Минимальное значение
+	 * @param {number} max Максимальное значение
+	 * @returns {number}
+	 */
     function random_float <F extends number, S extends number> (min: F, max: S): number;
 }
 
 declare namespace render {
-    function text <X extends number, Y extends number, C extends ColorRGBA, F extends number, S extends number, T extends string > (x: X, y: Y, color: C, flags: F, size: S, text: T): void;
-    function rect(x: number, y: number, w: number, h: number, color: ColorRGBA, rounding: number): void;
-    function filled_rect(x: number, y: number, w: number, h: number, color: ColorRGBA, rounding: number): void;
-    function filled_rect_gradient(x: number, y: number, w: number, h: number, col_upr_left: ColorRGBA, col_upr_right: ColorRGBA, col_bot_right: ColorRGBA, col_bot_left: ColorRGBA): void;
-    function arc(x: number, y: number, radius: number, angle_min: number, angle_max: number, segments: number, color: ColorRGBA, closed: boolean, thickness: number): void;
-    function arc_filled(x: number, y: number, radius: number, angle_min: number, angle_max: number, segments: number, color: ColorRGBA, closed: boolean, thickness: number): void;
+    function text <X extends number, Y extends number, C extends ColorRGBA, F extends number, S extends number, T extends string> (x: X, y: Y, color: C, flags: F, size: S, text: T): void;
+    function rect <X extends number, Y extends number, W extends number, H extends number, C extends ColorRGBA, R extends number> (x: X, y: Y, w: W, h: H, color: C, rounding: R): void;
+    function filled_rect <X extends number, Y extends number, W extends number, H extends number, C extends ColorRGBA, R extends number> (x: X, y: Y, w: W, h: H, color: C, rounding: R): void;
+    function filled_rect_gradient <X extends number, Y extends number, W extends number, H extends number, CUL extends ColorRGBA, CUR extends ColorRGBA, CBR extends ColorRGBA, CBL extends ColorRGBA> (x: X, y: Y, w: W, h: H, col_upr_left: CUL, col_upr_right: CUR, col_bot_right: CBR, col_bot_left: CBL): void;
+    function arc <X extends number, Y extends number, R extends number, AN extends number, AX extends number, S extends number, CR extends ColorRGBA, CL extends boolean, T extends number> (x: X, y: Y, radius: R, angle_min: AN, angle_max: AX, segments: S, color: CR, closed: CL, thickness: T): void;
+    function arc_filled <X extends number, Y extends number, R extends number, AN extends number, AX extends number, S extends number, CR extends ColorRGBA, CL extends boolean, T extends number> (x: X, y: Y, radius: R, angle_min: AN, angle_max: AX, segments: S, color: CL, closed: CL, thickness: T): void;
     function enable_aa(): void;
     function disable_aa(): void;
-    function line(x: number, y: number, x2: number, y2: number, color: ColorRGBA, thickness: number): void;
-    function circle(x: number, y: number, radius: number, color: ColorRGBA, segments: number): void;
-    function filled_circle(x: number, y: number, radius: number, color: ColorRGBA, segments: number): void;
+    function line <X extends number, Y extends number, X2 extends number, Y2 extends number, C extends ColorRGBA, T extends number> (x: X, y: Y, x2: X2, y2: Y2, color: C, thickness: T): void;
+    function circle <X extends number, Y extends number, R extends number, C extends ColorRGBA, S extends number> (x: X, y: Y, radius: R, color: C, segments: S): void;
+    function filled_circle <X extends number, Y extends number, R extends number, C extends ColorRGBA, S extends number> (x: X, y: Y, radius: R, color: C, segments: S): void;
     function get_screen_size(): [number, number];
-    function world_to_screen(x: number, y: number, z: number): [number, number];
-    function picture(path: string, x: number, y: number, w: number, h: number, thickness: number): void;
+    function world_to_screen <X extends number, Y extends number, Z extends number> (x: X, y: Y, z: Z): [number, number];
+    function picture <P extends string, X extends number, Y extends number, W extends number, H extends number, T extends number> (path: P, x: X, y: Y, w: W, h: H, thickness: T): void;
 }
 
 declare namespace global_vars {
+	/**
+	 * Функция для получения времени со старта игры.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * cheat.log(global_vars.realtime() + "\n"); // 66.8218765258789
+	 * ```
+	 * ---
+	 * @returns {number}
+	 */
     function realtime(): number;
+
+	/**
+	 * Функция для получения количества кадров со старта игры.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * cheat.log(global_vars.frame_count() + "\n"); // 9377
+	 * ```
+	 * ---
+	 * @returns {number}
+	 */
     function frame_count(): number;
+
+	/**
+	 * Функция для получения игрового времени.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * cheat.log(global_vars.curtime() + "\n"); // 113.8656005859375
+	 * ```
+	 * ---
+	 * @returns {number}
+	 */
     function curtime(): number;
+
+	/**
+	 * Функция для получения времени затраченного на рендер предыдущего кадра.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * cheat.log(global_vars.frametime() + "\n"); // 0.004914899822324514
+	 * ```
+	 * ---
+	 * @returns {number}
+	 */
     function frametime(): number;
+
+	/**
+	 * Функция для получения максимального количества игроков.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * cheat.log(global_vars.max_clients() + "\n"); // 0
+	 * ```
+	 * ---
+	 * @returns {number}
+	 */
     function max_clients(): number;
+
+	/**
+	 * Функция для получения количества тиков со старта сервера.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * cheat.log(global_vars.tick_count() + "\n"); // 7850
+	 * ```
+	 * ---
+	 * @returns {number}
+	 */
     function tick_count(): number;
+
+	/**
+	 * Функция для получения временного интервала между тиками.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * cheat.log(global_vars.interval_per_tick() + "\n"); // 0.015625
+	 * ```
+	 * ---
+	 * @returns {number}
+	 */
     function interval_per_tick(): number;
 }
 
@@ -296,64 +489,90 @@ declare namespace user_cmd {
     function set_command_number(command: number): void;
     function get_view_angles(): [number, number, number];
     function set_view_angles(coordinates: [number, number, number]): void;
-    function set_forwardmove(speed: number): void;
-    function set_sidemove(speed: number): void;
+
+	/**
+	 * Функция для изменения движения локального игрока по оси X.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * user_cmd.set_forwardmove(450);
+	 * ```
+	 * ---
+	 * @param {number} speed Новая скорость по оси X
+	 * @returns {void}
+	 */
+    function set_forwardmove <S extends number> (speed: S): void;
+
+	/**
+	 * Функция для изменения движения локального игрока по оси Y.
+	 * 
+	 * ---
+	 * @example
+	 * ```ts
+	 * user_cmd.set_sidemove(450);
+	 * ```
+	 * ---
+	 * @param {number} speed Новая скорость по оси Y
+	 * @returns {void}
+	 */
+    function set_sidemove <S extends number> (speed: S): void;
 }
 
 declare namespace entity {
     function get_local_player(): EntityID;
     function get_valid_players(): EntityID[];
-    function get_velocity(index: EntityID): number;
-    function get_flags(index: EntityID): number;
-    function get_origin(index: EntityID): [number, number, number];
-    function get_player_for_user_id(index: EntityID): EntityID;
-    function get_weapon_id(index: EntityID): number;
+    function get_velocity <I extends EntityID> (index: I): number;
+    function get_flags <I extends EntityID> (index: I): number;
+    function get_origin <I extends EntityID> (index: I): [number, number, number];
+    function get_player_for_user_id<I extends EntityID> (index: I): EntityID;
+    function get_weapon_id <I extends EntityID> (index: I): number;
     function get_enemies(): EntityID[];
     function get_teammates(): EntityID[];
-    function get_player_info(index: EntityID): PlayerInfo;
+    function get_player_info <I extends EntityID> (index: I): PlayerInfo;
 }
 
 declare namespace vars {
-    function set_bool(varname: string, value: boolean): void;
-    function get_bool(varname: string): boolean;
-    function set_int(varname: string, value: number): void;
-    function get_int(varname: string): number;
-    function set_uint(varname: string, value: number): void;
-    function get_uint(varname: string): number;
-    function is_bind_active(varname: string): boolean;
-    function set_bind_active(varname: string, value: boolean): void;
-    function set_bind_type(varname: string, value: number): void;
+    function set_bool <N extends string, V extends boolean> (name: N, value: V): void;
+    function get_bool <N extends string> (name: N): boolean;
+    function set_int <N extends string, V extends number> (name: N, value: V): void;
+    function get_int <N extends string> (name: N): number;
+    function set_uint <N extends string, V extends number> (name: N, value: V): void;
+    function get_uint <N extends string> (name: N): number;
+    function is_bind_active <N extends string> (name: N): boolean;
+    function set_bind_active <N extends string, V extends boolean> (name: N, value: V): void;
+    function set_bind_type <N extends string, V extends number> (name: N, value: V): void;
 }
 
 declare namespace current_event {
-    function get_int(varname: string): number;
-    function get_float(varname: string): number;
-    function get_bool(varname: string): boolean;
+    function get_int <N extends string> (name: N): number;
+    function get_float <N extends string> (name: N): number;
+    function get_bool <N extends string> (name: N): boolean;
 }
 
 declare namespace antiaim {
     function get_send_packet(): boolean;
     function override_of_pitch(): void;
     function override_off_yaw(): void;
-    function override_body_lean(value: number): void;
+    function override_body_lean <V extends number> (value: V): void;
 }
 
 declare namespace http {
-	function get(url: string): unknown;
+	function get <U extends string> (url: U): unknown;
 }
 
 declare namespace utils {
-    function play_sound(path: string): void;
-    function to_clipboard(data: string): void;
+    function play_sound	<P extends string> (path: P): void;
+    function to_clipboard <D extends string> (data: D): void;
     function from_clipboard(): string;
 }
 
 declare function register_callback(type: CallbackName, callableFn: Function): void;
 
 declare namespace ui {
-    function add_checkbox(name: string, varname: string): void;
-    function add_slider(name: string, varname: string, min_value: number, max_value: number): void;
-    function add_combo(name: string, varname: string, elements: string[]): void;
+    function add_checkbox <N extends string, V extends string> (name: N, varname: V): void;
+    function add_slider <N extends string, V extends string, MN extends number, MX extends number> (name: N, varname: V, min_value: MN, max_value: MX): void;
+    function add_combo <N extends string, V extends string, E extends string[]> (name: N, varname: V, elements: E): void;
     function get_menu_alpha(): number;
     function get_menu_position(): [number, number];
     function get_menu_size(): [number, number];
@@ -365,7 +584,7 @@ declare namespace ui {
  * API Weave.su
  * 
  * @author Mased
- * @author undef013
+ * @author undef033
  * @version 1.0.0
  * 
  * @see https://api.weave.su/weave-api
