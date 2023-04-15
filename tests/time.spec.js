@@ -11,6 +11,7 @@ const weekday = timeFormat.GetWeekday();
 const hours = timeFormat.GetHours();
 const minutes = timeFormat.GetMinutes();
 const seconds = timeFormat.GetSeconds();
+const timezone = timeFormat.GetTimezoneOffset();
 
 const currentDate = timeFormat.GetCurrentDate();
 const currentTime = timeFormat.GetCurrentTime();
@@ -22,10 +23,11 @@ const toPrint = [
     "Current month_number: " + (month_number + 1),
     "Current month: " + month,
     "Current year: " + year,
-    "Current weekday: " + weekday,
+    "Current weekday: " + weekday + "\n",
     "Current hours: " + hours,
     "Current minutes: " + minutes,
     "Current seconds: " + seconds,
+    "Current timezone: " + timezone + "\n",
     "Current date: " + [currentDate.day, currentDate.month, currentDate.year, currentDate.weekday].join(" "),
     "Current time: " + [currentTime.hours, currentTime.minutes, currentTime.seconds].join(":"),
 ];

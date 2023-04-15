@@ -87,6 +87,13 @@ export interface CurrentTime {
      * @type {string}
      */
     seconds: string;
+
+    /**
+     * Разница во времени с GMT
+     *
+     * @type {string}
+     */
+    timezone: string;
 }
 
 export class TimeFormat<D extends Date> {
@@ -254,6 +261,30 @@ export class TimeFormat<D extends Date> {
     };
 
     /**
+     * Получить разницу во времени GMT
+     *
+     * ---
+     * @example
+     * ```ts
+     * const timeFormat = new TimeFormat();
+     * const timezone = timeFormat.GetTimezoneOffset();
+     *
+     * Cheat.Print(timezone + "\n"); // МСК: +3
+     * ```
+     * ---
+     *
+     * @returns {string} Текущая разница во времени
+     */
+    public readonly GetTimezoneOffset = (): string => {
+        const timezoneOffset: number = this.date.getTimezoneOffset();
+        const offset: number = Math.abs(timezoneOffset);
+        const offsetOperator: "+" | "-" = timezoneOffset < 0 ? "+" : "-";
+        const offsetHours: number = Math.floor(offset / 60);
+
+        return offsetOperator + offsetHours;
+    };
+
+    /**
      * Получить текущую дату:
      * День, месяц, год, день недели
      *
@@ -300,7 +331,8 @@ export class TimeFormat<D extends Date> {
         const hours: string = this.GetHours();
         const minutes: string = this.GetMinutes();
         const seconds: string = this.GetSeconds();
+        const timezone: string = this.GetTimezoneOffset();
 
-        return { hours, minutes, seconds };
+        return { hours, minutes, seconds, timezone };
     };
 }
