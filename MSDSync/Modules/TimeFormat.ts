@@ -89,16 +89,12 @@ export interface CurrentTime {
     seconds: string;
 }
 
-interface TimeFormatStructure {
+export class TimeFormat<D extends Date> {
     /**
      * Текущая дата
      *
      * @type {Date}
      */
-    date: Date;
-}
-
-export class TimeFormat<D extends Date> implements TimeFormatStructure {
     public readonly date: Date;
 
     constructor(date: D = new Date() as D) {
