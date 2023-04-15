@@ -1,0 +1,8 @@
+{
+    "scripts": {
+        "compile": "tsc MSDSync.ts"
+    },
+    "dependencies": {
+        "prettier": "^2.8.7"
+    }
+}

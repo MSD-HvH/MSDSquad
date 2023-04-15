@@ -1,21 +1,11 @@
 {
     "compilerOptions": {
         "target": "ES5",
-        "lib": [
-            "ES5",
-        ],
+        "lib": ["ES5"],
         "outDir": "./",
         "module": "NodeNext",
         "moduleResolution": "node"
     },
-    "include": [
-        "MSDSync.ts",
-        "constants.ts",
-        "src/snippets",
-        "src/MSDSync"
-    ],
-    "exclude": [
-        "node_modules",
-        "**/node_modules/*"
-    ]
+    "include": ["MSDSync.ts", "constants.ts", "src/snippets", "src/MSDSync", "MSDSync"],
+    "exclude": ["node_modules", "**/node_modules/*"]
 }
