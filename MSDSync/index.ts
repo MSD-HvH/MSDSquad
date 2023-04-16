@@ -1,1 +1,1 @@
-export * from "./Modules/TimeFormat.js";
+export * from "./Modules/index.js";
