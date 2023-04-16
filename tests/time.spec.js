@@ -1,4 +1,4 @@
-const TimeFormat = require("../MSDSync/index.js").TimeFormat;
+const TimeFormat = require("../MSDSync/Modules/TimeFormat.js").TimeFormat;
 const timeFormat = new TimeFormat(new Date());
 
 const day = timeFormat.GetDay();

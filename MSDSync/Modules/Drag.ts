@@ -1,6 +1,6 @@
 type OnetapPath = ["Misc", "JAVASCRIPT", "Script items", string];
 
-interface DragStructure {
+export interface DragStructure {
     /**
      * Имя элемента
      *
