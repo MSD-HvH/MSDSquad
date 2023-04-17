@@ -102,11 +102,28 @@ export class TimeFormat<D extends Date> {
      *
      * @type {Date}
      */
-    public readonly date: Date;
+    public date: Date;
 
     constructor(date: D = new Date() as D) {
         this.date = date;
     }
+
+    /**
+     * Установить дату
+     *
+     * ---
+     * @example
+     * ```ts
+     * const timeFormat = new TimeFormat();
+     * timeFormat.SetDate(); // new Date();
+     * ```
+     * ---
+     *
+     * @param {Date} date
+     */
+    public readonly SetDate = (date: Date = new Date()) => {
+        this.date = date;
+    };
 
     /**
      * Получить текущий день
