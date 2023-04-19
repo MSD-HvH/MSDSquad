@@ -229,15 +229,16 @@ export class Drag<N extends string, X extends OnetapPath, Y extends OnetapPath, 
     /**
      * Функция для рендера обводки вокруг элемента когда мышка находится в его зоне.
      */
-    public readonly DrawOutline = () => {
+    public readonly DrawOutline = (color: [number, number, number, number] = [255, 255, 255, 75]) => {
         if (!UI.IsMenuOpen()) return;
 
         const isInBounds = this.IsInBounds();
         const [x, y] = this.GetCoordinates();
         const [w, h] = this.GetSize();
+        const [r, g, b, a] = color;
 
-        this.outline_alpha = Lerp(this.outline_alpha, isInBounds && !this.is_dragging ? 1 : 0, 0.2);
-        Render.Rect(x - 5, y - 5, w + 10, h + 10, [255, 255, 255, 255 * this.outline_alpha]);
+        this.outline_alpha = Lerp(this.outline_alpha, isInBounds && !this.is_dragging ? 1 : 0, 0.3);
+        Render.Rect(x - 5, y - 5, w + 10, h + 10, [r, g, b, a * this.outline_alpha]);
 
         return this;
     };
