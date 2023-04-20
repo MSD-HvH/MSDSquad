@@ -6,7 +6,7 @@
         ".prettierrc.json": true,
         "package*.json": true,
         "README.md": true,
-        "src/**/*.js": true
-        // "MSDSync/**/*.js": true
+        "src/**/*.js": true,
+        "MSDSync/**/*.js": true
     }
 }
