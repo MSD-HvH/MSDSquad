@@ -34,4 +34,4 @@ const toPrint = [
 
 Cheat.Print(toPrint.join("\n"));
 
-Cheat.Print("\n\n---------- Time Tests End ---------- \n");
+Cheat.Print("\n\n---------- Time Tests End ---------- \n\n");

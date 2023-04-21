@@ -6,6 +6,6 @@
         "module": "NodeNext",
         "moduleResolution": "node"
     },
-    "include": ["MSDSync.ts", "constants.ts", "src/snippets", "src/MSDSync", "MSDSync"],
+    "include": ["MSDSync.ts", "src/snippets", "src/MSDSync", "MSDSync"],
     "exclude": ["node_modules", "**/node_modules/*"]
 }

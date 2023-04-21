@@ -8,6 +8,7 @@ timeoutSystem.CreateTimeout(
     },
     3
 );
+
 timeoutSystem.CreateInterval(
     "printWorldInterval",
     function (interval) {

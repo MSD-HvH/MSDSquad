@@ -3,7 +3,7 @@
  */
 type CallbackFunction = <N extends string>(checkbox: Checkbox<N>) => any;
 
-interface CheckboxStructure<N extends string> {
+export interface CheckboxStructure<N extends string> {
     /**
      * Название чекбокса.
      *
