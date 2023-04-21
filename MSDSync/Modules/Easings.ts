@@ -106,4 +106,14 @@ export class Easings {
 
         return this.list[name].color;
     };
+
+    /**
+     * Получить значение и цвет элемента
+     *
+     * @param {string} name Имя элемента
+     * @returns {EasingItem}
+     */
+    public readonly GetEasing = <N extends string>(name: N): EasingItem => {
+        return this.list[name];
+    };
 }
