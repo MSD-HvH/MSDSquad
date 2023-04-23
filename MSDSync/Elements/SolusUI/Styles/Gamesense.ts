@@ -257,7 +257,7 @@ export class GamesenseStyle implements GamesenseStyleStructure {
         const [x, y] = this.GetPosition();
         const [w] = this.GetSize();
 
-        const color = HSVtoRGB(Globals.Realtime() * (speed || 1), 1, 1);
+        const color = HSVtoRGB(Globals.Realtime() * (speed || 0.1), 1, 1);
 
         Render.GradientRect(x, y, w / 2, 2, 1, [color.g, color.b, color.r, 255], [color.r, color.g, color.b, 255]);
         Render.GradientRect(x + w / 2, y, w / 2, 2, 1, [color.r, color.g, color.b, 255], [color.b, color.r, color.g, 255]);
