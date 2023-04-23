@@ -1,5 +1,6 @@
 src/**/*.js
 MSDSync/**/*.js
+MSDSync.js
 
 node_modules/
 jspm_packages/

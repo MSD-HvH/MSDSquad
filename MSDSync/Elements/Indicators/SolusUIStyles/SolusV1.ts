@@ -70,8 +70,8 @@ export class SolusV1 implements SolusV1Structure {
 
         this.x = x;
         this.y = y;
-        this.width = width;
-        this.height = height;
+        this.width = width - 2;
+        this.height = height - 1;
     }
 
     /**

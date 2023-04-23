@@ -88,7 +88,7 @@ export class SolusV2 implements SolusV2Structure {
     constructor(options: SolusV2Structure) {
         const { x, y, width, height } = options;
 
-        this.x = x;
+        this.x = x - 1;
         this.y = y;
         this.width = width;
         this.height = height;
@@ -276,7 +276,7 @@ export class SolusV2 implements SolusV2Structure {
         const color = options?.color || [110, 124, 171, 255];
         const round = Math.min(options?.round_offset || 5, h / 2);
 
-        const alpha = options.alpha || 155;
+        const alpha = options?.alpha || 155;
 
         const seg = 12;
 
