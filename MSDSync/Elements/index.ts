@@ -1,2 +1,2 @@
 export * from "./Games/index.js";
-export * from "./SolusUI/index.js";
+export * from "./Indicators/index.js";
