@@ -192,12 +192,12 @@ export class GamesenseStyle implements GamesenseStyleStructure {
      * ```
      * ---
      */
-    public readonly RenderBox = (): void => {
+    public readonly RenderBox = (alpha): void => {
         const [x, y] = this.GetPosition();
         const [w, h] = this.GetSize();
 
         const rectColor = [56, 56, 56, 255];
-        const blackColor = [0, 0, 0, 255];
+        const blackColor = [0, 0, 0, 120];
         const outline = [34, 34, 34, 255];
 
         Render.FilledRect(x, y, w, h, blackColor);
