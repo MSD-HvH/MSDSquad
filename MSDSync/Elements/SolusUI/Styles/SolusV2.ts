@@ -79,7 +79,7 @@ interface SolusV2Structure {
     height: number;
 }
 
-export class SolusV2 implements SolusV2Structure {
+class SolusV2 implements SolusV2Structure {
     public x: number;
     public y: number;
     public width: number;
@@ -250,7 +250,26 @@ export class SolusV2 implements SolusV2Structure {
         return this;
     };
 
-    public readonly Glow = (options?: { color?: [number, number, number, number]; round_offset?: number }) => {
+    /**
+     * Рендерит тень
+     *
+     * **ЕСТЬ ПРИЛИЧНОЕ КОЛИЧЕСТВО ФПС**
+     *
+     * ---
+     * @example
+     * ```ts
+     * const test = new SolusV2({ x: 100, y: 100, width: 100, height: 25 });
+     *
+     * const on_Draw = function () {
+     *      test.RenderBox({ color: [110, 124, 171, 255], alpha: 155 });
+     *      test.RenderGlow({ color: [110, 124, 171, 255] });
+     * }
+     *
+     * Cheat.RegisterCallback("Draw", "on_Draw");
+     * ```
+     * ---
+     */
+    public readonly RenderGlow = (options?: { color?: [number, number, number, number]; round_offset?: number }) => {
         const [x, y] = this.GetPosition();
         const [w, h] = this.GetSize();
 
@@ -258,6 +277,23 @@ export class SolusV2 implements SolusV2Structure {
         const round = Math.min(options?.round_offset || 5, h / 2);
 
         const seg = 12;
+
+        for (let i = 5; i > 0; i--) {
+            const alpha = 155;
+
+            const colorRect = [color[0], color[1], color[2], alpha / i];
+            const colorArc = [color[0], color[1], color[2], alpha / (i * 2)] as [number, number, number, number];
+
+            Arc(x + round - 0.5, y + round - 0.5, round + i, round - 1, 180, 90, seg, colorArc);
+            Arc(x + w - round - 0.5, y + round - 0.5, round + i, round - 1, 270, 90, seg, colorArc);
+            Arc(x + round - 0.5, y + h - 0.5 - round, round + i, round - 1, 90, 90, seg, colorArc);
+            Arc(x + w - round - 0.5, y + h - 0.5 - round, round + i, round - 1, 0, 90, seg, colorArc);
+
+            Render.FilledRect(x - i, y + round, 1, h - round * 2, colorRect);
+            Render.FilledRect(x + i + w - 1, y + round, 1, h - round * 2, colorRect);
+            Render.FilledRect(x + round, y - i, w - round * 2, 1, colorRect);
+            Render.FilledRect(x + round, y + i - 1 + h, w - round * 2, 1, colorRect);
+        }
     };
 
     /**
@@ -269,7 +305,7 @@ export class SolusV2 implements SolusV2Structure {
      * const test = new SolusV2({ x: 100, y: 100, width: 100, height: 25 });
      *
      * const on_Draw = function () {
-     *      test.RenderBox({ color: [110, 124, 171, 255], alpha: 255 });
+     *      test.RenderBox({ color: [110, 124, 171, 255], alpha: 155 });
      * }
      *
      * Cheat.RegisterCallback("Draw", "on_Draw");
