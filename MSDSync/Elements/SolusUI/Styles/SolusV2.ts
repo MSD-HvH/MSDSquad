@@ -79,7 +79,7 @@ interface SolusV2Structure {
     height: number;
 }
 
-export class SolusV2 {
+export class SolusV2 implements SolusV2Structure {
     public x: number;
     public y: number;
     public width: number;
