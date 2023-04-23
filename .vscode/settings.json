@@ -7,6 +7,7 @@
         "package*.json": true,
         "README.md": true,
         "src/**/*.js": true,
-        "MSDSync/**/*.js": true
+        "MSDSync/**/*.js": true,
+        "**/src": true
     }
 }

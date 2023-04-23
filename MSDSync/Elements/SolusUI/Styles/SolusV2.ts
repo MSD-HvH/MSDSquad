@@ -236,9 +236,9 @@ export class SolusV2 implements SolusV2Structure {
         Arc(x + w - round - 0.5, y + h - 0.5 - round, round, round - 1, 0, 90, seg, color);
 
         Render.FilledRect(x, y + round, 1, h - round * 2, color);
-        Render.FilledRect(x + w, y + round, 1, h - round * 2, color);
+        Render.FilledRect(x + w - 1, y + round, 1, h - round * 2, color);
         Render.FilledRect(x + round, y, w - round * 2, 1, color);
-        Render.FilledRect(x + round, y + h, w - round * 2, 1, color);
+        Render.FilledRect(x + round, y - 1 + h, w - round * 2, 1, color);
 
         Arc(x + round - 0.5, y + round - 0.5, round, round - 1, 180, 90, seg, color);
         Arc(x + w - round - 0.5, y + round - 0.5, round, round - 1, 270, 90, seg, color);
@@ -262,10 +262,11 @@ export class SolusV2 implements SolusV2Structure {
      * ```
      * ---
      */
-    public readonly Box = (options: { color: [number, number, number, number]; alpha: number }) => {
+    public readonly Box = (options: { color: [number, number, number, number]; alpha: number; round_offset?: number }) => {
         const { color, alpha } = options;
+        const round_offset = options?.round_offset || 5;
 
-        this.FilledRectRounded({ color: [0, 0, 0, alpha] });
-        this.RectRounded({ color });
+        this.FilledRectRounded({ color: [0, 0, 0, alpha], round_offset });
+        this.RectRounded({ color, round_offset });
     };
 }
