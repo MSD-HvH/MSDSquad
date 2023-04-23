@@ -269,18 +269,18 @@ export class SolusV2 implements SolusV2Structure {
      * ```
      * ---
      */
-    public readonly RenderGlow = (options?: { color?: [number, number, number, number]; round_offset?: number }) => {
+    public readonly RenderGlow = (options?: { color?: [number, number, number, number]; round_offset?: number; alpha?: number }) => {
         const [x, y] = this.GetPosition();
         const [w, h] = this.GetSize();
 
         const color = options?.color || [110, 124, 171, 255];
         const round = Math.min(options?.round_offset || 5, h / 2);
 
+        const alpha = options.alpha || 155;
+
         const seg = 12;
 
         for (let i = 5; i > 0; i--) {
-            const alpha = 155;
-
             const colorRect = [color[0], color[1], color[2], alpha / i];
             const colorArc = [color[0], color[1], color[2], alpha / (i * 2)] as [number, number, number, number];
 
