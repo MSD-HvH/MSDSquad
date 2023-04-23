@@ -216,6 +216,8 @@ export class SolusV2 implements SolusV2Structure {
         Arc(x + w - round - 0.5, y + round - 0.5, round, 0, 270, 90, seg, color);
         Arc(x + round - 0.5, y + h - 0.5 - round, round, 0, 90, 90, seg, color);
         Arc(x + w - round - 0.5, y + h - 0.5 - round, round, 0, 0, 90, seg, color);
+
+        return this;
     };
 
     /**
@@ -244,6 +246,18 @@ export class SolusV2 implements SolusV2Structure {
         Arc(x + w - round - 0.5, y + round - 0.5, round, round - 1, 270, 90, seg, color);
 
         Render.FilledRect(x + round, y, w - round * 2, 1, color);
+
+        return this;
+    };
+
+    public readonly Glow = (options?: { color?: [number, number, number, number]; round_offset?: number }) => {
+        const [x, y] = this.GetPosition();
+        const [w, h] = this.GetSize();
+
+        const color = options?.color || [110, 124, 171, 255];
+        const round = Math.min(options?.round_offset || 5, h / 2);
+
+        const seg = 12;
     };
 
     /**
@@ -255,18 +269,20 @@ export class SolusV2 implements SolusV2Structure {
      * const test = new SolusV2({ x: 100, y: 100, width: 100, height: 25 });
      *
      * const on_Draw = function () {
-     *      test.Box({ color: [110, 124, 171, 255], alpha: 255 });
+     *      test.RenderBox({ color: [110, 124, 171, 255], alpha: 255 });
      * }
      *
      * Cheat.RegisterCallback("Draw", "on_Draw");
      * ```
      * ---
      */
-    public readonly Box = (options: { color: [number, number, number, number]; alpha: number; round_offset?: number }) => {
+    public readonly RenderBox = (options: { color: [number, number, number, number]; alpha: number; round_offset?: number }) => {
         const { color, alpha } = options;
         const round_offset = options?.round_offset || 5;
 
         this.FilledRectRounded({ color: [0, 0, 0, alpha], round_offset });
         this.RectRounded({ color, round_offset });
+
+        return this;
     };
 }
