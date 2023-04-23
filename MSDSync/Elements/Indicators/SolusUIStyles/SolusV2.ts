@@ -313,7 +313,8 @@ export class SolusV2 implements SolusV2Structure {
      * ---
      */
     public readonly RenderBox = (options: { color: [number, number, number, number]; alpha: number; round_offset?: number }) => {
-        const { color, alpha } = options;
+        const color = options?.color || [110, 124, 171, 255];
+        const alpha = options?.alpha || 155;
         const round_offset = options?.round_offset || 5;
 
         this.FilledRectRounded({ color: [0, 0, 0, alpha], round_offset });
