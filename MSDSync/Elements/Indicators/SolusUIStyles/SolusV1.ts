@@ -124,22 +124,22 @@ export class SolusV1 extends BaseStyle {
      * ---
      */
     public readonly RenderBox = (options?: {
-        colorBackground?: [number, number, number, number];
-        colorLine?: [number, number, number, number];
+        backgroundColor?: [number, number, number, number];
+        color?: [number, number, number, number];
         lineHeight?: number;
         speed?: number;
         gradient?: boolean;
         animated?: boolean;
     }) => {
-        const colorBackground = options?.colorBackground || [0, 0, 0, 155];
-        const colorLine = options?.colorLine || [110, 124, 172, 255];
+        const backgroundColor = options?.backgroundColor || [0, 0, 0, 155];
+        const colorLine = options?.color || [110, 124, 172, 255];
         const lineHeight = options?.lineHeight || 2;
 
         const gradientSpeed = options?.speed || 0.1;
         const isGradient = options?.gradient || false;
         const isGradientAnimated = options?.animated || false;
 
-        this.RenderBackground({ color: colorBackground });
+        this.RenderBackground({ color: backgroundColor });
         isGradient
             ? isGradientAnimated
                 ? this.RenderGradient({ lineHeight, speed: gradientSpeed })
