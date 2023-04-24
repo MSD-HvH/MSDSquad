@@ -14,6 +14,8 @@ const on_Draw = () => {
     const time = timeformat.GetCurrentTime();
     const weekday = timeformat.GetWeekday();
 
+    Cheat.Print(timeformat.GetWeekdayNumber() + "\n");
+
     const str = [
         "onetap",
         "Mased",

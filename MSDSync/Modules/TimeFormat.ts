@@ -217,7 +217,7 @@ export class TimeFormat<D extends Date> {
      * @returns {number} Текущий день недели
      */
     public readonly GetWeekdayNumber = (): number => {
-        return this.date.getDay() + 1;
+        return this.date.getDay() === 0 ? 7 : this.date.getDay();
     };
 
     /**
