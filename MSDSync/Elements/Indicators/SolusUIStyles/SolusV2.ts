@@ -1,3 +1,5 @@
+import { BaseStyle, type BaseStyleStructure } from "./BaseStyle.js";
+
 const Arc = (
     x: number,
     y: number,
@@ -51,150 +53,21 @@ const Arc = (
     }
 };
 
-interface SolusV2Structure {
-    /**
-     * Позиция элемента по координате X
-     *
-     * @type {number}
-     */
-    x: number;
-    /**
-     * Позиция элемента по координате Y
-     *
-     * @type {number}
-     */
-    y: number;
-
-    /**
-     * Ширина элемента
-     *
-     * @type {number}
-     */
-    width: number;
-    /**
-     * Высота элемента
-     *
-     * @type {number}
-     */
-    height: number;
-}
-
-export class SolusV2 implements SolusV2Structure {
+export class SolusV2 extends BaseStyle {
     public x: number;
     public y: number;
     public width: number;
     public height: number;
 
-    constructor(options: SolusV2Structure) {
-        const { x, y, width, height } = options;
+    constructor(options: BaseStyleStructure) {
+        super(options);
+
+        const { x, width, height } = options;
 
         this.x = x - 1;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        this.height = height + 1;
+        this.width = width + 1;
     }
-
-    /**
-     * Получить позицию элемента по координате X
-     *
-     * @returns {number} Текущая позиция по координате X
-     */
-    public readonly GetX = (): number => {
-        return this.x;
-    };
-
-    /**
-     * Установить позицию для элемента по координате X
-     *
-     * @param {V} value Значение X
-     * @returns {number} Текущая позиция по координате X
-     */
-    public readonly SetX = <V extends number>(value: V): number => {
-        this.x = value;
-
-        return this.x;
-    };
-
-    /**
-     * Получить позицию элемента по координате Y
-     *
-     * @returns {number} Текущая позиция по координате Y
-     */
-    public readonly GetY = (): number => {
-        return this.y;
-    };
-
-    /**
-     * Установить позицию для элемента по координате Y
-     *
-     * @param {V} value Значение Y
-     * @returns {number} Текущая позиция по координате Y
-     */
-    public readonly SetY = <V extends number>(value: V): number => {
-        this.y = value;
-
-        return this.y;
-    };
-
-    /**
-     * Получить текущую ширину элемента
-     *
-     * @returns {number} Текущая ширина
-     */
-    public readonly GetWidth = (): number => {
-        return this.width;
-    };
-
-    /**
-     * Установить ширину для элемента
-     *
-     * @param {V} value Значение ширины
-     * @returns {number} Текущая ширина элемента
-     */
-    public readonly SetWidth = <V extends number>(value: V): number => {
-        this.width = value;
-
-        return this.width;
-    };
-
-    /**
-     * Получить текущую высоту элемента
-     *
-     * @returns {number} Текущая высота
-     */
-    public readonly GetHeight = (): number => {
-        return this.height;
-    };
-
-    /**
-     * Установить высоту для элемента
-     *
-     * @param {V} value Значение высоты
-     * @returns {number} Текущая высота элемента
-     */
-    public readonly SetHeight = <V extends number>(value: V): number => {
-        this.height = value;
-
-        return this.height;
-    };
-
-    /**
-     * Получить текущую позицию элемента по X, Y
-     *
-     * @returns {[number, number]} X, Y
-     */
-    public readonly GetPosition = (): [number, number] => {
-        return [this.GetX(), this.GetY()];
-    };
-
-    /**
-     * Получить текущие размеры элемента
-     *
-     * @returns {[number, number]} Width, Height
-     */
-    public readonly GetSize = (): [number, number] => {
-        return [this.GetWidth(), this.GetHeight()];
-    };
 
     /**
      * Нужно для рендера закругленного квадрата
@@ -253,7 +126,7 @@ export class SolusV2 implements SolusV2Structure {
     /**
      * Рендерит тень
      *
-     * **ЕСТЬ ПРИЛИЧНОЕ КОЛИЧЕСТВО ФПС**
+     * **ЕСТ ПРИЛИЧНОЕ КОЛИЧЕСТВО ФПС**
      *
      * ---
      * @example
@@ -269,20 +142,17 @@ export class SolusV2 implements SolusV2Structure {
      * ```
      * ---
      */
-    public readonly RenderGlow = (options?: { color?: [number, number, number, number]; round_offset?: number; alpha?: number }) => {
+    public readonly RenderGlow = (options?: { color?: [number, number, number, number]; round_offset?: number }) => {
         const [x, y] = this.GetPosition();
         const [w, h] = this.GetSize();
 
         const color = options?.color || [110, 124, 171, 255];
         const round = Math.min(options?.round_offset || 5, h / 2);
-
-        const alpha = options?.alpha || 155;
-
         const seg = 12;
 
         for (let i = 5; i > 0; i--) {
-            const colorRect = [color[0], color[1], color[2], alpha / i];
-            const colorArc = [color[0], color[1], color[2], alpha / (i * 2)] as [number, number, number, number];
+            const colorRect: [number, number, number, number] = [color[0], color[1], color[2], color[3] / i];
+            const colorArc: [number, number, number, number] = [color[0], color[1], color[2], color[3] / (i * 2)];
 
             Arc(x + round - 0.5, y + round - 0.5, round + i, round - 1, 180, 90, seg, colorArc);
             Arc(x + w - round - 0.5, y + round - 0.5, round + i, round - 1, 270, 90, seg, colorArc);
@@ -294,6 +164,8 @@ export class SolusV2 implements SolusV2Structure {
             Render.FilledRect(x + round, y - i, w - round * 2, 1, colorRect);
             Render.FilledRect(x + round, y + i - 1 + h, w - round * 2, 1, colorRect);
         }
+
+        return this;
     };
 
     /**
@@ -312,12 +184,16 @@ export class SolusV2 implements SolusV2Structure {
      * ```
      * ---
      */
-    public readonly RenderBox = (options: { color: [number, number, number, number]; alpha: number; round_offset?: number }) => {
+    public readonly RenderBox = (options?: {
+        color?: [number, number, number, number];
+        backgroundColor?: [number, number, number, number];
+        round_offset?: number;
+    }) => {
         const color = options?.color || [110, 124, 171, 255];
-        const alpha = options?.alpha || 155;
+        const backgroundColor = options?.backgroundColor || [0, 0, 0, 140];
         const round_offset = options?.round_offset || 5;
 
-        this.FilledRectRounded({ color: [0, 0, 0, alpha], round_offset });
+        this.FilledRectRounded({ color: backgroundColor, round_offset });
         this.RectRounded({ color, round_offset });
 
         return this;

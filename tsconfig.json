@@ -4,7 +4,8 @@
         "lib": ["ES5"],
         "outDir": "./",
         "module": "NodeNext",
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "esModuleInterop": true
     },
     "include": ["MSDSync.ts", "src/snippets", "src/MSDSync", "MSDSync"],
     "exclude": ["node_modules", "**/node_modules/*"]
