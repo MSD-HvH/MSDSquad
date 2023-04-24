@@ -202,6 +202,25 @@ export class TimeFormat<D extends Date> {
     };
 
     /**
+     * Получить число текущего дня недели
+     *
+     * ---
+     * @example
+     * ```ts
+     * const timeFormat = new TimeFormat();
+     * const weekday = timeFormat.GetWeekdayNumber();
+     *
+     * Cheat.Print(weekday + "\n");
+     * ```
+     * ---
+     *
+     * @returns {number} Текущий день недели
+     */
+    public readonly GetWeekdayNumber = (): number => {
+        return this.date.getDay() + 1;
+    };
+
+    /**
      * Получить текущий день недели
      *
      * ---
