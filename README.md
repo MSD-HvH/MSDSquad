@@ -1,7 +1,5 @@
 # MSDSquad
 
-![Preview](https://i.imgur.com/Ir0KLeH.png)
-
 Сделано было для Self-using
 
 api всех здесь находящися читов: 
